@@ -209,4 +209,56 @@ router.get("/sub-categories", async (req, res) => {
     }
 });
 
+router.get("/columns", async (req, res) => {
+    try {
+        const { mainCategory, subCategory } = req.query;
+        if (!mainCategory || !subCategory) {
+            return res.status(400).json({ error: "Missing parameters" });
+        }
+
+        const tableName = `${mainCategory}_${subCategory}`;
+        const pool = await connectToDB();
+
+        const result = await pool.request()
+            .query(`SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '${tableName}' AND TABLE_SCHEMA = 'dbo'`);
+
+        res.json(result.recordset.map(row => row.COLUMN_NAME));
+    } catch (error) {
+        console.error("❌ Error fetching columns:", error);
+        res.status(500).json({ error: "Failed to fetch columns" });
+    }
+});
+
+router.get("/column-values", async (req, res) => {
+    try {
+        const { mainCategory, subCategory, columnName, stationName, year, semiannual } = req.query;
+
+        if (!mainCategory || !subCategory || !columnName) {
+            return res.status(400).json({ error: "Missing parameters" });
+        }
+
+        const tableName = `${mainCategory}_${subCategory}`;
+        const pool = await connectToDB();
+
+        // ✅ กำหนด Filter Query
+        let query = `SELECT DISTINCT [${columnName}] FROM [dbo].[${tableName}] WHERE [${columnName}] IS NOT NULL`;
+        
+        if (stationName) query += ` AND stationName = @stationName`;
+        if (year) query += ` AND year = @year`;
+        if (semiannual) query += ` AND semiannual = @semiannual`;
+
+        const request = pool.request();
+        if (stationName) request.input("stationName", stationName);
+        if (year) request.input("year", year);
+        if (semiannual) request.input("semiannual", semiannual);
+
+        const result = await request.query(query);
+
+        res.json(result.recordset.map(row => row[columnName]));
+    } catch (error) {
+        console.error("❌ Error fetching column values:", error);
+        res.status(500).json({ error: "Failed to fetch column values" });
+    }
+});
+
 export default router;

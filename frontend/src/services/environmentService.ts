@@ -76,22 +76,85 @@ export const fetchStations = async (mainCategory: string, subCategory: string) =
 export const fetchYears = async (mainCategory: string, subCategory: string) => {
     const mainCategoryIdentifier = getMainCategoryIdentifier(mainCategory);
     const tableIdentifier = getTableIdentifier(subCategory);
-
-    console.log("✅ Sending API Request for:", mainCategoryIdentifier, tableIdentifier);
+    const response = await fetch(`${API_BASE_URL}/filter-options/years?mainCategory=${mainCategoryIdentifier}&subCategory=${tableIdentifier}`);
+    const data = await response.json();
     
-    const response = await fetch(`${API_BASE_URL}/filter-options/years?mainCategory=${encodeURIComponent(mainCategoryIdentifier)}&subCategory=${encodeURIComponent(tableIdentifier)}`);
-    return await response.json();
+    if (!Array.isArray(data)) {
+        console.error("❌ FetchYears: Response is not an array!");
+        return [];
+    }
+
+    return data;
 };
 
 // ✅ ดึง `Semiannuals`
 export const fetchSemiannuals = async (mainCategory: string, subCategory: string) => {
     const mainCategoryIdentifier = getMainCategoryIdentifier(mainCategory);
     const tableIdentifier = getTableIdentifier(subCategory);
-
-    console.log("✅ Sending API Request for:", mainCategoryIdentifier, tableIdentifier);
+    const response = await fetch(`${API_BASE_URL}/filter-options/semiannuals?mainCategory=${mainCategoryIdentifier}&subCategory=${tableIdentifier}`);
+    const data = await response.json();
     
-    const response = await fetch(`${API_BASE_URL}/filter-options/semiannuals?mainCategory=${encodeURIComponent(mainCategoryIdentifier)}&subCategory=${encodeURIComponent(tableIdentifier)}`);
-    return await response.json();
+    if (!Array.isArray(data)) {
+        console.error("❌ FetchSemiannuals: Response is not an array!");
+        return [];
+    }
+
+    return data;
+};
+
+export const fetchColumns = async (mainCategory: string, subCategory: string) => {
+    try {
+        const mainCategoryIdentifier = getMainCategoryIdentifier(mainCategory);
+        const tableIdentifier = getTableIdentifier(subCategory);
+
+        console.log("✅ Section fetchColumns mainCategory:", mainCategory);
+        console.log("✅ Section fetchColumns subCategory:", subCategory);
+
+        if (!tableIdentifier) {
+            throw new Error(`Invalid subCategory fetchColumns: ${encodeURIComponent(subCategory)}`);
+        } else {
+            console.log("✅ tableIdentifier Pass fetchColumns:", mainCategoryIdentifier, tableIdentifier);
+        }
+        const response = await fetch(`${API_BASE_URL}/filter-options/columns?mainCategory=${mainCategoryIdentifier}&subCategory=${tableIdentifier}`);
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+            console.error("❌ FetchColumns: Response is not an array!");
+            return [];
+        }
+        return data;
+    } catch (error) {
+        console.error("❌ Error fetching columns:", error);
+        return [];
+    }
+};
+
+export const fetchColumnValues = async (mainCategory: string, subCategory: string, columnName: string) => {
+    try {
+        const mainCategoryIdentifier = getMainCategoryIdentifier(mainCategory);
+        const tableIdentifier = getTableIdentifier(subCategory);
+
+        console.log("✅ Section fetchColumns mainCategory:", mainCategory);
+        console.log("✅ Section fetchColumns subCategory:", subCategory);
+
+        if (!tableIdentifier) {
+            throw new Error(`Invalid subCategory fetchColumns: ${encodeURIComponent(subCategory)}`);
+        } else {
+            console.log("✅ tableIdentifier Pass fetchColumns:", mainCategoryIdentifier, tableIdentifier);
+        }
+        const response = await fetch(`${API_BASE_URL}/filter-options/column-values?mainCategory=${mainCategoryIdentifier}&subCategory=${tableIdentifier}&columnName=${encodeURIComponent(columnName)}`);
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+            console.error("❌ FetchColumnValues: Response is not an array!");
+            return [];
+        }
+
+        return data;
+    } catch (error) {
+        console.error("❌ Error fetching column values:", error);
+        return [];
+    }
 };
 
 // ✅ ดึง `Environmental Data` ตาม `Main Category` และ `Sub Category`
@@ -109,7 +172,12 @@ export const fetchEnvironmentalData = async (mainCategory: string, subCategory: 
             console.log("✅ tableIdentifier Pass:", mainCategoryIdentifier, tableIdentifier);
         }
 
-        const query = new URLSearchParams(filters).toString();
+        const queryParams = new URLSearchParams({
+            ...(filters.stationName && { stationName: filters.stationName }),
+            ...(filters.semiannual && { semiannual: filters.semiannual }),
+            ...(filters.year && { year: filters.year }),
+        }).toString();
+        
         let response;
         
         switch (mainCategoryIdentifier) {
@@ -119,7 +187,7 @@ export const fetchEnvironmentalData = async (mainCategory: string, subCategory: 
             case "Env_WasteWater":
             case "Env_SeaWater":
             case "Env_MarineEcology":
-                response = await fetch(`${API_BASE_URL}/${mainCategoryIdentifier}/${tableIdentifier}?${query}`);
+                response = await fetch(`${API_BASE_URL}/${mainCategoryIdentifier}/${tableIdentifier}?${queryParams}`);
                 break;
             default:
                 throw new Error("Invalid category");
