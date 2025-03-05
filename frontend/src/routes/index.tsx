@@ -18,6 +18,8 @@ import Settings from "@/pages/admin/Settings";
 import Profile from "@/pages/admin/Profile";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import TestAPICall from "@/components/TestAPICall";
+import Contact from "@/components/main/Contact";
+import Visualization from "@/components/main/Visualization";
 
 const router = createBrowserRouter([
   {
@@ -42,7 +44,15 @@ const router = createBrowserRouter([
       },
       {
         path: "/about",
-        element: <TestAPICall />
+        element: <TestAPICall />,
+      },
+      {
+        path: "/contact",
+        element: <Contact />
+      },
+      {
+        path: "/environment",
+        element: <Visualization />,
       }
     ],
   },

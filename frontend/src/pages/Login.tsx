@@ -1,53 +1,73 @@
 import { Container } from "@/components/template/Container"
 import DarkSwitch from "@/components/template/DarkSwitch"
 import { SectionTitle } from "@/components/template/SectionTitle"
-import { useEffect } from "react"
 import { Link, useNavigate } from "react-router"
+import { useState, useEffect } from "react";
+
 
 export default function Login() {
+  const navigate = useNavigate();
+  
 
-  const navigate = useNavigate()
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  
   useEffect(() => {
-    document.title = "Login | WindReact"
-  }, [])
+    document.title = "Login | WindReact";
+  }, []);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log("Form submitted")
-    // to login
-    navigate("/dashboard")
-  }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", data.token); // เก็บ Token
+        alert("Login successful!");
+        navigate("/dashboard"); // ไปหน้า Dashboard
+      } else {
+        alert(data.message || "Login failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Something went wrong.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Container>
-        {/* Back to Home Button */}
-        <div className="py-4 flex justify-center">
-          <Link 
-            to="/" 
-            className="flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
-          >
-            <svg className="mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to Home
-          </Link>
-        </div>
-
         <div className="flex min-h-[80vh] items-center justify-center flex-col space-y-4">
           <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-8 shadow-lg dark:bg-gray-800">
-            <div>
-              <SectionTitle
-                preTitle="Welcome back"
-                title="Sign In"
-                align="center"
+            {/* Back to Home Button */}
+            <div className="flex justify-start">
+              <Link 
+                to="/" 
+                className="flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
               >
-              </SectionTitle>
+                <svg className="mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Home
+              </Link>
+            </div>
+            <div>
+              <SectionTitle preTitle="Welcome back" title="Sign In" align="center" />
             </div>
 
+            {/* Form Login */}
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4 rounded-md">
+                {/* Email */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Email address
@@ -57,12 +77,15 @@ export default function Login() {
                     name="email"
                     type="email"
                     autoComplete="email"
-                    value="admin@windreact.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     placeholder="Enter your email"
                   />
                 </div>
+
+                {/* Password */}
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Password
@@ -72,8 +95,9 @@ export default function Login() {
                     name="password"
                     type="password"
                     autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
-                    value="123456"
                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     placeholder="Enter your password"
                   />
@@ -117,7 +141,7 @@ export default function Login() {
               </div>
             </form>
           </div>
-          
+
           {/* Dark Mode Switch */}
           <div className="flex justify-center mt-4">
             <DarkSwitch />
@@ -125,5 +149,5 @@ export default function Login() {
         </div>
       </Container>
     </div>
-  )
+  );
 }
