@@ -1,1 +1,0 @@
-export { getSeaWaterData } from "./envSeaWater";
