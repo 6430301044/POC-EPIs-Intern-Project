@@ -1,0 +1,1 @@
+export { getAirQualityData } from "./envAirAirQuality";

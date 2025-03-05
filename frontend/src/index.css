@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "IBM Plex Sans Thai", "sans-serif";
+  --font-thai: "IBM-Plex-Sans-Thai", "sans-serif";
+}
+
+/* Custom variant for dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@font-face {
+  font-family: "PTT-Pride-light";
+  src: url("assets/fonts/ptt45pride-light.woff2") format("woff2");
+}
+@font-face {
+  font-family: "PTT-Pride-Regular";
+  src: url("assets/fonts/ptt45pride-regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "PTT-Pride-Bold";
+  src: url("assets/fonts//ptt45pride-bold.woff2") format("woff2");
+}
+
+@layer base {
+  html,
+  body {
+    @apply bg-gray-50 text-gray-800 dark:bg-gray-950 dark:text-gray-100;
+    font-family: "IBM Plex Sans Thai", "Anuphan", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+}

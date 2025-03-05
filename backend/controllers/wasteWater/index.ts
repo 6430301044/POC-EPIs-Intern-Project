@@ -1,0 +1,1 @@
+export { getWasteWaterData } from "./envWasteWater";
