@@ -16,7 +16,7 @@ router.get("/PlanktonPhytos", async (req, res) => {
         const result = await getMEPlanktonPhytosData(offset, pageSize, filters);
         res.json(result);
     } catch (error) {
-        console.error("❌ Error fetching wind-direction & wind-speed data:", error);
+        console.error("❌ Error fetching PlanktonPhytos data:", error);
         res.status(500).send('Error fetching PlanktonPhytos data');
     }
 });
@@ -34,7 +34,7 @@ router.get("/PlanktonZoos", async (req, res) => {
         const result = await getMEPlanktonZoosData(offset, pageSize, filters);
         res.json(result);
     } catch (error) {
-        console.error("❌ Error fetching wind-direction & wind-speed data:", error);
+        console.error("❌ Error fetching PlanktonZoos data:", error);
         res.status(500).send('Error fetching PlanktonZoos data');
     }
 });
@@ -52,7 +52,7 @@ router.get("/Benthos", async (req, res) => {
         const result = await getMEBenthosData(offset, pageSize, filters);
         res.json(result);
     } catch (error) {
-        console.error("❌ Error fetching wind-direction & wind-speed data:", error);
+        console.error("❌ Error fetching Benthos data:", error);
         res.status(500).send('Error fetching Benthos data');
     }
 });
@@ -70,7 +70,7 @@ router.get("/FishLarvaeEggs", async (req, res) => {
         const result = await getMEFishEggsData(offset, pageSize, filters);
         res.json(result);
     } catch (error) {
-        console.error("❌ Error fetching wind-direction & wind-speed data:", error);
+        console.error("❌ Error fetching FishEggs data:", error);
         res.status(500).send('Error fetching FishEggs data');
     }
 });
@@ -88,7 +88,7 @@ router.get("/JuvenileAquaticAnimals", async (req, res) => {
         const result = await getMEJuvenileAquaticData(offset, pageSize, filters);
         res.json(result);
     } catch (error) {
-        console.error("❌ Error fetching wind-direction & wind-speed data:", error);
+        console.error("❌ Error fetching JuvenileAquatic data:", error);
         res.status(500).send('Error fetching JuvenileAquatic data');
     }
 });
