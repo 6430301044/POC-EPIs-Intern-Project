@@ -16,10 +16,13 @@ import Documents from "@/pages/admin/Documents";
 import Reports from "@/pages/admin/Reports";
 import Settings from "@/pages/admin/Settings";
 import Profile from "@/pages/admin/Profile";
+import Upload from "@/pages/admin/Upload";
+import Approval from "@/pages/admin/Approval";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import TestAPICall from "@/components/TestAPICall";
 import Contact from "@/components/main/Contact";
 import Visualization from "@/components/main/Visualization";
+
 
 const router = createBrowserRouter([
   {
@@ -108,6 +111,14 @@ const router = createBrowserRouter([
       {
         path: "/admin/profile",
         element: <Profile />,
+      },
+      {
+        path: "/admin/upload",
+        element: <Upload />,
+      },
+      {
+        path: "/admin/approval",
+        element: <Approval />,
       },
     ],
   },

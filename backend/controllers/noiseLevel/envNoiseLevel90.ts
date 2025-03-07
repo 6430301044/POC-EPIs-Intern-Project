@@ -1,6 +1,6 @@
 import { connectToDB } from "../../db/dbConfig";
 
-export async function getMEPlanktonPhytosData(
+export async function getNoiseLevel90Data(
   offset: number,
   pageSize: number,
   filters: any
@@ -10,14 +10,16 @@ export async function getMEPlanktonPhytosData(
   // First, get the total count of records
   let countQuery = `
     SELECT COUNT(*) as totalCount
-    FROM [dbo].[Env_MarineEcology_PlanktonPhytos] mep
-          JOIN [dbo].[SbCategories] sc ON mep.sub_Id = sc.sub_Id
+    FROM [dbo].[Env_Noise_NoiseLevel90] nln
+          JOIN [dbo].[SbCategories] sc ON nln.sub_Id = sc.sub_Id
           JOIN [dbo].[Mcategories] mc ON sc.main_Id = mc.main_Id
-          JOIN [dbo].[Monitoring_Station] ms ON mep.station_id = ms.station_Id
-          JOIN [dbo].[Daysperiod] dp ON mep.period_id = dp.period_Id
+          JOIN [dbo].[Monitoring_Station] ms ON nln.station_id = ms.station_Id
+          JOIN [dbo].[Daysperiod] dp ON nln.period_id = dp.period_Id
           JOIN [dbo].[Semiannual] s ON dp.semiannual_id = s.semiannual_Id
-          JOIN [dbo].[Companies] c ON mep.company_id = c.company_Id
-          JOIN [dbo].[Companies] cr ON mep.reportBy = cr.company_Id
+          JOIN [dbo].[Companies] c ON nln.company_id = c.company_Id
+          JOIN [dbo].[Tool] at ON nln.toolAnalyst = at.tool_Id
+          JOIN [dbo].[Tool] ct ON nln.toolCalibration = ct.tool_Id
+          JOIN [dbo].[Companies] cr ON nln.reportBy = cr.company_Id
           WHERE 1=1
   `;
 
@@ -46,32 +48,41 @@ export async function getMEPlanktonPhytosData(
 
   const countResult = await countRequest.query(countQuery);
   const totalCount = countResult.recordset[0].totalCount;
-
+  // Then, get the actual data
   let query = `
-      SELECT
+    SELECT
               s.semiannual,
               s.[year],
               mc.mainName,
               sc.subName,
-              ms.stationName,
-              mep.division,
-              mep.class,
-              mep.[order],
-              mep.family,
-              mep.genu,
-              mep.quantity_per_m3,
+              nln.timePeriod,
+              nln.day1st_result,
+              nln.day2nd_result,
+              nln.day3rd_result,
+              nln.certifiedDate,
+              nln.calibrationRefdB,
+              nln.slmRead,
+              nln.slmAdjust,
+              nln.calSheetNO,
+              at.toolName AS toolAnalyst,
+              at.toolSerial AS 'Analyst Tool Serial',
+              ct.toolName AS toolCalibration,
+              ct.toolSerial AS 'Calibration Tool Serial',
               cr.companyName AS reportBy,
+              ms.stationName,
               c.companyName,
               dp.startDate,
               dp.endDate
-          FROM [dbo].[Env_MarineEcology_PlanktonPhytos] mep
-          JOIN [dbo].[SbCategories] sc ON mep.sub_Id = sc.sub_Id
+          FROM [dbo].[Env_Noise_NoiseLevel90] nln
+          JOIN [dbo].[SbCategories] sc ON nln.sub_Id = sc.sub_Id
           JOIN [dbo].[Mcategories] mc ON sc.main_Id = mc.main_Id
-          JOIN [dbo].[Monitoring_Station] ms ON mep.station_id = ms.station_Id
-          JOIN [dbo].[Daysperiod] dp ON mep.period_id = dp.period_Id
+          JOIN [dbo].[Monitoring_Station] ms ON nln.station_id = ms.station_Id
+          JOIN [dbo].[Daysperiod] dp ON nln.period_id = dp.period_Id
           JOIN [dbo].[Semiannual] s ON dp.semiannual_id = s.semiannual_Id
-          JOIN [dbo].[Companies] c ON mep.company_id = c.company_Id
-          JOIN [dbo].[Companies] cr ON mep.reportBy = cr.company_Id
+          JOIN [dbo].[Companies] c ON nln.company_id = c.company_Id
+          JOIN [dbo].[Tool] at ON nln.toolAnalyst = at.tool_Id
+          JOIN [dbo].[Tool] ct ON nln.toolCalibration = ct.tool_Id
+          JOIN [dbo].[Companies] cr ON nln.reportBy = cr.company_Id
           WHERE 1=1
   `;
   // ✅ เพิ่มเงื่อนไขการกรองตามค่าที่ได้รับ
