@@ -3,43 +3,48 @@ import DarkSwitch from "@/components/template/DarkSwitch"
 import { SectionTitle } from "@/components/template/SectionTitle"
 import { Link, useNavigate } from "react-router"
 import { useState, useEffect } from "react";
-
+import { Eye, EyeOff }  from "lucide-react";
 
 export default function Login() {
-  const navigate = useNavigate();
-  
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
-  useEffect(() => {
-    document.title = "Login | WindReact";
-  }, []);
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    console.log("Submitting Login:", { email, password });
+  
     try {
-      const response = await fetch("http://localhost:5000/api/login", {
+      const response = await fetch("http://localhost:5000/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ User_email: email, User_password: password }),
       });
-
-      const data = await response.json();
-
+  
+      console.log("Response Status:", response.status);
+  
+      let data;
+      try {
+        data = await response.json(); // อ่าน JSON
+      } catch (jsonError) {
+        console.error("Failed to parse JSON response");
+        const text = await response.text(); // อ่านเป็นข้อความดิบ
+        console.error("Response Text:", text);
+        throw new Error("Invalid server response");
+      }
+  
+      console.log("Response Data:", data);
+  
       if (response.ok) {
-        localStorage.setItem("token", data.token); // เก็บ Token
         alert("Login successful!");
-        navigate("/dashboard"); // ไปหน้า Dashboard
+        navigate("/dashboard");
       } else {
-        alert(data.message || "Login failed");
+        alert(data.message || "Invalid email or password");
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Something went wrong.");
+      console.error("Login error:", error);
+      alert("Something went wrong. Please try again.");
     }
   };
 
@@ -50,8 +55,8 @@ export default function Login() {
           <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-8 shadow-lg dark:bg-gray-800">
             {/* Back to Home Button */}
             <div className="flex justify-start">
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 className="flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
               >
                 <svg className="mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,20 +95,31 @@ export default function Login() {
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Password
                   </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    placeholder="Enter your password"
-                  />
+                  <div className="relative w-full">
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"} // Toggle text/password
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white pr-10"
+                      placeholder="password"
+                    />
+                    {/* ปุ่ม Toggle สำหรับแสดง/ซ่อนรหัสผ่าน */}
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-400"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      tabIndex={0}
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
+              {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <input
@@ -124,6 +140,7 @@ export default function Login() {
                 </div>
               </div>
 
+              {/* Sign In Button */}
               <div>
                 <button
                   type="submit"
@@ -133,6 +150,7 @@ export default function Login() {
                 </button>
               </div>
 
+              {/* Register Link */}
               <div className="text-center text-sm">
                 <span className="text-gray-600 dark:text-gray-400">Don't have an account? </span>
                 <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">

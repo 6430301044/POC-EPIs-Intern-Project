@@ -25,7 +25,7 @@ const dbConfig: sql.config = {
 async function connectDB(): Promise<sql.ConnectionPool | null> {
   try {
     const pool = await sql.connect(dbConfig);
-    console.log("Connected to Azure SQL Database");
+    console.log("Connected to Azure SQL Database EiEi");
     return pool;
   } catch (err) {
     console.error("Database connection failed:", err);

@@ -23,25 +23,6 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  // const expreess = require("express") ;
-  // const bcrypt = require("bcryptjs") ;
-  // const sql = require("mssql");
-  // require("dotenv").config() ;
-  
-
-  // const router = express.Router();
-
-  // const dbConfig = { 
-  //   user: episadmin,
-  //   password: 7CzuNu6pVPnq9xu,
-  //   server: epis.database.windows.net,
-  //   database: POC-EPIs,
-  //   option: {
-  //     encrypt: true,
-  //     enableArithAbort: true,
-  //   },
-  // };
-
   const [passwordValidations, setPasswordValidations] = useState({
     lowercase: false,
     uppercase: false,
@@ -107,39 +88,44 @@ export default function Register() {
     const userData = {
       User_name: userName,
       User_email: email,
-      User_Phone: phone,
+      User_phone: phone,
       User_Job_Position: jobPosition,
       User_password: password, // **ควรเข้ารหัสฝั่ง Backend**
     };
 
     try {
-      // เช็คอีเมลซ้ำก่อนสมัคร
-      const checkResponse = await fetch(`http://localhost:5000/api/check-email?email=${email}`);
-      const checkData = await checkResponse.json();
-
-      if (checkResponse.ok && checkData.exists) {
-        alert("Email นี้เคยสมัครไว้แล้ว");
-        return;
-      }
-
+      // ช็คว่าเซิร์ฟเวอร์เช็คอีเมลทำงานได้ไหม
+      // const checkResponse = await fetch(`http://localhost:5000/api/check-email?email=${email}`);
+      
+      // if (!checkResponse.ok) {
+      //   throw new Error("Failed to check email.");
+      // }
+  
+      // const checkData = await checkResponse.json();
+  
+      // if (checkData.exists) {
+      //   alert("Email นี้เคยสมัครไว้แล้ว");
+      //   return;
+      // }
+  
       // สมัครสมาชิก
-      const response = await fetch("http://localhost:5000/register", {
+      const response = await fetch("http://localhost:5000/register", { 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Registration successful!");
-        navigate("/login"); // ไปหน้า Login หลังสมัครเสร็จ
-      } else {
-        alert(data.message || "Registration failed");
+  
+      // ตรวจสอบ response ก่อน .json()
+      if (!response.ok) {
+        throw new Error("Failed to register.");
       }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Something went wrong.");
+  
+      alert("Registration successful!");
+      navigate("/login"); // ไปหน้า Login หลังสมัครเสร็จ
+  
+    } catch (error: any) {
+      console.error("Error:", error.message);
+      alert("Something went wrong: " + error.message);
     }
   };
 
@@ -310,7 +296,7 @@ export default function Register() {
                     id="confirmPassword"
                     type={showPassword ? "text" : "password"}
                     value={confirmPassword}
-                    onChange={handleConfirmPasswordChange} // เช็คแบบเรียลไทม์
+                    onChange={handleConfirmPasswordChange}
                     required
                     className={`mt-1 block w-full rounded-lg border px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 dark:bg-gray-700 dark:text-white ${
                       passwordError ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-indigo-500"
@@ -335,6 +321,7 @@ export default function Register() {
                 </label>
               </div>
 
+              {/* Submit Button */}
               <div>
                 <button
                   type="submit"
