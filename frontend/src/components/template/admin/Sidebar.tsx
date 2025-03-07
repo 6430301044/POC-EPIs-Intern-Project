@@ -11,15 +11,15 @@ export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   
   // แยก Dashboard ออกมา
-  const dashboard = { name: 'Dashboard', path: '/dashboard', icon: HomeIcon }
+  const admin = { name: 'Admin', path: '/admin', icon: HomeIcon }
   
   // เมนูหลัก
   const mainMenus = [
-    { name: 'Team', path: '/dashboard/team', icon: TeamIcon },
-    { name: 'Projects', path: '/dashboard/projects', icon: ProjectIcon },
-    { name: 'Calendar', path: '/dashboard/calendar', icon: CalendarIcon },
-    { name: 'Documents', path: '/dashboard/documents', icon: DocumentIcon },
-    { name: 'Reports', path: '/dashboard/reports', icon: ReportIcon },
+    { name: 'Team', path: '/admin/team', icon: TeamIcon },
+    { name: 'Projects', path: '/admin/projects', icon: ProjectIcon },
+    { name: 'Calendar', path: '/admin/calendar', icon: CalendarIcon },
+    { name: 'Documents', path: '/admin/documents', icon: DocumentIcon },
+    { name: 'Reports', path: '/admin/reports', icon: ReportIcon },
   ]
 
   const teams = [
@@ -64,7 +64,7 @@ export default function Sidebar() {
           <div className="flex items-center justify-between px-6">
             {!isCollapsed && (
               <div className="flex items-center flex-shrink-0">
-                <Link to="/dashboard" className="flex items-center">
+                <Link to="/admin" className="flex items-center">
                   <img className="w-8" src="/images/wrlogo.png" alt="" />
                     <span className="ml-2 text-xl font-semibold text-gray-900 dark:text-white">WindReact</span>
                 </Link>
@@ -81,19 +81,19 @@ export default function Sidebar() {
 
           {/* Main Navigation */}
           <nav className="flex-1 px-3 mt-5">
-            {/* Dashboard */}
+            {/* Admin */}
             <div className="space-y-1">
               <Link
-                to={dashboard.path}
+                to={admin.path}
                 onClick={handleMenuClick}
                 className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
-                  location.pathname === dashboard.path
+                  location.pathname === admin.path
                     ? 'bg-indigo-50 text-indigo-600 dark:bg-gray-800 dark:text-white'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'
                 }`}
               >
-                <dashboard.icon className="w-6 h-6 mr-3" />
-                {!isCollapsed && dashboard.name}
+                <admin.icon className="w-6 h-6 mr-3" />
+                {!isCollapsed && admin.name}
               </Link>
 
               {/* Main Menus */}
@@ -142,10 +142,10 @@ export default function Sidebar() {
           {/* Settings - Fixed at bottom */}
           <div className="px-3 pb-4">
             <Link
-              to="/dashboard/settings"
+              to="/admin/settings"
               onClick={handleMenuClick}
               className={`flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 ${
-                location.pathname === '/dashboard/settings'
+                location.pathname === '/admin/settings'
                   ? 'bg-indigo-50 text-indigo-600 dark:bg-gray-800 dark:text-white'
                   : ''
               }`}
