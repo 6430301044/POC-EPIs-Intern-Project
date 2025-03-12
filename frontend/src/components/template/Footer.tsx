@@ -3,6 +3,7 @@ import { Container } from "./Container";
 import { Link } from "react-router";
 import { scrollToSection } from "@/utils/scrollHelper";
 
+
 export default function Footer() {
   const { theme } = useTheme();
 
@@ -16,6 +17,7 @@ export default function Footer() {
     { name: "Privacy", href: "/privacy" },
     { name: "Legal", href: "/legal" },
   ];
+
 
   return (
     <div className="relative bg-gray-200 dark:bg-gray-800">

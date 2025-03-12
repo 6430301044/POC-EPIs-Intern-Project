@@ -51,7 +51,7 @@ export default function Navbar() {
 
   const navigation = [
     { name: "หน้าแรก", id: "" },
-    { name: "เกี่ยวกับเรา", id: "" },
+    { name: "เกี่ยวกับเรา", id: "#about" },
     { name: "ข้อมูลสิ่งแวดล้อม", id: "/environment" },
     { name: "ข่าวสารและกิจกรรม", id: ""},
     { name: "ติดต่อเรา", id: "/contact"},

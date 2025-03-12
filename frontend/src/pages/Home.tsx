@@ -90,6 +90,7 @@ const newsData: NewsItem[] = [
 ];
 
 
+
 export default function HeroSection() {
   const [index, setIndex] = useState(0);
   // const [scrolling, setScrolling] = useState(false);
@@ -99,6 +100,7 @@ export default function HeroSection() {
 
   const [startIndex, setStartIndex] = useState(0);
   const [step, setStep] = useState(3)
+
 
 
   useEffect(() => {
@@ -149,15 +151,20 @@ export default function HeroSection() {
 
   const { cards } = environmentInfo[selectedOption];
   
-
+  const backgroundImages: Record<string, string> = {
+    sriracha: "/images/DJI_0050.JPG",
+    khaoboya: "/images/DJI_0024.JPG",
+    lamlamchabang: "/images/LaemChaBang.png",
+  };
+  
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative w-screen h-screen overflow-hidden">
+      <section className="relative w-full h-screen overflow-hidden">
         {/* Background Image */}
         <motion.div
           key={index}
-          className="absolute inset-0 w-screen h-screen bg-no-repeat bg-center bg-cover"
+          className="absolute inset-0 w-full h-screen bg-no-repeat bg-center bg-cover"
           style={{ backgroundImage: `url(${images[index]})` }}
           initial={{ opacity: 0, scale: 1 }}
           animate={{ opacity: 1, scale: window.innerWidth > 640 ? 1.1 : 1 }} // ปรับ scale ตามขนาดจอ
@@ -166,19 +173,47 @@ export default function HeroSection() {
         />
       </section>
 
-      <section className="relative w-full min-h-[874px] overflow-x-auto bg-white flex flex-col md:flex-row items-center justify-start px-4 md:px-[192px]">
+      {/* Section  */}
+      <section className="relative w-full bg-[#1B5172] h-[42px]">
+        {/* SVG แรกที่มีเงา */}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="absolute top-0 left-0 w-full h-auto z-20 drop-shadow-xl transform ">
+          <defs>
+            <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="50%">
+              <stop offset="0%" style={{ stopColor: "#0066a1", stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: "#0066a1", stopOpacity: 1 }} />
+            </linearGradient>
+          </defs>
+          <path fill="#0099ff" fill-opacity="1" d="M0,96L1440,192L1440,0L0,0Z"></path>
+        </svg>
+
+        {/* SVG ที่สอง */}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="absolute left-0 w-full h-auto z-10 ">
+          <defs>
+            <linearGradient id="gradient2" x1="0%" y1="100%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: "#1B5172", stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: "#1B5172", stopOpacity: 1 }} />
+            </linearGradient>
+          </defs>
+          <path fill="#1B5172" fill-opacity="1" d="M0,192L1440,96L1440,0L0,0Z"></path>
+        </svg>
+      </section>
+      {/* #2c9c3f */}
+      
+      {/* Section  PTT*/}
+      <section id="about" className="relative w-full min-h-[710px] overflow-x-auto bg-gradient-to-tr from-[#0066a1] via-[#0066a1] to-[#0066a1] flex flex-col md:flex-row items-center justify-start px-4 md:px-[192px]  mt-[100px]">
         {/* PTT Group */}
         <div className="flex-shrink-0 justify-center items-center mt-[100px] min-w-[300px]">
           <ul className="text-left">
-            <li className="text-[22px] font-bold text-black mb-[16px]">PTT Group</li>
+            <li className="text-[22px] font-bold text-white mb-[16px]">PTT Group</li>
           </ul>
           <ul className="text-left">
             {/* รู้จักกับสถานประกอบการของเรา */}
-            <li className="text-[50px] font-bold text-black mb-[10px]">
+            <li className="text-[50px] font-bold text-white mb-[10px]">
               รู้จักกับสถาน<br />ประกอบการ<br />ของเรา
             </li>
           </ul>
         </div>
+        
 
         {/* ส่วนที่สอง */}
         <div className="flex-shrink-0 justify-center items-center bg-gray-200 shadow-lg w-[460px] h-[385px] mt-4 md:mt-0 ml-4 overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:cursor-pointer relative">
@@ -208,44 +243,61 @@ export default function HeroSection() {
         </div>
       </section>
 
-      {/* Dropdown และ Cards */}
-      <section className="relative w-full h-156 bg-black bg-cover bg-center" 
-        style={{ backgroundImage: "url('/images/DJI_0050.JPG')",
-        backgroundAttachment: "fixed",
-         }}>
-        
-        {/* Overlay */}
-        <div className="relative w-full h-full bg-black/70 flex flex-col items-center justify-center px-4 py-8">
+      <section className="relative w-full h-[760px] z-30 overflow-visible -mt-[100px]">
+        {/* SVG สีส้มและสีแดง */}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1440 700"
+          className="relative top-0 left-0 drop-shadow-xl z-10"
+        >
+          <path fill="#F79421" fillOpacity="1" d="M0,32L1440,100L1440,370L0,300Z"></path>
+          <path fill="#E30613" fillOpacity="1" d="M0,300 L1440,370 L1440,640 L0,580Z"></path>
+        </svg>
 
-          {/* Dropdown Selection */}
-          <div className="absolute left-10 top-10">
-            <select 
-              className="text-[22px] font-bold text-white bg-transparent border-none outline-none"
-              value={selectedOption}
-              onChange={handleSelectChange}
-            >
-              <option className="text-black" value="sriracha">คลังน้ำมันศรีราชา</option>
-              <option className="text-black" value="khaoboya">คลังก๊าซเขาบ่อยา</option>
-              <option className="text-black" value="lamlamchabang">ชุมชนบ้านแหลมฉบัง</option>
-            </select>
-            <p className="text-white text-sm mt-2">ข้อมูล ณ ไตรมาสที่ 1/2567</p>
-          </div>
-
-          {/* Business Info Cards */}
-          <div className="flex flex-wrap justify-center space-x-0 md:space-x-6 space-y-4 md:space-y-0 mt-8">
-            {cards.map((card, index) => (
-              <div key={index} className="bg-gray-800 bg-opacity-80 rounded-xl p-6 w-[280px] h-[180px] flex flex-col items-center">
-                <img src={card.icon} alt="icon" className="w-12 h-12 mb-4" />
-                <p className="text-md text-white">{card.title}</p>
-                <h2 className="text-3xl font-bold text-white">{card.value}</h2>
-                <p className="text-sm text-gray-300">{card.unit}</p>
+        {/* Div สีเขียวที่เอียงและใส่รูป */}
+        <div
+            className="absolute top-0 left-0 w-full h-[840px] z-20 bg-cover bg-center flex items-center justify-center"
+            style={{
+              backgroundImage: `url('${backgroundImages[selectedOption]}')`, // เปลี่ยนตามตัวเลือกที่เลือก
+              clipPath: 'polygon(0% 15%, 100% 5%, 100% 91%, 0% 100%)',
+            }}
+          >
+          {/* Overlay สำหรับปรับความมืด + ใส่เนื้อหา */}
+          <div className="relative w-full h-full bg-black/70 flex flex-col items-center justify-center px-4 py-8">
+            {/* Dropdown Selection */}
+            <div className="relative w-full flex justify-start px-10 mt-6 z-30">
+              <div className="bg-black/50 px-4 py-2 rounded-lg">
+                <select
+                  className="text-[22px] font-bold text-white bg-transparent border-none outline-none"
+                  value={selectedOption}
+                  onChange={handleSelectChange}
+                >
+                  <option className="text-black" value="sriracha">คลังน้ำมันศรีราชา</option>
+                  <option className="text-black" value="khaoboya">คลังก๊าซเขาบ่อยา</option>
+                  <option className="text-black" value="lamlamchabang">ชุมชนบ้านแหลมฉบัง</option>
+                </select>
+                <p className="text-white text-sm mt-2">ข้อมูล ณ ไตรมาสที่ 1/2567</p>
               </div>
-            ))}
+            </div>
+
+            {/* Business Info Cards */}
+            <div className="flex flex-wrap justify-center space-x-0 md:space-x-6 space-y-4 md:space-y-0 mt-8">
+              {cards.map((card, index) => (
+                <div key={index} className="bg-gray-800 bg-opacity-80 rounded-xl p-6 w-[280px] h-[180px] flex flex-col items-center">
+                  <img src={card.icon} alt="icon" className="w-12 h-12 mb-4" />
+                  <p className="text-md text-white">{card.title}</p>
+                  <h2 className="text-3xl font-bold text-white">{card.value}</h2>
+                  <p className="text-sm text-gray-300">{card.unit}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="relative w-full h-screen flex items-center justify-center">
+
+      {/*  News */}
+      <section className="relative w-full h-screen flex items-center bg-gradient-to-tr from-[#0a3d91] to-[#9d1b31] justify-center ">
         <div className="flex flex-col sm:flex-row max-w-6xl mx-auto p-4">
           {/* เมนูนำทาง */}
           <div className="w-full sm:w-1/3 bg-blue-900 text-white p-6 rounded-lg">
@@ -257,8 +309,8 @@ export default function HeroSection() {
               <li className="hover:text-yellow-300">เยี่ยมชม ปตท.</li>
             </ul>
           </div>
-
-          {/* ข่าวสาร */}
+          
+          {/* section ข่าวสาร */}
           <div className="w-full sm:w-2/3 sm:pl-6 relative mt-4 sm:mt-0">
             {/* แสดงข่าวแค่ 1 ข่าวในมือถือ */}
             <div className="grid grid-cols-1 sm:hidden gap-4">

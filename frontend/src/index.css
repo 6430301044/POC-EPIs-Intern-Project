@@ -5,6 +5,10 @@
   --font-thai: "IBM-Plex-Sans-Thai", "sans-serif";
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* Custom variant for dark mode */
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -21,51 +25,6 @@
   src: url("assets/fonts//ptt45pride-bold.woff2") format("woff2");
 }
 
-/* สไตล์ container สำหรับการแสดงภาพ */
-.slider-container {
-  @apply relative w-full h-full overflow-hidden;
-}
-
-/* สไตล์ของ background image */
-.slider {
-  @apply absolute w-full h-full bg-no-repeat bg-center;
-  animation: slider 20s infinite;
-}
-
-/* กำหนด @keyframes สำหรับการเปลี่ยนภาพ */
-@keyframes slider {
-  0% {
-    background-image: url("/images/DJI_0024.JPG");
-  }
-  30% {
-    background-image: url("/images/DJI_0052.JPG");
-  }
-  60% {
-    background-image: url("/images/DJI_0050.JPG");
-  }
-  100% {
-    background-image: url("/images/DJI_0049.JPG");
-  }
-}
-
-/* เพิ่มคลาสสำหรับการแสดงภาพที่แตกต่างกัน */
-.slider-1 {
-  animation: slider 20s infinite;
-}
-
-.slider-2 {
-  animation: slider 20s infinite;
-}
-
-.slider-3 {
-  animation: slider 20s infinite;
-}
-
-.slider-4 {
-  animation: slider 20s infinite;
-}
-
-
 @layer base {
   html,
   body {
@@ -75,3 +34,4 @@
     line-height: 1.5;
   }
 }
+
