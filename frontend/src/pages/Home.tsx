@@ -1,5 +1,5 @@
 import Visualization from "@/components/main/Visualization";
-import Table from "@/components/main/Table";
+import Table from "@/components/main/TableNC";
 import Contact from "@/components/main/Contact";
 
 export default function Home() {

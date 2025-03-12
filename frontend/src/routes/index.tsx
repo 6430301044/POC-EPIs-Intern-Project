@@ -109,7 +109,7 @@ const router = createBrowserRouter([
       {
         path: "/admin/approval",
         element: <Approval />,
-      },
+      }
     ],
   },
 ]);

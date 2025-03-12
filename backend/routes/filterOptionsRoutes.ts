@@ -101,7 +101,7 @@ router.get("/stations", async (req, res) => {
             .query(`
                 SELECT DISTINCT ms.stationName
                 FROM dbo.Monitoring_Station ms
-                JOIN dbo.${tableName} t ON ms.station_Id = t.station_id;
+                JOIN dbo.${tableName} t ON ms.station_id = t.station_id;
             `);
 
         res.json(result.recordset);
@@ -133,10 +133,11 @@ router.get("/years", async (req, res) => {
         const result = await pool.request()
             .input("subCategory", subCategory)
             .query(`
-                SELECT DISTINCT s.year
-                FROM dbo.Semiannual s
-                JOIN dbo.Daysperiod dp ON s.semiannual_Id = dp.semiannual_id
-                JOIN dbo.${tableName} t ON dp.period_Id = t.period_id;
+                SELECT DISTINCT y.year
+                FROM dbo.Years y
+                JOIN [dbo].[Years] y ON dp.year_id = y.year_id
+                JOIN dbo.Daysperiod dp ON y.year_id = dp.year_id
+                JOIN dbo.${tableName} t ON dp.period_id = t.period_id;
             `);
 
         res.json(result.recordset);
@@ -166,8 +167,8 @@ router.get("/semiannuals", async (req, res) => {
         const pool = await connectToDB();
         const result = await pool.request()
             .query(`SELECT DISTINCT s.semiannual FROM dbo.Semiannual s
-                JOIN dbo.Daysperiod dp ON s.semiannual_Id = dp.semiannual_id
-                JOIN dbo.${tableName} t ON dp.period_Id = t.period_id;`);
+                JOIN dbo.Daysperiod dp ON s.semiannual_id = dp.semiannual_id
+                JOIN dbo.${tableName} t ON dp.period_id = t.period_id;`);
 
         res.json(result.recordset);
     } catch (error) {
@@ -201,7 +202,7 @@ router.get("/sub-categories", async (req, res) => {
             .query(`
                 SELECT DISTINCT sc.subName 
                 FROM dbo.SbCategories sc
-                JOIN dbo.Mcategories mc ON sc.main_Id = mc.main_Id
+                JOIN dbo.Mcategories mc ON sc.main_id = mc.main_id
                 WHERE mc.mainName = @mainCategory;
             `);
 
