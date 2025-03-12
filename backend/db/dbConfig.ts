@@ -10,6 +10,7 @@ const dbConfig = {
     database: process.env.DB_NAME,
     options: {
         encrypt: true,
+        enableArithAbort: true,
         trustServerCertificate: false
     }
 };

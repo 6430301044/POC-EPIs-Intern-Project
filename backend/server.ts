@@ -1,9 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import apiRoutes from './routes/index';
-import register from './routes/register';
+import registerRoutes from "./routes/registerRoutes";
 import login from './routes/login';
-import userImage from './routes/UserImage';
+import userImage from './routes/userImage';
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 const PORT = 5000;
@@ -13,7 +16,7 @@ app.use(express.json());
 
 app.use('/api', apiRoutes);
 
-app.use('/register', register);
+app.use("/register", registerRoutes);
 
 app.use('/login', login);
 
