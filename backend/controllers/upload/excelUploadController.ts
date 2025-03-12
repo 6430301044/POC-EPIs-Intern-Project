@@ -256,7 +256,7 @@ const getTableIdentifier = (subCategory: string): string => {
 const getColumnMapping = (subCategory: string): { [key: string]: string } => {
     // Define column mappings for each subcategory
     const mappings: { [key: string]: { [key: string]: string } } = {
-        "WDWS": {
+        "ผลการตรวจวัดทิศทางและความเร็วลมเฉลี่ยรายชั่วโมง": { //WDWS
             "windDirection": "windDirection",
             "ws_05_1": "ws_05_1",
             "ws_1_2": "ws_1_2",
@@ -264,52 +264,73 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "ws_3_4": "ws_3_4",
             "ws_4_6": "ws_4_6",
             "ws_more_that_6": "ws_more_that_6",
-            "station_id": "station_id"
+            "station_id": "station_id",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "WindQuality": {
+        "ผลการตรวจวัดคุณภาพอากาศในบรรยากาศ": { 
             "station_id": "station_id",
             "parameter": "parameter",
             "unit": "unit",
             "day1st_result": "day1st_result",
             "day2nd_result": "day2nd_result",
             "day3rd_result": "day3rd_result",
-            "std": "std"
+            "std": "std",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "SO2": {
+        "ผลการตรวจวัดค่าความเข้มข้นของก๊าซซัลเฟอร์ไดออกไซด์ในบรรยากาศ": { //SO2
             "station_id": "station_id",
             "timePeriod": "timePeriod",
             "day1st_result_ppm": "day1st_result_ppm",
             "day2nd_result_ppm": "day2nd_result_ppm",
             "day3rd_result_ppm": "day3rd_result_ppm",
             "certifiedDate": "certifiedDate",
-            "expireDate": "expireDate"
+            "expireDate": "expireDate",
+            "concentrationPPB": "concentrationPPB",
+            "gasCylinder": "gasCylinder",
+            "toolAnalyst": "toolAnalyst",
+            "toolCalibration": "toolCalibration",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "Vocs": {
+        "ผลการตรวจวัดสารอินทรีย์ระเหยง่ายในบรรยากาศ": {
             "station_id": "station_id",
             "index_name": "index_name",
             "day1st_result_ug_per_m3": "day1st_result_ug_per_m3",
             "day2nd_result_ug_per_m3": "day2nd_result_ug_per_m3",
             "day3rd_result_ug_per_m3": "day3rd_result_ug_per_m3",
             "std_lower": "std_lower",
-            "std_higher": "std_higher"
+            "std_higher": "std_higher",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "AirQuality": {
+        "ผลการตรวจวัดคุณภาพอากาศภายในสถานประกอบการ": {
             "station_id": "station_id",
             "index_name": "index_name",
             "unit": "unit",
             "result": "result",
-            "std": "std"
+            "std": "std",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "NoiseLevelNormal": {
+        "ผลการตรวจวัดระดับเสียงโดยทั่วไป": {
             "station_id": "station_id",
             "timePeriod": "timePeriod",
             "day1st_result": "day1st_result",
             "day2nd_result": "day2nd_result",
             "day3rd_result": "day3rd_result",
             "certifiedDate": "certifiedDate",
-            "calibrationRefdB": "calibrationRefdB"
+            "calibrationRefdB": "calibrationRefdB",
+            "slmRead":"slmRead",
+            "slmAdjust":"slmAdjust",
+            "calSheetNo":"calSheetNo",
+            "toolAnalyst":"toolAnalyst",
+            "toolCalibration":"toolCalibration",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "NoiseLevel90": {
+        "ผลการตรวจวัดคุณภาพเสียง 90": {
             "station_id": "station_id",
             "timePeriod": "timePeriod",
             "day1st_result": "day1st_result",
@@ -319,9 +340,13 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "calibrationRefdB": "calibrationRefdB",
             "slmRead": "slmRead",
             "slmAdjust": "slmAdjust",
-            "calSheetNo": "calSheetNo"
+            "calSheetNo": "calSheetNo",
+            "toolAnalyst":"toolAnalyst",
+            "toolCalibration":"toolCalibration",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "Monitorresult": {
+        "ผลการติดตามตรวจสอบ": {
             "station_id": "station_id",
             "timePeriod": "timePeriod",
             "day1st_Leq": "day1st_Leq",
@@ -334,65 +359,83 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "slmRead": "slmRead",
             "slmAdjust": "slmAdjust",
             "certifiedDate": "certifiedDate",
-            "calSheetNo": "calSheetNo"
+            "calSheetNo": "calSheetNo",
+            "toolAnalyst":"toolAnalyst",
+            "toolCalibration":"toolCalibration",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "SeaWater": {
+        "ผลการตรวจวัดคุณภาพน้ำทะเล": {
             "station_id": "station_id",
             "parameter": "parameter",
             "result": "result",
             "unit": "unit",
             "std_lower": "std_lower",
-            "std_higher": "std_higher"
+            "std_higher": "std_higher",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "WasteWater": {
+        "ผลการตรวจวัดคุณภาพน้ำทิ้ง": {
             "station_id": "station_id",
             "index_name": "index_name",
             "result": "result",
             "unit": "unit",
             "std_lower": "std_lower",
-            "std_higher": "std_higher"
+            "std_higher": "std_higher",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "PlanktonPhytos": {
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนพืช": {
             "station_id": "station_id",
             "division": "division",
             "class": "class",
             "order": "order",
             "family": "family",
             "genu": "genu",
-            "quantity_per_m3": "quantity_per_m3"
+            "quantity_per_m3": "quantity_per_m3",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "PlanktonZoos": {
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนสัตว์": {
             "station_id": "station_id",
             "phylum": "phylum",
             "class": "class",
             "order": "order",
             "family": "family",
             "genu": "genu",
-            "quantity_per_m3": "quantity_per_m3"
+            "quantity_per_m3": "quantity_per_m3",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "Benthos": {
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์หน้าดิน": {
             "station_id": "station_id",
             "phylum": "phylum",
             "class": "class",
             "order": "order",
             "family": "family",
             "genu": "genu",
-            "quantity_per_m2": "quantity_per_m2"
+            "quantity_per_m2": "quantity_per_m2",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "FishLarvaeEggs": {
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของลูกปลาและไข่ปลา": {
             "station_id": "station_id",
             "phylum": "phylum",
             "class": "class",
             "order": "order",
             "family": "family",
             "genu": "genu",
-            "quantity_per_1000m3": "quantity_per_1000m3"
+            "quantity_per_1000m3": "quantity_per_1000m3",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
-        "JuvenileAquaticAnimals": {
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์น้ำวัยอ่อน": {
             "station_id": "station_id",
             "phylum": "phylum",
             "group_name": "group_name",
-            "quantity_per_1000m3": "quantity_per_1000m3"
+            "quantity_per_1000m3": "quantity_per_1000m3",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         }
     };
 

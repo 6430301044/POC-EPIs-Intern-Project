@@ -263,7 +263,9 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "ws_3_4": "ws_3_4",
             "ws_4_6": "ws_4_6",
             "ws_more_that_6": "ws_more_that_6",
-            "station_id": "station_id"
+            "station_id": "station_id",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการตรวจวัดคุณภาพอากาศในบรรยากาศ": {
             "station_id": "station_id",
@@ -272,7 +274,9 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "day1st_result": "day1st_result",
             "day2nd_result": "day2nd_result",
             "day3rd_result": "day3rd_result",
-            "std": "std"
+            "std": "std",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการตรวจวัดค่าความเข้มข้นของก๊าซซัลเฟอร์ไดออกไซด์ในบรรยากาศ": {
             "station_id": "station_id",
@@ -281,7 +285,13 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "day2nd_result_ppm": "day2nd_result_ppm",
             "day3rd_result_ppm": "day3rd_result_ppm",
             "certifiedDate": "certifiedDate",
-            "expireDate": "expireDate"
+            "expireDate": "expireDate",
+            "concentrationPPB": "concentrationPPB",
+            "gasCylinder": "gasCylinder",
+            "toolAnalyst": "toolAnalyst",
+            "toolCalibration": "toolCalibration",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการตรวจวัดสารอินทรีย์ระเหยง่ายในบรรยากาศ": {
             "station_id": "station_id",
@@ -290,14 +300,18 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "day2nd_result_ug_per_m3": "day2nd_result_ug_per_m3",
             "day3rd_result_ug_per_m3": "day3rd_result_ug_per_m3",
             "std_lower": "std_lower",
-            "std_higher": "std_higher"
+            "std_higher": "std_higher",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการตรวจวัดคุณภาพอากาศภายในสถานประกอบการ": {
             "station_id": "station_id",
             "index_name": "index_name",
             "unit": "unit",
             "result": "result",
-            "std": "std"
+            "std": "std",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการตรวจวัดระดับเสียงโดยทั่วไป": {
             "station_id": "station_id",
@@ -306,7 +320,14 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "day2nd_result": "day2nd_result",
             "day3rd_result": "day3rd_result",
             "certifiedDate": "certifiedDate",
-            "calibrationRefdB": "calibrationRefdB"
+            "calibrationRefdB": "calibrationRefdB",
+            "slmRead":"slmRead",
+            "slmAdjust":"slmAdjust",
+            "calSheetNo":"calSheetNo",
+            "toolAnalyst":"toolAnalyst",
+            "toolCalibration":"toolCalibration",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการตรวจวัดคุณภาพเสียง 90": {
             "station_id": "station_id",
@@ -318,7 +339,11 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "calibrationRefdB": "calibrationRefdB",
             "slmRead": "slmRead",
             "slmAdjust": "slmAdjust",
-            "calSheetNo": "calSheetNo"
+            "calSheetNo": "calSheetNo",
+            "toolAnalyst":"toolAnalyst",
+            "toolCalibration":"toolCalibration",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการติดตามตรวจสอบ": {
             "station_id": "station_id",
@@ -333,7 +358,11 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "slmRead": "slmRead",
             "slmAdjust": "slmAdjust",
             "certifiedDate": "certifiedDate",
-            "calSheetNo": "calSheetNo"
+            "calSheetNo": "calSheetNo",
+            "toolAnalyst":"toolAnalyst",
+            "toolCalibration":"toolCalibration",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการตรวจวัดคุณภาพน้ำทะเล": {
             "station_id": "station_id",
@@ -341,7 +370,9 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "result": "result",
             "unit": "unit",
             "std_lower": "std_lower",
-            "std_higher": "std_higher"
+            "std_higher": "std_higher",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการตรวจวัดคุณภาพน้ำทิ้ง": {
             "station_id": "station_id",
@@ -349,7 +380,9 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "result": "result",
             "unit": "unit",
             "std_lower": "std_lower",
-            "std_higher": "std_higher"
+            "std_higher": "std_higher",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนพืช": {
             "station_id": "station_id",
@@ -358,7 +391,9 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "order": "order",
             "family": "family",
             "genu": "genu",
-            "quantity_per_m3": "quantity_per_m3"
+            "quantity_per_m3": "quantity_per_m3",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนสัตว์": {
             "station_id": "station_id",
@@ -367,7 +402,9 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "order": "order",
             "family": "family",
             "genu": "genu",
-            "quantity_per_m3": "quantity_per_m3"
+            "quantity_per_m3": "quantity_per_m3",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์หน้าดิน": {
             "station_id": "station_id",
@@ -376,7 +413,9 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "order": "order",
             "family": "family",
             "genu": "genu",
-            "quantity_per_m2": "quantity_per_m2"
+            "quantity_per_m2": "quantity_per_m2",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของลูกปลาและไข่ปลา": {
             "station_id": "station_id",
@@ -385,13 +424,17 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
             "order": "order",
             "family": "family",
             "genu": "genu",
-            "quantity_per_1000m3": "quantity_per_1000m3"
+            "quantity_per_1000m3": "quantity_per_1000m3",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         },
         "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์น้ำวัยอ่อน": {
             "station_id": "station_id",
             "phylum": "phylum",
             "group_name": "group_name",
-            "quantity_per_1000m3": "quantity_per_1000m3"
+            "quantity_per_1000m3": "quantity_per_1000m3",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
         }
     };
 

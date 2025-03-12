@@ -19,8 +19,8 @@ export const getPendingApprovals = async (req: Request, res: Response) => {
                         ELSE 'Unknown'
                     END as period_name,
                     YEAR(d.startDate) as year,
-                    m.main_name as mainCategory,
-                    sb.sub_name as subCategory,
+                    m.mainName as mainCategory,
+                    sb.subName as subCategory,
                     usr.User_name as uploaded_by
                 FROM 
                     dbo.UploadedFiles u
@@ -75,7 +75,7 @@ export const approveUpload = async (req: Request, res: Response) => {
             await transaction.begin();
             
             // Get the upload data including parsed JSON data
-            const uploadResult = await pool.request()
+            const uploadResult = await transaction.request()
                 .input("uploadId", uploadId)
                 .query(`
                     SELECT 
@@ -106,7 +106,7 @@ export const approveUpload = async (req: Request, res: Response) => {
                 // Build dynamic query based on the record fields and column mapping
                 const columns: string[] = [];
                 const paramNames: string[] = [];
-                const request = pool.request();
+                const request = transaction.request();
 
                 // Add period_id to all records
                 request.input("period_id", uploadData.period_id);
@@ -133,15 +133,11 @@ export const approveUpload = async (req: Request, res: Response) => {
             }
             
             // Update the status to approved
-            await pool.request()
+            await transaction.request()
                 .input("uploadId", uploadId)
-                .input("approvedBy", req.body.userId || "system")
-                .input("approvedDate", new Date())
                 .query(`
                     UPDATE dbo.UploadedFiles 
-                    SET status = 'อนุมัติแล้ว', 
-                        approved_by = @approvedBy,
-                        approved_date = @approvedDate
+                    SET status = 'อนุมัติแล้ว'
                     WHERE upload_id = @uploadId
                 `);
             
@@ -188,42 +184,50 @@ export const rejectUpload = async (req: Request, res: Response) => {
         }
         
         const pool = await connectToDB();
+        let transaction = null;
         
-        // Check if the upload exists and is pending approval
-        const checkResult = await pool.request()
-            .input("uploadId", uploadId)
-            .query(`SELECT upload_id, filename FROM dbo.UploadedFiles WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'`);
+        try {
+            // Begin transaction
+            transaction = pool.transaction();
+            await transaction.begin();
             
-        if (checkResult.recordset.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "ไม่พบข้อมูลที่รอการอนุมัติตาม ID ที่ระบุ"
-            });
-        }
-        
-        // Update the status to rejected
-        await pool.request()
-            .input("uploadId", uploadId)
-            .input("rejectedBy", req.body.userId || "system")
-            .input("rejectedDate", new Date())
-            .input("rejectionReason", rejectionReason || "")
-            .query(`
-                UPDATE dbo.UploadedFiles 
-                SET status = 'ปฏิเสธแล้ว', 
-                    rejected_by = @rejectedBy,
-                    rejected_date = @rejectedDate,
-                    rejection_reason = @rejectionReason
-                WHERE upload_id = @uploadId
-            `);
-        
-        res.status(200).json({
-            success: true,
-            message: "ปฏิเสธข้อมูลเรียบร้อยแล้ว",
-            data: {
-                uploadId,
-                filename: checkResult.recordset[0].filename
+            // Check if the upload exists and is pending approval
+            const checkResult = await transaction.request()
+                .input("uploadId", uploadId)
+                .query(`SELECT upload_id, filename FROM dbo.UploadedFiles WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'`);
+                
+            if (checkResult.recordset.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: "ไม่พบข้อมูลที่รอการอนุมัติตาม ID ที่ระบุ"
+                });
             }
-        });
+            
+            // Update the status to rejected
+            await transaction.request()
+                .input("uploadId", uploadId)
+                .query(`
+                    UPDATE dbo.UploadedFiles 
+                    SET status = 'ปฏิเสธแล้ว'
+                    WHERE upload_id = @uploadId
+                `);
+            
+            // Commit transaction
+            await transaction.commit();
+            
+            res.status(200).json({
+                success: true,
+                message: "ปฏิเสธข้อมูลเรียบร้อยแล้ว",
+                data: {
+                    uploadId,
+                    filename: checkResult.recordset[0].filename
+                }
+            });
+        } catch (error) {
+            // If there's an error, roll back the transaction
+            if (transaction) await transaction.rollback();
+            throw error;
+        }
         
     } catch (error) {
         console.error("Error rejecting upload:", error);
