@@ -22,6 +22,8 @@ import { ThemeProvider } from "@/contexts/ThemeProvider";
 import TestAPICall from "@/components/TestAPICall";
 import Contact from "@/components/main/Contact";
 import Visualization from "@/components/main/Visualization";
+import ApproveUsere from "@/pages/admin/ApproveUser";
+
 
 
 const router = createBrowserRouter([
@@ -119,6 +121,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/approval",
         element: <Approval />,
+      },
+      {
+        path: "/admin/approveuser",
+        element: <ApproveUsere />,
       },
     ],
   },

@@ -51,8 +51,8 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       const hashedPassword = await bcrypt.hash(User_password, 10);
   
       const query = `
-        INSERT INTO dbo.Register (User_name, User_email, User_phone, User_Job_Position, User_password, Company_id)
-        VALUES (@UserName, @Email, @Phone, @Job, @Password, @CompanyId)
+        INSERT INTO dbo.Register (User_name, User_email, User_phone, User_Job_Position, User_password, Company_id, User_role)
+        VALUES (@UserName, @Email, @Phone, @Job, @Password, @CompanyId, 'Admin')
       `;
   
       await pool.request()
@@ -69,7 +69,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       console.error("Error registering user:", err);
       res.status(500).json({ message: "Server error" });
     }
-  };
+};
 
 // ✅ ฟังก์ชันดึงรายการผู้ใช้ที่รออนุมัติ
 export const getPendingUsers = async (req: Request, res: Response) => {
@@ -77,7 +77,7 @@ export const getPendingUsers = async (req: Request, res: Response) => {
     const pool = await connectDB();
     if (!pool) return res.status(500).json({ message: "Database connection failed" });
 
-    const query = "SELECT * FROM dbo.Register";
+    const query = "SELECT * FROM dbo.Register WHERE User_status = 'Pending'";
     const result = await pool.request().query(query);
 
     res.status(200).json(result.recordset);
@@ -90,60 +90,87 @@ export const getPendingUsers = async (req: Request, res: Response) => {
 
 // ✅ ฟังก์ชันอนุมัติผู้ใช้
 export const approveUser = async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      const pool = await connectDB();
-      if (!pool) return res.status(500).json({ message: "Database connection failed" });
-  
-      // ดึงข้อมูลจาก Register
-      const userQuery = "SELECT * FROM dbo.Register WHERE Register_id = @Id";
-      const userResult = await pool.request().input("Id", sql.Int, id).query(userQuery);
-      if (userResult.recordset.length === 0) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      const user = userResult.recordset[0];
-  
-      // ย้ายไป Users
-      const insertQuery = `
-        INSERT INTO dbo.Users (User_name, User_email, User_phone, User_Job_Position, User_password, Company_id)
-        VALUES (@UserName, @Email, @Phone, @Job, @Password, @CompanyId)
-      `;
-      await pool.request()
-        .input("UserName", sql.NVarChar, user.User_name)
-        .input("Email", sql.NVarChar, user.User_email)
-        .input("Phone", sql.VarChar, user.User_phone)
-        .input("Job", sql.NVarChar, user.User_Job_Position)
-        .input("Password", sql.VarChar, user.User_password)
-        .input("CompanyId", sql.Int, user.Company_id || null)
-        .query(insertQuery);
-  
-      // ลบจาก Register
-      const deleteQuery = "DELETE FROM dbo.Register WHERE Register_id = @Id";
-      await pool.request().input("Id", sql.Int, id).query(deleteQuery);
-  
-      res.status(200).json({ message: "User approved successfully" });
-  
-    } catch (err) {
-      console.error("Error approving user:", err);
-      res.status(500).json({ message: "Server error" });
+  try {
+    const { id } = req.params;
+    
+    // แปลง id เป็นตัวเลข
+    const idNumber = parseInt(id, 10);
+    
+    // ตรวจสอบว่า id เป็นตัวเลขหรือไม่
+    if (isNaN(idNumber)) {
+      return res.status(400).json({ message: "Invalid ID format" });
     }
-  };
-  
+
+    const pool = await connectDB();
+    if (!pool) return res.status(500).json({ message: "Database connection failed" });
+
+    const userQuery = "SELECT * FROM dbo.Register WHERE Register_id = @Id"; // ตรวจสอบคอลัมน์ Register_id
+    const userResult = await pool.request().input("Id", sql.Int, idNumber).query(userQuery);
+    
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const user = userResult.recordset[0];
+
+    const insertQuery = `
+      INSERT INTO dbo.Users (User_name, User_email, User_phone, User_Job_Position, User_password, Company_id, User_role)
+      VALUES (@UserName, @Email, @Phone, @Job, @Password, @CompanyId, @UserRole)
+    `;
+    await pool.request()
+      .input("UserName", sql.NVarChar, user.User_name)
+      .input("Email", sql.NVarChar, user.User_email)
+      .input("Phone", sql.VarChar, user.User_phone)
+      .input("Job", sql.NVarChar, user.User_Job_Position)
+      .input("Password", sql.VarChar, user.User_password)
+      .input("CompanyId", sql.Int, user.Company_id || null)
+      .input("UserRole", sql.NVarChar, user.User_role)
+      .query(insertQuery);
+
+    const deleteQuery = "DELETE FROM dbo.Register WHERE Register_id = @Id";
+    await pool.request().input("Id", sql.Int, idNumber).query(deleteQuery);
+
+    res.status(200).json({ message: "User approved successfully" });
+
+  } catch (err) {
+    console.error("Error approving user:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 // ✅ ฟังก์ชันปฏิเสธผู้ใช้
 export const rejectUser = async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      const pool = await connectDB();
-      if (!pool) return res.status(500).json({ message: "Database connection failed" });
-  
-      const query = "DELETE FROM dbo.Register WHERE Register_id = @Id";
-      await pool.request().input("Id", sql.Int, id).query(query);
-  
-      res.status(200).json({ message: "User rejected successfully" });
-  
-    } catch (err) {
-      console.error("Error rejecting user:", err);
-      res.status(500).json({ message: "Server error" });
+  try {
+    const { id } = req.params;
+
+    // แปลง id เป็นตัวเลข
+    const idNumber = parseInt(id, 10);
+    
+    // ตรวจสอบว่า id เป็นตัวเลขหรือไม่
+    if (isNaN(idNumber)) {
+      return res.status(400).json({ message: "Invalid ID format" });
     }
-  };
+
+    const pool = await connectDB();
+    if (!pool) return res.status(500).json({ message: "Database connection failed" });
+
+    // ตรวจสอบว่าผู้ใช้มีอยู่ในฐานข้อมูล
+    const userQuery = "SELECT * FROM dbo.Register WHERE Register_id = @Id";
+    const userResult = await pool.request().input("Id", sql.Int, idNumber).query(userQuery);
+    
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // ลบผู้ใช้จากฐานข้อมูล
+    const deleteQuery = "DELETE FROM dbo.Register WHERE Register_id = @Id";
+    await pool.request().input("Id", sql.Int, idNumber).query(deleteQuery);
+
+    res.status(200).json({ message: "User rejected successfully" });
+
+  } catch (err) {
+    console.error("Error rejecting user:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
