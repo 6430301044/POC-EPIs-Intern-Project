@@ -18,6 +18,7 @@ export async function getMEBenthosData(
           JOIN [dbo].[Semiannual] s ON dp.semiannual_id = s.semiannual_Id
           JOIN [dbo].[Companies] c ON meb.company_id = c.company_Id
           JOIN [dbo].[Companies] cr ON meb.reportBy = cr.company_Id
+          JOIN [dbo].[Years] y ON dp.year_id = y.year_id
           WHERE 1=1
   `;
 
@@ -26,7 +27,7 @@ export async function getMEBenthosData(
     countQuery += ` AND ms.stationName = @stationName`;
   }
   if (filters.year) {
-    countQuery += ` AND s.year = @year`;
+    countQuery += ` AND y.year = @year`;
   }
   if (filters.semiannual) {
     countQuery += ` AND s.semiannual = @semiannual`;
@@ -50,7 +51,7 @@ export async function getMEBenthosData(
   let query = `
       SELECT
               s.semiannual,
-              s.[year],
+              y.[year],
               mc.mainName,
               sc.subName,
               ms.stationName,
@@ -72,6 +73,7 @@ export async function getMEBenthosData(
           JOIN [dbo].[Semiannual] s ON dp.semiannual_id = s.semiannual_Id
           JOIN [dbo].[Companies] c ON meb.company_id = c.company_Id
           JOIN [dbo].[Companies] cr ON meb.reportBy = cr.company_Id
+          JOIN [dbo].[Years] y ON dp.year_id = y.year_id
           WHERE 1=1
   `;
   // ✅ เพิ่มเงื่อนไขการกรองตามค่าที่ได้รับ
@@ -79,14 +81,14 @@ export async function getMEBenthosData(
     query += ` AND ms.stationName = @stationName`;
   }
   if (filters.year) {
-    query += ` AND s.year = @year`;
+    query += ` AND y.year = @year`;
   }
   if (filters.semiannual) {
     query += ` AND s.semiannual = @semiannual`;
   }
 
   query += `
-    ORDER BY s.year DESC
+    ORDER BY y.year DESC
     OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY;
 `;
 

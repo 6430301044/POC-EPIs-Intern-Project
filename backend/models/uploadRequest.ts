@@ -26,14 +26,10 @@ export interface IUploadRequest extends Document {
   mimeType: string;
   
   /**
-   * Year the data belongs to
+   * Period ID that links to the Daysperiod table
+   * This replaces the separate year and period fields
    */
-  year: string;
-  
-  /**
-   * Period the data belongs to (1: Jan-Jun, 2: Jul-Dec)
-   */
-  period: string;
+  periodId: string;
   
   /**
    * Main category of the data (environmental, social, governance)
@@ -90,8 +86,7 @@ const uploadRequestSchema = new mongoose.Schema<IUploadRequest>(
     systemFilename: { type: String, required: true },
     fileSize: { type: Number, required: true },
     mimeType: { type: String, required: true },
-    year: { type: String, required: true },
-    period: { type: String, required: true },
+    periodId: { type: String, required: true },
     mainCategory: { type: String, required: true },
     subCategory: { type: String, required: true },
     status: { 

@@ -11,15 +11,16 @@ export async function getNoiseLevelNormalData(
   let countQuery = `
     SELECT COUNT(*) as totalCount
     FROM [dbo].[Env_Noise_NoiseLevelNormal] nlm
-    JOIN [dbo].[SbCategories] sc ON nlm.sub_Id = sc.sub_Id
-    JOIN [dbo].[Mcategories] mc ON sc.main_Id = mc.main_Id
-    JOIN [dbo].[Monitoring_Station] ms ON nlm.station_id = ms.station_Id
-    JOIN [dbo].[Daysperiod] dp ON nlm.period_id = dp.period_Id
-    JOIN [dbo].[Semiannual] s ON dp.semiannual_id = s.semiannual_Id
-    JOIN [dbo].[Companies] c ON nlm.company_id = c.company_Id
-    JOIN [dbo].[Tool] at ON nlm.toolAnalyst = at.tool_Id
-    JOIN [dbo].[Tool] ct ON nlm.toolCalibration = ct.tool_Id
-    JOIN [dbo].[Companies] cr ON nlm.reportBy = cr.company_Id
+    JOIN [dbo].[SbCategories] sc ON nlm.sub_id = sc.sub_id
+    JOIN [dbo].[Mcategories] mc ON sc.main_id = mc.main_id
+    JOIN [dbo].[Monitoring_Station] ms ON nlm.station_id = ms.station_id
+    JOIN [dbo].[Daysperiod] dp ON nlm.period_id = dp.period_id
+    JOIN [dbo].[Semiannual] s ON dp.semiannual_id = s.semiannual_id
+    JOIN [dbo].[Companies] c ON nlm.company_id = c.company_id
+    JOIN [dbo].[Tool] at ON nlm.toolAnalyst = at.tool_id
+    JOIN [dbo].[Tool] ct ON nlm.toolCalibration = ct.tool_id
+    JOIN [dbo].[Companies] cr ON nlm.reportBy = cr.company_id
+    JOIN [dbo].[Years] y ON dp.year_id = y.year_id
     WHERE 1=1
   `;
   
@@ -28,7 +29,7 @@ export async function getNoiseLevelNormalData(
     countQuery += ` AND ms.stationName = @stationName`;
   }
   if (filters.year) {
-    countQuery += ` AND s.year = @year`;
+    countQuery += ` AND y.year = @year`;
   }
   if (filters.semiannual) {
     countQuery += ` AND s.semiannual = @semiannual`;
@@ -53,7 +54,7 @@ export async function getNoiseLevelNormalData(
   let query = `
     SELECT
               s.semiannual,
-              s.[year],
+              y.[year],
               mc.mainName,
               sc.subName,
               nlm.timePeriod,
@@ -75,15 +76,16 @@ export async function getNoiseLevelNormalData(
               dp.startDate,
               dp.endDate
           FROM [dbo].[Env_Noise_NoiseLevelNormal] nlm
-          JOIN [dbo].[SbCategories] sc ON nlm.sub_Id = sc.sub_Id
-          JOIN [dbo].[Mcategories] mc ON sc.main_Id = mc.main_Id
-          JOIN [dbo].[Monitoring_Station] ms ON nlm.station_id = ms.station_Id
-          JOIN [dbo].[Daysperiod] dp ON nlm.period_id = dp.period_Id
-          JOIN [dbo].[Semiannual] s ON dp.semiannual_id = s.semiannual_Id
-          JOIN [dbo].[Companies] c ON nlm.company_id = c.company_Id
-          JOIN [dbo].[Tool] at ON nlm.toolAnalyst = at.tool_Id
-          JOIN [dbo].[Tool] ct ON nlm.toolCalibration = ct.tool_Id
-          JOIN [dbo].[Companies] cr ON nlm.reportBy = cr.company_Id
+          JOIN [dbo].[SbCategories] sc ON nlm.sub_id = sc.sub_id
+          JOIN [dbo].[Mcategories] mc ON sc.main_id = mc.main_id
+          JOIN [dbo].[Monitoring_Station] ms ON nlm.station_id = ms.station_id
+          JOIN [dbo].[Daysperiod] dp ON nlm.period_id = dp.period_id
+          JOIN [dbo].[Semiannual] s ON dp.semiannual_id = s.semiannual_id
+          JOIN [dbo].[Companies] c ON nlm.company_id = c.company_id
+          JOIN [dbo].[Tool] at ON nlm.toolAnalyst = at.tool_id
+          JOIN [dbo].[Tool] ct ON nlm.toolCalibration = ct.tool_id
+          JOIN [dbo].[Companies] cr ON nlm.reportBy = cr.company_id
+          JOIN [dbo].[Years] y ON dp.year_id = y.year_id
           WHERE 1=1
   `;
   // ✅ เพิ่มเงื่อนไขการกรองตามค่าที่ได้รับ
@@ -91,14 +93,14 @@ export async function getNoiseLevelNormalData(
     query += ` AND ms.stationName = @stationName`;
   }
   if (filters.year) {
-    query += ` AND s.year = @year`;
+    query += ` AND y.year = @year`;
   }
   if (filters.semiannual) {
     query += ` AND s.semiannual = @semiannual`;
   }
 
   query += `
-    ORDER BY s.year DESC
+    ORDER BY y.year DESC
     OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY;
 `;
 

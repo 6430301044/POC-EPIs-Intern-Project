@@ -1,13 +1,14 @@
 import { Container } from "@/components/template/Container";
 import { SectionTitle } from "@/components/template/SectionTitle";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 interface PendingApproval {
   id: string;
   file_name: string;
   upload_date: string;
+  period_id: string;
+  period_name: string;
   year: string;
-  period: string;
   mainCategory: string;
   subCategory: string;
   uploaded_by: string;
@@ -49,7 +50,7 @@ export default function Approval() {
   const fetchPendingApprovals = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/upload/pending-approvals");
+      const response = await fetch("http://localhost:5000/api/upload/pending-approvals");
       
       if (!response.ok) {
         throw new Error("Failed to fetch pending approvals");
@@ -78,7 +79,7 @@ export default function Approval() {
   const handleApprove = async (id: string) => {
     try {
       setProcessingId(id);
-      const response = await fetch(`/api/upload/approve/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/upload/approve/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
@@ -116,7 +117,7 @@ export default function Approval() {
   const handleReject = async (id: string, reason: string = "") => {
     try {
       setProcessingId(id);
-      const response = await fetch(`/api/upload/reject/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/upload/reject/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
@@ -217,7 +218,7 @@ export default function Approval() {
                         <td className="py-3 px-4 border-b">{formatDate(approval.upload_date)}</td>
                         <td className="py-3 px-4 border-b">{approval.year}</td>
                         <td className="py-3 px-4 border-b">
-                          {approval.period === "1" ? "ม.ค. - มิ.ย." : "ก.ค. - ธ.ค."}
+                          {approval.period_name}
                         </td>
                         <td className="py-3 px-4 border-b">{approval.mainCategory}</td>
                         <td className="py-3 px-4 border-b">{approval.subCategory}</td>
