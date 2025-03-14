@@ -167,12 +167,12 @@ export default function Approval() {
   return (
     <>
       <Container>
-        <SectionTitle title="Approval" align="center" />
+        <SectionTitle title="Approve File" align="center" />
         <div className="p-8">
           <div className="flex flex-col space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">
-                Pending Approvals
+                Pending Approve
               </h2>
               <button 
                 onClick={() => fetchPendingApprovals()}

@@ -17,13 +17,13 @@ import Reports from "@/pages/admin/Reports";
 import Settings from "@/pages/admin/Settings";
 import Profile from "@/pages/admin/Profile";
 import Upload from "@/pages/admin/Upload";
-import Approval from "@/pages/admin/Approval";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import TestAPICall from "@/components/TestAPICall";
 import Contact from "@/components/main/Contact";
 import Visualization from "@/components/main/Visualization";
-import ApproveUsere from "@/pages/admin/ApproveUser";
-
+// import ApproveUsere from "@/pages/admin/ApproveUser";
+// import Approval from "@/pages/admin/Approval";
+import ApproveMain from "@/pages/admin/ApproveMain";
 
 
 const router = createBrowserRouter([
@@ -119,13 +119,10 @@ const router = createBrowserRouter([
         element: <Upload />,
       },
       {
-        path: "/admin/approval",
-        element: <Approval />,
+        path: "/admin/approve",
+        element: <ApproveMain />,
       },
-      {
-        path: "/admin/approveuser",
-        element: <ApproveUsere />,
-      },
+
     ],
   },
 ]);

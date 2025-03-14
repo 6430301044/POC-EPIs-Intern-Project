@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import sql from "mssql";
+import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 import type { Request, Response } from "express";
@@ -44,7 +45,6 @@ router.post("/", async (req: Request, res: Response) => {
     console.log("🟢 API Hit: Login Endpoint");
     console.log("Received Body:", req.body);
   
-  
     try {
       const { User_email, User_password } = req.body;
       console.log("Checking email:", User_email); // ตรวจสอบค่าที่รับมา
@@ -57,8 +57,9 @@ router.post("/", async (req: Request, res: Response) => {
       if (!pool) {
         return res.status(500).json({ message: "Database connection failed" });
       }
-  
-      const query = "SELECT User_name, User_email, User_password FROM dbo.Users WHERE User_email = @Email";
+
+      // ดึงข้อมูลผู้ใช้จากฐานข้อมูล
+      const query = "SELECT User_id, User_name, User_email, User_password FROM dbo.Users WHERE User_email = @Email";
       console.log("Executing query:", query);
       
       const result = await pool.request().input("Email", sql.NVarChar, User_email).query(query);
@@ -70,24 +71,33 @@ router.post("/", async (req: Request, res: Response) => {
   
       const user = result.recordset[0];
       console.log("User found:", user);
-  
+      
+      // ตรวจสอบรหัสผ่าน
       const isMatch = await bcrypt.compare(User_password, user.User_password);
       console.log("Password Match:", isMatch);
-  
       if (!isMatch) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
-  
+
+      // สร้าง JWT Token
+      const token = jwt.sign(
+        { userId: user.User_id, name: user.User_name, email: user.User_email },
+        process.env.JWT_SECRET!,
+        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" } // กำหนดอายุ Token
+      );
+
+      // ส่ง token และข้อมูลผู้ใช้กลับไปยัง frontend
       res.status(200).json({
-        message: "Login successful",
-        user: { name: user.User_name, email: user.User_email },
-      });
+      message: "Login successful",
+      token,
+      user: { userId: user.User_id, name: user.User_name, email: user.User_email },
+    });
   
-    } catch (err) {
-      console.error("Login error:", err);
-      res.status(500).json({ message: "Server error" });
-    }
-  });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
   
 
 export default router;

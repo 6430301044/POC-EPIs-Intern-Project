@@ -9,6 +9,7 @@ interface PendingApproval {
   User_phone: string;
   User_Job_Position: string;
   Company_id: string | null;
+  Created_at: string;
 }
 
 export default function Approval() {
@@ -100,7 +101,7 @@ export default function Approval() {
 
   return (
     <Container>
-      <SectionTitle title="Approve" align="center" />
+      <SectionTitle title="Approve User" align="center" />
       <div className="p-8">
         <div className="flex flex-col space-y-6">
           <div className="flex justify-between items-center">
@@ -128,9 +129,12 @@ export default function Approval() {
               <table className="min-w-full bg-white border border-gray-200">
                 <thead>
                   <tr className="bg-gray-100">
-                    <th className="py-3 px-4 border-b text-left">User Name</th>
-                    <th className="py-3 px-4 border-b text-left">Email</th>
+                    <th className="py-3 px-4 border-b text-left">User Name</th>       
                     <th className="py-3 px-4 border-b text-left">Job Position</th>
+                    <th className="py-3 px-4 border-b text-left">Company</th>
+                    <th className="py-3 px-4 border-b text-left">Email</th>
+                    <th className="py-3 px-4 border-b text-left">Phone</th>
+                    <th className="py-3 px-4 border-b text-left">Date</th>
                     <th className="py-3 px-4 border-b text-center">Actions</th>
                   </tr>
                 </thead>
@@ -138,8 +142,20 @@ export default function Approval() {
                   {pendingApprovals.map((approval) => (
                     <tr key={approval.Register_id} className="hover:bg-gray-50">
                       <td className="py-3 px-4 border-b">{approval.User_name}</td>
-                      <td className="py-3 px-4 border-b">{approval.User_email}</td>
                       <td className="py-3 px-4 border-b">{approval.User_Job_Position}</td>
+                      <td className="py-3 px-4 border-b">{approval.Company_id}</td>
+                      <td className="py-3 px-4 border-b">{approval.User_email}</td>
+                      <td className="py-3 px-4 border-b">{approval.User_phone}</td>
+                      <td className="py-3 px-4 border-b">
+                          {new Date(approval.Created_at).toLocaleString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                          })}
+                        </td>
                       <td className="py-3 px-4 border-b text-center">
                         <div className="flex justify-center space-x-2">
                           <button onClick={() => handleApprove(approval.Register_id)} disabled={processingId === approval.Register_id} className={`px-3 py-1 rounded text-white ${processingId === approval.Register_id ? 'bg-green-400' : 'bg-green-600 hover:bg-green-700'}`}>

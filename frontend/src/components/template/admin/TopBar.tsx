@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import DarkSwitch from '@/components/template/DarkSwitch'
 
 // กำหนด interface สำหรับ SVG props
@@ -10,6 +10,9 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
 export default function TopBar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const [userName, setUserName] = useState("Guest");
+
+  const navigate = useNavigate()
 
   // Click outside handler
   useEffect(() => {
@@ -23,9 +26,27 @@ export default function TopBar() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // ดึงข้อมูลชื่อผู้ใช้จาก localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUserName(parsedUser.name); // ใช้ name ที่เก็บใน localStorage
+    }
+  }, []);
+
   // Close dropdown when clicking menu items
   const handleMenuClick = () => {
     setIsProfileOpen(false)
+  }
+
+  const handleSignOut = () => {
+    // ลบข้อมูลจาก localStorage
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
+
+    // นำทางไปหน้า login
+    navigate('/login')
   }
 
   return (
@@ -69,7 +90,7 @@ export default function TopBar() {
                 alt=""
               />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Tom Cook
+                {userName !== '' ? userName : 'Loading...'}
               </span>
             </button>
 
@@ -88,14 +109,14 @@ export default function TopBar() {
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   Settings
-                </Link>
-                <Link
-                  to="/login"
-                  onClick={handleMenuClick}
-                  className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  </Link>
+                {/* Sign out button */}
+                <button
+                  onClick={handleSignOut}
+                  className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left"
                 >
                   Sign out
-                </Link>
+                </button>
               </div>
             )}
           </div>

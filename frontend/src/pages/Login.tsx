@@ -4,6 +4,9 @@ import { SectionTitle } from "@/components/template/SectionTitle"
 import { Link, useNavigate } from "react-router"
 import { useState, useEffect } from "react";
 import { Eye, EyeOff }  from "lucide-react";
+import { jwtDecode } from "jwt-decode"; 
+
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -14,16 +17,16 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Submitting Login:", { email, password });
-  
+
     try {
       const response = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ User_email: email, User_password: password }),
       });
-  
+
       console.log("Response Status:", response.status);
-  
+
       let data;
       try {
         data = await response.json(); // อ่าน JSON
@@ -33,12 +36,27 @@ export default function Login() {
         console.error("Response Text:", text);
         throw new Error("Invalid server response");
       }
-  
+
       console.log("Response Data:", data);
-  
+
       if (response.ok) {
         alert("Login successful!");
-        navigate("/dashboard");
+
+        // Decode token
+        const decodedToken = jwtDecode(data.token);
+
+        // บันทึก token และข้อมูลที่เกี่ยวข้องลงใน localStorage
+        localStorage.setItem("token", data.token); // ใส่ token ลงใน localStorage
+        localStorage.setItem("user", JSON.stringify({
+          userId: decodedToken.userId,
+          name: decodedToken.name,
+          email: decodedToken.email
+        }));
+
+        const user = decodedToken;
+        console.log("Logged in user:", user);
+
+        navigate("/admin");
       } else {
         alert(data.message || "Invalid email or password");
       }

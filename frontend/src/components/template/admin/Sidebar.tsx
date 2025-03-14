@@ -16,10 +16,10 @@ export default function Sidebar() {
   // เมนูหลัก
   const mainMenus = [
     { name: 'Team', path: '/admin/team', icon: TeamIcon },
-    { name: 'Projects', path: '/admin/projects', icon: ProjectIcon },
-    { name: 'Calendar', path: '/admin/calendar', icon: CalendarIcon },
-    { name: 'Documents', path: '/admin/documents', icon: DocumentIcon },
-    { name: 'Reports', path: '/admin/reports', icon: ReportIcon },
+    { name: 'Upload', path: '/admin/upload', icon: ProjectIcon },
+    { name: 'Approve', path: '/admin/approve', icon: CalendarIcon },
+    { name: 'Audiolog', path: '/admin/', icon: DocumentIcon },
+    { name: 'News', path: '/admin/', icon: ReportIcon },
   ]
 
   const teams = [
