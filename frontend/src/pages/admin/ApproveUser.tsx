@@ -1,6 +1,8 @@
 import { Container } from "@/components/template/Container";
 import { SectionTitle } from "@/components/template/SectionTitle";
 import { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";  // ✅ ต้องใช้ Named Import
+import { useNavigate } from "react-router-dom"; // สำหรับเปลี่ยนหน้
 
 interface PendingApproval {
   Register_id: number;  
@@ -16,6 +18,9 @@ export default function Approval() {
   const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<number | null>(null);
+
+  const navigate = useNavigate(); //
+
   const [toast, setToast] = useState<{ show: boolean; title: string; message: string; type: 'success' | 'error' | 'warning' }>({
     show: false,
     title: '',
@@ -32,68 +37,120 @@ export default function Approval() {
   };
 
   useEffect(() => {
+    checkTokenExpiration();
     fetchPendingApprovals();
   }, []);
 
-  const fetchPendingApprovals = async () => {
+  const checkTokenExpiration = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("🚨 No token found! Redirecting to login...");
+      navigate("/login"); // ✅ ถ้าไม่มี Token ให้ไปหน้า Login
+      return false;
+    }
+
+    try {
+      const decoded: any = jwtDecode(token); // ✅ ถอดรหัส JWT
+      const currentTime = Date.now() / 1000; // แปลงเป็นวินาที
+      console.log("⏳ Token Expires At:", decoded.exp);
+      console.log("🕒 Current Time:", currentTime);
+
+      if (decoded.exp < currentTime) {
+        console.warn("🚨 Token expired! Redirecting to login...");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/login"); // ✅ ไปหน้า Login ถ้า Token หมดอายุ
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("❌ Invalid token:", error);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/login"); // ✅ ไปหน้า Login ถ้า Token ไม่ถูกต้อง
+      return false;
+    }
+  };
+
+
+   const fetchPendingApprovals = async () => {
+    if (!checkTokenExpiration()) return; // ❌ หยุดถ้า Token หมดอายุ
+
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/register/pending");
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:5000/register/pending", {
+        headers: {
+          "Authorization": `Bearer ${token}`, // ✅ ส่ง Token ไปกับ API
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        console.warn("🚨 Unauthorized! Redirecting to login...");
+        navigate("/login");
+        return;
+      }
+
       const data = await response.json();
-
-      console.log("API Response:", data);
-
       setPendingApprovals(data || []);
     } catch (error) {
-      showToast("Error", "Failed to load pending approvals", "error");
+      console.error("❌ Failed to fetch pending approvals:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleApprove = async (Register_id: number | undefined) => {
-    if (Register_id === undefined || Register_id === null) {
-      showToast("Error", "User ID is missing", "error");
-      return;
-    }
+    if (!Register_id) return;
+    if (!checkTokenExpiration()) return;
 
     setProcessingId(Register_id);
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`http://localhost:5000/register/approve/${Register_id}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" }
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
       });
 
       if (!response.ok) throw new Error("Failed to approve user");
 
-      showToast("Success", "User approved successfully", "success");
+      showToast("Success", "User approved successfully!", "success"); // ✅ แสดง Toast
       fetchPendingApprovals();
     } catch (error) {
-      showToast("Error", "Failed to approve user", "error");
+      console.error("❌ Failed to approve user:", error);
+      showToast("Error", "Failed to approve user!", "error");// ❌ แสดง Toast เมื่อผิดพลาด
     } finally {
       setProcessingId(null);
     }
   };
-
+  
+  // ✅ ฟังก์ชัน Reject (เช็ค Token ก่อน)
   const handleReject = async (Register_id: number | undefined) => {
-    if (Register_id === undefined || Register_id === null) {
-      showToast("Error", "User ID is missing", "error");
-      return;
-    }
+    if (!Register_id) return;
+    if (!checkTokenExpiration()) return; // ❌ หยุดถ้า Token หมดอายุ
 
     setProcessingId(Register_id);
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`http://localhost:5000/register/reject/${Register_id}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" }
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
       });
 
       if (!response.ok) throw new Error("Failed to reject user");
 
-      showToast("Success", "User rejected successfully", "success");
+      showToast("Success", "User rejected successfully!", "warning"); // ✅ แสดง Toast
       fetchPendingApprovals();
     } catch (error) {
-      showToast("Error", "Failed to reject user", "error");
+      console.error("❌ Failed to reject user:", error);
+      showToast("Error", "Failed to reject user!", "error"); // ❌ แสดง Toast เมื่อผิดพลาด
     } finally {
       setProcessingId(null);
     }

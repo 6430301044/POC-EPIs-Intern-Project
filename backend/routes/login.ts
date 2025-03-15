@@ -83,7 +83,8 @@ router.post("/", async (req: Request, res: Response) => {
       const token = jwt.sign(
         { userId: user.User_id, name: user.User_name, email: user.User_email },
         process.env.JWT_SECRET!,
-        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" } // กำหนดอายุ Token
+        // { expiresIn: process.env.JWT_EXPIRES_IN || "30s" } // กำหนดอายุ Token
+        { expiresIn: "30s" }
       );
 
       // ส่ง token และข้อมูลผู้ใช้กลับไปยัง frontend

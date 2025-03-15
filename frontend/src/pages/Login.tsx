@@ -1,10 +1,11 @@
 import { Container } from "@/components/template/Container"
 import DarkSwitch from "@/components/template/DarkSwitch"
 import { SectionTitle } from "@/components/template/SectionTitle"
-import { Link, useNavigate } from "react-router"
+import { Link } from "react-router"
 import { useState, useEffect } from "react";
 import { Eye, EyeOff }  from "lucide-react";
-import { jwtDecode } from "jwt-decode"; 
+import { useNavigate } from "react-router-dom";
+import { jwtDecode }  from 'jwt-decode';
 
 
 
@@ -13,6 +14,52 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  // ✅ **ตรวจสอบ Token ว่าหมดอายุหรือยัง**
+  useEffect(() => {
+    console.log("Checking token expiration...");
+    const checkTokenExpiration = () => {
+      const token = localStorage.getItem("token");
+      console.log("Token from localStorage:", token);
+      if (token) {
+        try {
+          const decoded: any = jwtDecode(token); // Decode JWT
+          const currentTime = Date.now() / 1000; // เวลาปัจจุบัน (วินาที)
+          console.log("Current Time:", currentTime);
+          console.log("Token Expiry (exp):", decoded.exp);
+  
+          if (decoded.exp < currentTime) {
+            console.log("⏳ Token expired, redirecting to login...");
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            navigate("/login"); // พาไปหน้า Login
+          }
+        } catch (error) {
+          console.error("❌ Invalid token:", error);
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          navigate("/login");
+        }
+      }
+    }
+  
+    checkTokenExpiration(); // ตรวจสอบตอนเข้าเว็บ
+    const interval = setInterval(checkTokenExpiration, 1000); // เช็คทุก 1 นาที
+  
+    // กำหนด listener สำหรับการเปลี่ยนแปลงใน localStorage
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === "token" || event.key === "user") {
+        checkTokenExpiration();
+      }
+    };
+  
+    window.addEventListener("storage", handleStorageChange);
+  
+    return () => {
+      clearInterval(interval); // ล้าง interval ตอนออกจากหน้า
+      window.removeEventListener("storage", handleStorageChange); // ลบ event listener
+    };
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

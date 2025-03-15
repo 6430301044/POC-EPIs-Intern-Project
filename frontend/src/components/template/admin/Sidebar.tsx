@@ -113,30 +113,6 @@ export default function Sidebar() {
                 </Link>
               ))}
             </div>
-
-            {/* Teams Section */}
-            {!isCollapsed && (
-              <div className="pt-6">
-                <div className="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Your teams
-                </div>
-                <div className="mt-2 space-y-1">
-                  {teams.map((team) => (
-                    <Link
-                      key={team.name}
-                      to={team.path}
-                      onClick={handleMenuClick}
-                      className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800"
-                    >
-                      <span className="w-8 h-8 mr-3 flex items-center justify-center bg-indigo-500 dark:bg-gray-800 rounded-md text-white">
-                        {team.initial}
-                      </span>
-                      {team.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
           </nav>
 
           {/* Settings - Fixed at bottom */}

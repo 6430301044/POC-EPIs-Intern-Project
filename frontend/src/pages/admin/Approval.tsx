@@ -50,63 +50,69 @@ export default function Approval() {
   const fetchPendingApprovals = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/upload/pending-approvals");
-      
+      const token = localStorage.getItem("token"); // ดึง Token จาก Local Storage
+  
+      const response = await fetch("http://localhost:5000/api/upload/pending-approvals", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // ส่ง Token ไปด้วย
+        }
+      });
+  
+      if (response.status === 401) {
+        // Token หมดอายุ ให้ Redirect ไปหน้า Login หรือแจ้งเตือน
+        showToast("Session Expired", "Please log in again.", "error");
+        localStorage.removeItem("token"); // ลบ Token ที่หมดอายุออก
+        window.location.href = "/login"; // Redirect ไปหน้า Login
+        return;
+      }
+  
       if (!response.ok) {
         throw new Error("Failed to fetch pending approvals");
       }
-      
+  
       const data = await response.json();
       setPendingApprovals(data.data || []);
     } catch (error) {
-      showToast(
-        "Error",
-        "Failed to load pending approvals",
-        "error"
-      );
+      showToast("Error", "Failed to load pending approvals", "error");
       console.error("Error fetching pending approvals:", error);
     } finally {
       setLoading(false);
     }
   };
-
-  // ดึงข้อมูลเมื่อโหลดคอมโพเนนต์
-  useEffect(() => {
-    fetchPendingApprovals();
-  }, []);
+  
 
   // ฟังก์ชันสำหรับอนุมัติคำขอ
   const handleApprove = async (id: string) => {
     try {
       setProcessingId(id);
+      const token = localStorage.getItem("token");
+  
       const response = await fetch(`http://localhost:5000/api/upload/approve/${id}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({
-          userId: "admin" // ควรใช้ ID ของผู้ใช้ที่ login อยู่
-        })
+        body: JSON.stringify({ userId: "admin" })
       });
-
+  
+      if (response.status === 401) {
+        showToast("Session Expired", "Please log in again.", "error");
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        return;
+      }
+  
       if (!response.ok) {
         throw new Error("Failed to approve upload");
       }
-
-      showToast(
-        "Success",
-        "Upload approved successfully",
-        "success"
-      );
-      
-      // รีเฟรชข้อมูลหลังจากอนุมัติ
+  
+      showToast("Success", "Upload approved successfully", "success");
       fetchPendingApprovals();
     } catch (error) {
-      showToast(
-        "Error",
-        "Failed to approve upload",
-        "error"
-      );
+      showToast("Error", "Failed to approve upload", "error");
       console.error("Error approving upload:", error);
     } finally {
       setProcessingId(null);
@@ -117,35 +123,32 @@ export default function Approval() {
   const handleReject = async (id: string, reason: string = "") => {
     try {
       setProcessingId(id);
+      const token = localStorage.getItem("token");
+  
       const response = await fetch(`http://localhost:5000/api/upload/reject/${id}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({
-          userId: "admin", // ควรใช้ ID ของผู้ใช้ที่ login อยู่
-          rejectionReason: reason
-        })
+        body: JSON.stringify({ userId: "admin", rejectionReason: reason })
       });
-
+  
+      if (response.status === 401) {
+        showToast("Session Expired", "Please log in again.", "error");
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        return;
+      }
+  
       if (!response.ok) {
         throw new Error("Failed to reject upload");
       }
-
-      showToast(
-        "Success",
-        "Upload rejected successfully",
-        "success"
-      );
-      
-      // รีเฟรชข้อมูลหลังจากปฏิเสธ
+  
+      showToast("Success", "Upload rejected successfully", "success");
       fetchPendingApprovals();
     } catch (error) {
-      showToast(
-        "Error",
-        "Failed to reject upload",
-        "error"
-      );
+      showToast("Error", "Failed to reject upload", "error");
       console.error("Error rejecting upload:", error);
     } finally {
       setProcessingId(null);
