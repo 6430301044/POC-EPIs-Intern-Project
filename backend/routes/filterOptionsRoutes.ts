@@ -1,5 +1,6 @@
 import express from "express";
 import { connectToDB } from "../db/dbConfig";
+import { authenticateToken } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -135,7 +136,6 @@ router.get("/years", async (req, res) => {
             .query(`
                 SELECT DISTINCT y.year
                 FROM dbo.Years y
-                JOIN [dbo].[Years] y ON dp.year_id = y.year_id
                 JOIN dbo.Daysperiod dp ON y.year_id = dp.year_id
                 JOIN dbo.${tableName} t ON dp.period_id = t.period_id;
             `);

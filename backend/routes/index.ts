@@ -7,6 +7,8 @@ import seaWaterDataRoutes from "./seaWaterDataRoutes";
 import wasteWaterDataRoutes from "./wasteWaterDataRoutes";
 import uploadRoutes from "./uploadRoutes";
 import filterOptionsRoutes from "./filterOptionsRoutes";
+import userRoutes from "./userRoutes";
+import newsRoutes from "./newsRoutes";
 
 const router = express.Router();
 
@@ -24,5 +26,7 @@ router.use("/Env_SeaWater", seaWaterDataRoutes);
 router.use("/Env_WasteWater", wasteWaterDataRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/filter-options", filterOptionsRoutes);
+router.use("/user", userRoutes);
+router.use("/news", newsRoutes);
 
 export default router;

@@ -1,0 +1,182 @@
+โครงสร้างข้อมูลสำหรับแต่ละ Sub Category (อ้างอิงจาก Database Schema):
+
+1. Env_Wind_WDWS (ข้อมูลลม):
+   - windDirection (string): ทิศทางลม
+   - ws_05_1 (decimal): ความเร็วลม 0.5-1 m/s
+   - ws_1_2 (decimal): ความเร็วลม 1-2 m/s
+   - ws_2_3 (decimal): ความเร็วลม 2-3 m/s
+   - ws_3_4 (decimal): ความเร็วลม 3-4 m/s
+   - ws_4_6 (decimal): ความเร็วลม 4-6 m/s
+   - ws_more_that_6 (decimal): ความเร็วลมมากกว่า 6 m/s
+   - station_id (int): รหัสสถานี
+   - company_id (int): รหัสบริษัทตรวจวัด
+   - reportBy (int): รหัสบริษัททำรายงาน
+
+2. Env_Wind_WindQuality (คุณภาพลม):
+   - station_id (int): รหัสสถานี
+   - parameter (string): พารามิเตอร์
+   - unit (string): หน่วย
+   - day1st_result (decimal): ผลวันที่ 1
+   - day2nd_result (decimal): ผลวันที่ 2
+   - day3rd_result (decimal): ผลวันที่ 3
+   - std (decimal): ค่ามาตรฐาน
+   - company_id (int): รหัสบริษัทตรวจวัด
+   - reportBy (int): รหัสบริษัททำรายงาน
+
+3. Env_Wind_SO2 (ซัลเฟอร์ไดออกไซด์):
+   - station_id (int): รหัสสถานี
+   - timePeriod (string): ช่วงเวลา
+   - day1st_result_ppm (decimal): ผลวันที่ 1 (ppm)
+   - day2nd_result_ppm (decimal): ผลวันที่ 2 (ppm)
+   - day3rd_result_ppm (decimal): ผลวันที่ 3 (ppm)
+   - certifiedDate (date): วันที่รับรอง
+   - expireDate (date): วันที่หมดอายุ
+   - concentrationPPB (string): ความเข้มข้นที่ทำการสอบเทียบ
+   - gasCylinder (int): รหัสอุปกรณ์ gasCylinder
+   - toolAnalyst (int): รหัสรุ่นของเครื่องมือตรวจวิเคราะห์
+   - toolCalibration (int): รหัสของรุ่นอุปกรณ์สอบเทียบ
+   - company_id (int): รหัสบริษัทตรวจวัด
+   - reportBy (int): รหัสบริษัททำรายงาน
+
+4. Env_Wind_Vocs (สารอินทรีย์ระเหยง่าย):
+   - station_id (int): รหัสสถานี
+   - index_name (string): ชื่อดัชนี
+   - day1st_result_ug_per_m3 (float): ผลวันที่ 1 (µg/m³)
+   - day2nd_result_ug_per_m3 (float): ผลวันที่ 2 (µg/m³)
+   - day3rd_result_ug_per_m3 (float): ผลวันที่ 3 (µg/m³)
+   - std_lower (float): ค่ามาตรฐานต่ำสุด
+   - std_higher (float): ค่ามาตรฐานสูงสุด
+   - company_id (int): รหัสบริษัทตรวจวัด
+   - reportBy (int): รหัสบริษัททำรายงาน
+
+5. Env_Air_AirQuality (คุณภาพอากาศ):
+   - station_id (int): รหัสสถานี
+   - index_name (string): ชื่อดัชนี
+   - unit (string): หน่วย
+   - result (decimal): ผลการตรวจวัด
+   - std (decimal): ค่ามาตรฐาน
+   - company_id (int): รหัสบริษัทตรวจวัด
+   - reportBy (int): รหัสบริษัททำรายงาน
+
+6. Env_Noise_NoiseLevelNormal (ระดับเสียงปกติ):
+   - station_id (int): รหัสสถานี
+   - timePeriod (string): ช่วงเวลา
+   - day1st_result (decimal): ผลวันที่ 1
+   - day2nd_result (decimal): ผลวันที่ 2
+   - day3rd_result (decimal): ผลวันที่ 3
+   - certifiedDate (date): วันที่รับรอง
+   - calibrationRefdB (decimal): ค่าอ้างอิงการสอบเทียบ (dB)
+   - slmRead (decimal): ค่าที่อ่านได้จาก Sound Level Master Reading (dB)
+   - slmAdjust (decimal): ค่าปรับแต่ง Sound Level Master Adjust (dB)
+   - calSheetNo(string): เลขที่เอกสารการสอบเทียบ
+   - toolAnalyst (int): รหัสรุ่นของเครื่องมือตรวจวิเคราะห์
+   - toolCalibration (int): รหัสของรุ่นอุปกรณ์สอบเทียบ
+   - company_id (int): รหัสบริษัทตรวจวัด
+   - reportBy (int): รหัสบริษัททำรายงาน
+
+7. Env_Noise_NoiseLevel90 (ระดับเสียงที่ 90 เปอร์เซ็นต์):
+   - station_id (int): รหัสสถานี
+   - timePeriod (string): ช่วงเวลา
+   - day1st_result (decimal): ผลวันที่ 1
+   - day2nd_result (decimal): ผลวันที่ 2
+   - day3rd_result (decimal): ผลวันที่ 3
+   - certifiedDate (date): วันที่รับรอง
+   - calibrationRefdB (decimal): ค่าอ้างอิงการสอบเทียบ (dB)
+   - slmRead (decimal): ค่าที่อ่านได้จาก Sound Level Master Reading (dB)
+   - slmAdjust (decimal): ค่าปรับแต่ง Sound Level Master Adjust (dB)
+   - calSheetNo (string): หมายเลขแผ่นสอบเทียบ
+   - toolAnalyst (int): รหัสรุ่นของเครื่องมือตรวจวิเคราะห์
+   - toolCalibration (int): รหัสของรุ่นอุปกรณ์สอบเทียบ
+   - company_id (int): รหัสบริษัทตรวจวัด
+   - reportBy (int): รหัสบริษัททำรายงาน
+
+8. Env_Noise_Monitorresult (ผลการตรวจวัดเสียง):
+   - station_id (int): รหัสสถานี
+   - timePeriod (string): ช่วงเวลา
+   - day1st_Leq (decimal): ค่า Leq วันที่ 1
+   - day1st_L90 (decimal): ค่า L90 วันที่ 1
+   - day2nd_Leq (decimal): ค่า Leq วันที่ 2
+   - day2nd_L90 (decimal): ค่า L90 วันที่ 2
+   - day3rd_Leq (decimal): ค่า Leq วันที่ 3
+   - day3rd_L90 (decimal): ค่า L90 วันที่ 3
+   - calibrationRefdB (decimal): ค่าอ้างอิงการสอบเทียบ (dB)
+   - slmRead (decimal): ค่าที่อ่านได้จาก Sound Level Master Reading (dB)
+   - slmAdjust (decimal): ค่าปรับแต่ง Sound Level Master Adjust (dB)
+   - certifiedDate (date): วันที่รับรอง
+   - calSheetNo (string): หมายเลขแผ่นสอบเทียบ
+   - toolAnalyst (int): รหัสรุ่นของเครื่องมือตรวจวิเคราะห์
+   - toolCalibration (int): รหัสของรุ่นอุปกรณ์สอบเทียบ
+   - company_id (int): รหัสบริษัทตรวจวัด
+   - reportBy (int): รหัสบริษัททำรายงาน
+
+9. Env_SeaWater_SeaWater (คุณภาพน้ำทะเล):
+   - station_id (int): รหัสสถานี
+   - parameter (string): พารามิเตอร์
+   - result (decimal): ผลการตรวจวัด
+   - unit (string): หน่วย
+   - std_lower (decimal): ค่ามาตรฐานต่ำสุด
+   - std_higher (decimal): ค่ามาตรฐานสูงสุด
+   - company_id (int): รหัสบริษัทตรวจวัด
+   - reportBy (int): รหัสบริษัททำรายงาน
+
+10. Env_WasteWater_WasteWater (น้ำเสีย):
+    - station_id (int): รหัสสถานี
+    - index_name (string): ชื่อดัชนี
+    - result (decimal): ผลการตรวจวัด
+    - unit (string): หน่วย
+    - std_lower (decimal): ค่ามาตรฐานต่ำสุด
+    - std_higher (decimal): ค่ามาตรฐานสูงสุด
+    - company_id (int): รหัสบริษัทตรวจวัด
+    - reportBy (int): รหัสบริษัททำรายงาน
+
+11. Env_MarineEcology_PlanktonPhytos (แพลงก์ตอนพืช):
+    - station_id (int): รหัสสถานี
+    - division (string): ดิวิชัน
+    - class (string): คลาส
+    - order (string): อันดับ
+    - family (string): วงศ์
+    - genu (string): สกุล
+    - quantity_per_m3 (float): ปริมาณต่อลูกบาศก์เมตร
+    - company_id (int): รหัสบริษัทตรวจวัด
+    - reportBy (int): รหัสบริษัททำรายงาน
+
+12. Env_MarineEcology_PlanktonZoos (แพลงก์ตอนสัตว์):
+    - station_id (int): รหัสสถานี
+    - phylum (string): ไฟลัม
+    - class (string): คลาส
+    - order (string): อันดับ
+    - family (string): วงศ์
+    - genu (string): สกุล
+    - quantity_per_m3 (float): ปริมาณต่อลูกบาศก์เมตร
+    - company_id (int): รหัสบริษัทตรวจวัด
+    - reportBy (int): รหัสบริษัททำรายงาน
+
+13. Env_MarineEcology_Benthos (สัตว์หน้าดิน):
+    - station_id (int): รหัสสถานี
+    - phylum (string): ไฟลัม
+    - class (string): คลาส
+    - order (string): อันดับ
+    - family (string): วงศ์
+    - genu (string): สกุล
+    - quantity_per_m2 (float): ปริมาณต่อตารางเมตร
+    - company_id (int): รหัสบริษัทตรวจวัด
+    - reportBy (int): รหัสบริษัททำรายงาน
+
+14. Env_MarineEcology_FishLarvaeEggs (ไข่และลูกปลาวัยอ่อน):
+    - station_id (int): รหัสสถานี
+    - phylum (string): ไฟลัม
+    - class (string): คลาส
+    - order (string): อันดับ
+    - family (string): วงศ์
+    - genu (string): สกุล
+    - quantity_per_1000m3 (float): ปริมาณต่อ 1000 ลูกบาศก์เมตร
+    - company_id (int): รหัสบริษัทตรวจวัด
+    - reportBy (int): รหัสบริษัททำรายงาน
+
+15. Env_MarineEcology_JuvenileAquaticAnimals (สัตว์น้ำวัยอ่อน):
+    - station_id (int): รหัสสถานี
+    - phylum (string): ไฟลัม
+    - group_name (string): ชื่อกลุ่ม
+    - quantity_per_1000m3 (float): ปริมาณต่อ 1000 ลูกบาศก์เมตร
+    - company_id (int): รหัสบริษัทตรวจวัด
+    - reportBy (int): รหัสบริษัททำรายงาน

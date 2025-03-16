@@ -1,0 +1,1 @@
+export { uploadNews, getAllNews, getNewsById } from './newsController';

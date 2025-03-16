@@ -1,5 +1,6 @@
 import express from 'express';
 import { getWindWDWSData, getWindWindQualityData, getWindSO2Data, getWindVocsData } from '../controllers/windData/index';
+import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = express.Router();
 

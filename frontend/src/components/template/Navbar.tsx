@@ -1,13 +1,12 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router";
+import { Link } from "react-router";
 import DarkSwitch from "./DarkSwitch";
 import { scrollToSection } from "@/utils/scrollHelper";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const location = useLocation();
+  const [isOpened, setIsOpened] = useState(false);
+  const [language, setLanguage] = useState("ไทย");
 
   const { theme } = useTheme();
 
@@ -15,7 +14,7 @@ export default function Navbar() {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleMobileMenuClick = () => {
-    setIsOpen(!isOpen);
+    setIsOpened(!isOpened);
   };
 
   useEffect(() => {
@@ -29,7 +28,7 @@ export default function Navbar() {
 
       // ถ้าคลิกนอกเมนูให้ปิด
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(target)) {
-        setIsOpen(false);
+        setIsOpened(false);
       }
     }
 
@@ -38,6 +37,10 @@ export default function Navbar() {
   }, []);
 
   const navigation = [
+    { name: "Fist Section", id: "firstSection" },
+    { name: "Second Section", id: "secondSection" },
+    { name: "Third Section", id: "thirdSection" },
+    { name: "Four Section", id: "fourSection" },
     { name: "Data visualization", id: "visualization" },
     { name: "Table", id: "table" },
     { name: "Contact Us", id: "contact" },
@@ -45,113 +48,181 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="fixed top-0 w-full z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm">
-        <div className="container px-8 py-4 mx-auto xl:px-0">
-          <nav className="relative flex flex-wrap items-center justify-between mx-auto lg:justify-between max-w-screen-xl">
-            {/* Logo  */}
-            <Link to="/">
-              <span className="flex items-center space-x-2 text-2xl font-semibold dark:text-white">
-                <span>
+      <section> {/* Navbar รอง ด้านบน Navbar หลัก */}
+        <div className="fixed top-0 left-0 w-full h-[50px] bg-gradient-to-r from-[#0066a1] via-[#0066a1] to-[#2c9c3f] z-50">
+          <div className="container max-w-7xl mx-auto flex items-center justify-between px-6 h-full text-white">
+            <nav id='subNav' className="relative flex flex-wrap items-center justify-between w-full mx-auto lg:justify-between max-w-screen-xl">
+              {/* Left side - Only show menu items on desktop */}
+              <div className="flex items-center space-x-2 md:w-1/3">
+                {/* Left menu items - show only on desktop */}
+                <div className="hidden lg:flex space-x-4">
+                  <a href="#" className="hover:underline">
+                    ขนาดตัวอักษร
+                  </a>
+                  <a href="#" className="hover:underline">
+                    การแสดงผล
+                  </a>
+                </div>
+              </div>
+              
+              {/* Center - Logo - visible on all screens */}
+              <div className="flex justify-center md:w-1/3">
+                <Link to="/" className="mx-auto lg:hidden">
                   <img
                     src={
                       theme === "light"
-                        ? "/images/pttwm.svg"
+                        ? "/images/pttdm.svg"
                         : "/images/pttdm.svg"
                     }
-                    alt=""
+                    alt="Company Logo"
                     className="w-20"
                   />
-                </span>
-              </span>
-            </Link>
-
-            {/* get started and dark mode */}
-            <div className=" lg:hidden flex items-center gap-3 nav__item mr-2 ml-auto lg:ml-0 lg:order-2">
-              <DarkSwitch />
-            </div>
-
-            {/* Mobile menu button - เพิ่ม ref */}
-            <button
-              ref={menuButtonRef}
-              onClick={handleMobileMenuClick}
-              className="px-2 py-1 text-gray-500 dark:text-gray-400 rounded-md lg:hidden hover:text-indigo-500 dark:hover:text-indigo-400 focus:text-indigo-500 focus:bg-indigo-100 dark:focus:bg-gray-800 focus:outline-hidden"
-            >
-              <svg
-                className="w-6 h-6 fill-current"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
-                {isOpen ? (
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M18.278 16.864a1 1 0 0 1-1.414 1.414l-4.829-4.828-4.828 4.828a1 1 0 0 1-1.414-1.414l4.828-4.829-4.828-4.828a1 1 0 0 1 1.414-1.414l4.829 4.828 4.828-4.828a1 1 0 1 1 1.414 1.414l-4.828 4.829 4.828 4.828z"
-                  />
-                ) : (
-                  <path
-                    fillRule="evenodd"
-                    d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"
-                  />
-                )}
-              </svg>
-            </button>
-
-            {/* Mobile menu panel */}
-            {isOpen && (
-              <div
-                ref={mobileMenuRef}
-                className="flex flex-wrap w-full my-5 lg:hidden"
-              >
-                {/* Other navigation items */}
-                {navigation.map((item) => (
-                  <button
-                    key={item.name}
-                    onClick={() => {
-                      scrollToSection(item.id);
-                      setIsOpen(false);
-                    }}
-                    className={`w-full px-4 py-2 text-lg font-normal text-left hover:text-indigo-500 dark:text-gray-300 dark:hover:text-indigo-400
-                          ${
-                            location.pathname === item.id
-                              ? "text-indigo-600 dark:text-indigo-400"
-                              : ""
-                          }`}
-                  >
-                    {item.name}
-                  </button>
-                ))}
+                </Link>
               </div>
-            )}
+              
+              {/* Right side - Theme toggle and hamburger on mobile/tablet, other links on desktop */}
+              <div className="flex items-center justify-end space-x-2 md:w-1/3">
+                {/* Desktop links - show only on desktop */}
+                <div className="hidden lg:flex items-center space-x-4">
+                  <a href="#" className="hover:underline">
+                    ศูนย์ข้อมูลข่าวสาร
+                  </a>
+                  <a href="#" className="hover:underline">
+                    1365 Contact Center
+                  </a>
 
-            {/* Desktop menu */}
-            <div className="hidden text-center lg:flex lg:items-center">
-              <ul className="items-center justify-end flex-1 pt-6 list-none lg:pt-0 lg:flex">
-                {/* Other navigation items */}
-                {navigation.map((item) => (
-                  <li className="mr-3" key={item.name}>
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        scrollToSection(item.id);
-                        setIsOpen(false);
-                      }}
-                      className={`inline-block px-4 py-2 text-lg font-normal rounded-md hover:text-indigo-500 focus:text-indigo-500 focus:bg-indigo-100 focus:outline-hidden
-                            ${
-                              location.pathname === item.id
-                                ? "text-indigo-600"
-                                : ""
-                            }`}
-                    >
-                      {item.name}
+                  {/* ปุ่มเปลี่ยนภาษา */}
+                  <button
+                    onClick={() => setLanguage(language === "ไทย" ? "En" : "ไทย")}
+                    className="hover:underline"
+                  >
+                    {language}
+                  </button>
+
+                  <Link to="/login">
+                    <button className="relative z-0 h-12 rounded-full bg-blue-500 px-6 text-neutral-50 after:absolute after:left-0 after:top-0 after:-z-10 after:h-full after:w-full after:rounded-full after:bg-blue-500 hover:after:scale-x-125 hover:after:scale-y-150 hover:after:opacity-0 hover:after:transition hover:after:duration-500">
+                      Login
                     </button>
-                  </li>
-                ))}
-              </ul>
-              <DarkSwitch />
-            </div>
-          </nav>
+                  </Link>
+                </div>
+                
+                {/* Dark mode switch - show only on mobile/tablet */}
+                <div className="flex items-center lg:hidden">
+                  <DarkSwitch variant="light" />
+                </div>
+                
+                {/* Mobile menu button - show only on mobile/tablet */}
+                <button
+                  ref={menuButtonRef}
+                  onClick={handleMobileMenuClick}
+                  className="px-2 py-1 text-white rounded-md lg:hidden hover:text-gray-200 focus:outline-none"
+                >
+                  <svg
+                    className="w-6 h-6 fill-current"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                  >
+                    {isOpened ? (
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M18.278 16.864a1 1 0 0 1-1.414 1.414l-4.829-4.828-4.828 4.828a1 1 0 0 1-1.414-1.414l4.828-4.829-4.828-4.828a1 1 0 0 1 1.414-1.414l4.829 4.828 4.828-4.828a1 1 0 1 1 1.414 1.414l-4.828 4.829 4.828 4.828z"
+                      />
+                    ) : (
+                      <path
+                        fillRule="evenodd"
+                        d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"
+                      />
+                    )}
+                  </svg>
+                </button>
+              </div>
+
+              {/* Mobile menu panel */}
+              {isOpened && (
+                <div
+                  ref={mobileMenuRef}
+                  className="absolute top-[50px] left-0 w-full bg-[#0066a1] shadow-lg z-50 lg:hidden"
+                >
+                  <div className="flex flex-col w-full py-4 px-6">
+                    {/* Navigation items */}
+                    {navigation.map((item) => (
+                      <button
+                        key={item.name}
+                        onClick={() => {
+                          scrollToSection(item.id);
+                          setIsOpened(false);
+                        }}
+                        className="w-full px-4 py-3 text-lg font-normal text-left text-white hover:bg-[#005a8e] border-b border-[#0077b8]"
+                      >
+                        {item.name}
+                      </button>
+                    ))}
+                    
+                    {/* Login button in mobile menu */}
+                    <Link 
+                      to="/login" 
+                      className="mt-4 block"
+                      onClick={() => setIsOpened(false)}
+                    >
+                      <button className="w-full py-3 text-center font-medium bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
+                        Login
+                      </button>
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </nav>
+          </div>
         </div>
-      </div>
+      </section>
+      
+      {/* Navbar หลัก - แสดงเฉพาะบนจอขนาดใหญ่ */}
+      <section>
+        <div className="fixed top-[50px] w-full z-40 bg-[rgba(0,0,0,0.5)] text-white backdrop-blur-md shadow-sm hidden lg:block">
+          <div className="container px-8 py-4 mx-auto xl:px-0">
+            <nav id='mainNav' className="relative flex flex-wrap items-center justify-between mx-auto lg:justify-between max-w-screen-xl">
+              {/* Logo */}
+              <Link to="/">
+                <span className="flex items-center space-x-2 text-2xl font-semibold dark:text-white">
+                  <span>
+                    <img
+                      src={
+                        theme === "light"
+                          ? "/images/pttdm.svg"
+                          : "/images/pttdm.svg"
+                      }
+                      alt=""
+                      className="w-20"
+                    />
+                  </span>
+                </span>
+              </Link>
+
+              {/* Desktop menu */}
+              <div className="flex items-center">
+                <ul className="flex items-center space-x-2">
+                  {/* Navigation items */}
+                  {navigation.map((item) => (
+                    <li key={item.name}>
+                      <button
+                        onClick={() => scrollToSection(item.id)}
+                        className="px-4 py-2 text-lg font-normal rounded-md hover:text-indigo-300 focus:outline-none"
+                      >
+                        {item.name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                {/* Dark switch in main navbar for desktop view */}
+                <div className="ml-4">
+                  <DarkSwitch variant="light" />
+                </div>
+              </div>
+            </nav>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

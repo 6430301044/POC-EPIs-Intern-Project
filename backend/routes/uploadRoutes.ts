@@ -1,17 +1,19 @@
 import express from "express";
 import multer from "multer";
-import { uploadCSV, getRegisterData, uploadExcel, getPendingApprovals, approveUpload, rejectUpload } from "../controllers/upload/index";
+import { uploadCSV, uploadExcel, getPendingApprovals, approveUpload, rejectUpload, deleteDataByPeriod, updateDataByPeriod, getAvailableTables } from "../controllers/upload/index";
 import { getPeriods } from "../controllers/upload/periodController";
+import { getReferenceData, addReferenceData, updateReferenceData, deleteReferenceData } from "../controllers/upload/referenceDataController";
+import { authenticateToken, authorizeRoles } from "../middleware/authMiddleware";
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" }); // กำหนดโฟลเดอร์อัปโหลด
 
 // Specific endpoints for CSV and Excel uploads
-router.post("/upload-csv", upload.single("file"), uploadCSV);
-router.post("/upload-excel", upload.single("file"), uploadExcel);
+router.post("/upload-csv", authenticateToken, authorizeRoles(['admin', 'member', 'approver']), upload.single("file"), uploadCSV);
+router.post("/upload-excel", authenticateToken, authorizeRoles(['admin', 'member', 'approver']), upload.single("file"), uploadExcel);
 
 // General upload endpoint that routes to the appropriate controller based on file type
-router.post("/", upload.single("file"), (req, res) => {
+router.post("/", authenticateToken, authorizeRoles(['admin', 'member', 'approver']), upload.single("file"), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: "กรุณาอัปโหลดไฟล์" });
     }
@@ -33,25 +35,25 @@ router.post("/", upload.single("file"), (req, res) => {
     }
 });
 
-
-router.get("/register", async (req, res) => {
-    try {
-        const offset = parseInt(req.query.offset as string) || 0;
-        const pageSize = parseInt(req.query.pageSize as string) || 10;
-        const result = await getRegisterData(offset, pageSize);
-        res.json(result);
-    } catch (error) {
-        console.error("❌ Error fetching register data:", error);
-        res.status(500).send('Error fetching register data');
-    }
-});
-
 // Approval management routes
-router.get("/pending-approvals", getPendingApprovals);
-router.put("/approve/:uploadId", approveUpload);
-router.put("/reject/:uploadId", rejectUpload);
+router.get("/pending-approvals", authenticateToken, authorizeRoles(['admin', 'approver']), getPendingApprovals);
+router.put("/approve/:uploadId", authenticateToken, authorizeRoles(['admin', 'approver']), approveUpload);
+router.put("/reject/:uploadId", authenticateToken, authorizeRoles(['admin', 'approver']), rejectUpload);
 
 // Period data endpoint for the upload form
-router.get("/periods", getPeriods);
+router.get("/periods", authenticateToken, getPeriods);
+
+// Get available tables for data management
+router.get("/available-tables", authenticateToken, getAvailableTables);
+
+// Data management routes
+router.delete("/delete-data", authenticateToken, authorizeRoles(['admin']), deleteDataByPeriod);
+router.put("/update-data", authenticateToken, authorizeRoles(['admin']), updateDataByPeriod);
+
+// Reference data management routes
+router.get("/reference/:table", authenticateToken, getReferenceData);
+router.post("/reference/:table", authenticateToken, authorizeRoles(['admin']), addReferenceData);
+router.put("/reference/:table/:id", authenticateToken, authorizeRoles(['admin']), updateReferenceData);
+router.delete("/reference/:table/:id", authenticateToken, authorizeRoles(['admin']), deleteReferenceData);
 
 export default router;

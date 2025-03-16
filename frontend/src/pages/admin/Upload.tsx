@@ -6,6 +6,7 @@ import API_BASE_URL from "@/config/apiConfig";
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import { formatDayMonth } from "@/utils/dateUtils";
+import { hasAddPermission } from '@/utils/authUtils';
 
 // Define the Period interface based on the backend response
 interface Period {
@@ -272,7 +273,13 @@ export default function Upload() {
   const fetchPeriods = async () => {
     try {
       setIsLoadingPeriods(true);
-      const response = await fetch(`${API_BASE_URL}/upload/periods`);
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`${API_BASE_URL}/upload/periods`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
       if (!response.ok) {
         throw new Error("Failed to fetch periods");
@@ -600,9 +607,13 @@ export default function Upload() {
     try {
       // ใช้ API_BASE_URL เพื่อให้ตรงกับ endpoint จริง
       // ตรวจสอบประเภทไฟล์และเลือก endpoint ที่เหมาะสม
+      const token = localStorage.getItem('token');
       const endpoint = selectedFile.type === "text/csv" ? "upload-csv" : "upload-excel";
       const response = await fetch(`${API_BASE_URL}/upload/${endpoint}`, {
         method: "POST",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData,
       });
 
@@ -787,9 +798,10 @@ export default function Upload() {
 
             {/* ปุ่มอัปโหลด */}
             <button
-              className={`px-4 py-2 rounded text-white ${isUploading ? "bg-blue-400" : previewData && !previewData.isValid ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+              className={`px-4 py-2 rounded text-white ${isUploading ? "bg-blue-400" : previewData && !previewData.isValid ? "bg-gray-400 cursor-not-allowed" : hasAddPermission() ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"}`}
               onClick={handleUpload}
-              disabled={isUploading || (previewData && !previewData.isValid)}
+              disabled={isUploading || (previewData && !previewData.isValid) || !hasAddPermission()}
+              title={!hasAddPermission() ? "คุณไม่มีสิทธิ์ในการอัปโหลดข้อมูล" : ""}
             >
               {isUploading ? "Uploading..." : "Upload"}
             </button>

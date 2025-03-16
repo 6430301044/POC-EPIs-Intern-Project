@@ -18,8 +18,13 @@ import Settings from "@/pages/admin/Settings";
 import Profile from "@/pages/admin/Profile";
 import Upload from "@/pages/admin/Upload";
 import Approval from "@/pages/admin/Approval";
+import DataManagement from "@/pages/admin/DataManagement";
+import ReferenceDataManagement from "@/pages/admin/ReferenceDataManagement";
+import News from "@/pages/admin/News";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 import TestAPICall from "@/components/TestAPICall";
+import ApproveUser from "@/pages/admin/ApproveUser";
+import ApprovalCenter from "@/pages/admin/ApprovalCenter";
 
 
 const router = createBrowserRouter([
@@ -109,6 +114,26 @@ const router = createBrowserRouter([
       {
         path: "/admin/approval",
         element: <Approval />,
+      },
+      {
+        path: "/admin/data-management",
+        element: <DataManagement />,
+      },
+      {
+        path: "/admin/reference-data",
+        element: <ReferenceDataManagement />,
+      },
+      {
+        path: "/admin/approve-user",
+        element: <ApproveUser />,
+      },
+      {
+        path: "/admin/approval-center",
+        element: <ApprovalCenter />,
+      },
+      {
+        path: "/admin/news",
+        element: <News />,
       }
     ],
   },

@@ -1,5 +1,6 @@
 import express from 'express';
 import { getAirQualityData } from '../controllers/airQuality/index';
+import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = express.Router();
 

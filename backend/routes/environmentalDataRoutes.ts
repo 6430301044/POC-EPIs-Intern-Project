@@ -1,5 +1,6 @@
 import { connectToDB } from "../db/dbConfig";
 import express from "express";
+import { authenticateToken } from "../middleware/authMiddleware";
 
 const router = express.Router();
 

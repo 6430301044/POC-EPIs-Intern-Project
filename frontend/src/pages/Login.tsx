@@ -1,23 +1,80 @@
 import { Container } from "@/components/template/Container"
 import DarkSwitch from "@/components/template/DarkSwitch"
 import { SectionTitle } from "@/components/template/SectionTitle"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router"
+import API_BASE_URL from '@/config/apiConfig';
+import { Eye, EyeOff } from "lucide-react";
+import { isAuthenticated, isTokenExpired, getDecodedToken } from "@/utils/authUtils";
 
 export default function Login() {
 
   const navigate = useNavigate()
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   useEffect(() => {
     document.title = "Login | WindReact"
-  }, [])
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    // ตรวจสอบ Token ว่าหมดอายุหรือยัง
+    const checkTokenExpiration = () => {
+      if (isTokenExpired()) {
+        console.log("⏳ Token expired, clearing credentials...");
+        localStorage.removeItem("token");
+        // ไม่ต้อง redirect เพราะอยู่ในหน้า Login อยู่แล้ว
+      } else if (isAuthenticated()) {
+        // ถ้า token ยังไม่หมดอายุและยังใช้งานได้ ให้ redirect ไปหน้า admin
+        navigate("/admin");
+      }
+    }
+
+    checkTokenExpiration(); // ตรวจสอบตอนเข้าเว็บ
+    const interval = setInterval(checkTokenExpiration, 10 * 1000); // เช็คทุก 10 วินาที
+
+    // กำหนด listener สำหรับการเปลี่ยนแปลงใน localStorage
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === "token") {
+        checkTokenExpiration();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      clearInterval(interval); // ล้าง interval ตอนออกจากหน้า
+      window.removeEventListener("storage", handleStorageChange); // ลบ event listener
+    };
+  }, [navigate])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     console.log("Form submitted")
     // to login
-    navigate("/dashboard")
-  }
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ User_email: email, User_password: password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", data.token); // เก็บ Token เพียงอย่างเดียว โดยข้อมูล role จะอยู่ใน token
+        alert("Login successful!");
+        navigate("/admin"); // ไปหน้า Dashboard
+      } else {
+        alert(data.message || "Login failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Something went wrong.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -45,9 +102,10 @@ export default function Login() {
               >
               </SectionTitle>
             </div>
-
+            {/* Form Login */}
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4 rounded-md">
+                {/* Email */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Email address
@@ -57,26 +115,40 @@ export default function Login() {
                     name="email"
                     type="email"
                     autoComplete="email"
-                    value="admin@windreact.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     placeholder="Enter your email"
                   />
                 </div>
-                <div>
+                {/* Password */}
+                <div className="relative">
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Password
                   </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    value="123456"
-                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    placeholder="Enter your password"
-                  />
+                  <div className="relative">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white pr-10"
+                      placeholder="Enter your password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-400"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      tabIndex={0}
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -120,7 +192,7 @@ export default function Login() {
           
           {/* Dark Mode Switch */}
           <div className="flex justify-center mt-4">
-            <DarkSwitch />
+            <DarkSwitch variant="default" />
           </div>
         </div>
       </Container>

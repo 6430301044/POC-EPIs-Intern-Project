@@ -1,0 +1,9 @@
+record_Id,parameter,result,unit,std_lower,std_higher,station_id,company_id,reportBy,period_id,sub_id
+1,Temperature,31.40,C,NULL,NULL,8,1,1,2,9
+2,ph,8.11,ph,7.00,8.50,8,1,1,2,9
+3,Transparency,2.40,m,NULL,NULL,8,1,1,2,9
+4,DO,6.60,mg/m3,4.00,NULL,8,1,1,2,9
+5,Salinity,31.90,ppt,NULL,NULL,8,1,1,2,9
+6,BOD,1.00,mg/m3,NULL,NULL,8,1,1,2,9
+7,Floatable Oil and Grease,NULL,NULL,NULL,NULL,8,1,1,2,9
+8,TDS,38520.00,mg/m3,NULL,NULL,8,1,1,2,9

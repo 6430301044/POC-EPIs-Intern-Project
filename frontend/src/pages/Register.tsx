@@ -1,13 +1,143 @@
 import { Container } from "@/components/template/Container"
 import DarkSwitch from "@/components/template/DarkSwitch"
 import { SectionTitle } from "@/components/template/SectionTitle"
-import { useEffect } from "react"
-import { Link } from "react-router"
+import { useEffect, useState } from "react"
+import { Link, useNavigate } from "react-router"
+import API_BASE_URL from '@/config/apiConfig';
+import { Eye, EyeOff, CheckCircle, XCircle, Circle } from "lucide-react";
 
 export default function Register() {
+  const navigate = useNavigate();
+
   useEffect(() => {
     document.title = "Register | WindReact"
   }, [])
+  
+  // State
+  const [showPassword, setShowPassword] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [companyId, setCompanyId] = useState<number | null>(null);
+  const [companies, setCompanies] = useState<Array<{company_id: number, companyName: string}>>([]);
+  const [jobPosition, setJobPosition] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  
+  // Fetch companies for dropdown
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/user/companies`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch companies");
+        }
+        const data = await response.json();
+        if (data.success && data.data) {
+          setCompanies(data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching companies:", error);
+      }
+    };
+    
+    fetchCompanies();
+  }, []);
+
+  const [passwordValidations, setPasswordValidations] = useState({
+    lowercase: false,
+    uppercase: false,
+    number: false,
+    length: false,
+    typed: false,
+  });
+
+  // เช็คเงื่อนไขการตั้งรหัสผ่าน
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+  
+    setPasswordValidations({
+      lowercase: /[a-z]/.test(newPassword),
+      uppercase: /[A-Z]/.test(newPassword),
+      number: /\d/.test(newPassword),
+      length: newPassword.length >= 8 && newPassword.length <= 32,
+      typed: newPassword.length > 0,
+    });
+  };
+
+  // ฟังก์ชันเลือกสีของข้อความ
+  const getTextColor = (isValid: boolean, isTyped: boolean) => {
+    if (!isTyped) return "text-gray-700 dark:text-gray-400"; // ยังไม่พิมพ์ -> สีดำ/เทา
+    return isValid ? "text-green-500" : "text-red-500"; // ผ่าน -> เขียว / ไม่ผ่าน -> แดง
+  };
+
+  // ฟังก์ชันเลือกไอคอน
+  const getIcon = (isValid: boolean, isTyped: boolean) => {
+    if (!isTyped) return <Circle size={16} className="text-gray-500" />; // ยังไม่พิมพ์ -> วงกลมสีเทา
+    return isValid ? <CheckCircle size={16} className="text-green-500" /> : <XCircle size={16} className="text-red-500" />;
+  };
+
+  // ตรวจสอบรหัสผ่าน
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newConfirmPassword = e.target.value;
+    setConfirmPassword(newConfirmPassword);
+  
+    if (!newConfirmPassword) { // ถ้ายังไม่ได้พิมพ์อะไรเลย
+      setPasswordError(""); // ไม่แสดง error
+    } 
+    else if (password && newConfirmPassword !== password) {
+      setPasswordError("Passwords do not match!"); // แสดง error
+    } 
+    else {
+      setPasswordError(""); // ล้าง error ถ้าถูกต้อง
+    }
+  };
+
+  // ฟังก์ชันส่งฟอร์ม
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // เช็คว่ารหัสผ่านไม่ตรงกัน
+    if (passwordError || password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    // รวมชื่อเป็น User_Name
+    const userName = `${firstName} ${lastName}`;
+    const userData = {
+      User_name: userName,
+      User_email: email,
+      User_phone: phone,
+      Company_id: companyId,
+      User_Job_Position: jobPosition,
+      User_password: password,
+    };
+
+    try {
+      // สมัครสมาชิก
+      const response = await fetch(`${API_BASE_URL}/user/register`, { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+  
+      // ตรวจสอบ response
+      if (!response.ok) {
+        throw new Error("Failed to register.");
+      }
+  
+      alert("Registration successful!");
+      navigate("/login"); // ไปหน้า Login หลังสมัครเสร็จ
+  
+    } catch (error: any) {
+      console.error("Error:", error.message);
+      alert("Something went wrong: " + error.message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -36,7 +166,7 @@ export default function Register() {
               </SectionTitle>
             </div>
 
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4 rounded-md">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -47,9 +177,11 @@ export default function Register() {
                       id="firstName"
                       name="firstName"
                       type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
                       required
                       className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                      placeholder="John"
+                      placeholder="Jane"
                     />
                   </div>
                   <div>
@@ -60,6 +192,8 @@ export default function Register() {
                       id="lastName"
                       name="lastName"
                       type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
                       required
                       className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       placeholder="Doe"
@@ -76,9 +210,64 @@ export default function Register() {
                     name="email"
                     type="email"
                     autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    placeholder="john@example.com"
+                    placeholder="janeD@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    placeholder="Phone number"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="companyId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Company
+                  </label>
+                  <select
+                    id="companyId"
+                    name="companyId"
+                    value={companyId || ""}
+                    onChange={(e) => setCompanyId(e.target.value ? parseInt(e.target.value) : null)}
+                    required
+                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  >
+                    <option value="">Select a company</option>
+                    {companies.map((company) => (
+                      <option key={company.company_id} value={company.company_id}>
+                        {company.companyName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="jobPosition" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Job Position
+                  </label>
+                  <input
+                    id="jobPosition"
+                    name="jobPosition"
+                    type="text"
+                    value={jobPosition}
+                    onChange={(e) => setJobPosition(e.target.value)}
+                    required
+                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    placeholder="Job position"
                   />
                 </div>
 
@@ -86,14 +275,45 @@ export default function Register() {
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Password
                   </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    placeholder="••••••••"
-                  />
+                  <div className="relative w-full">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={handlePasswordChange}
+                      required
+                      className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white pr-10"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-400"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      tabIndex={0}
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                  <ul className="mt-2 text-sm space-y-1">
+                    <li className={`flex items-center gap-2 ${getTextColor(passwordValidations.lowercase, passwordValidations.typed)}`}>
+                      {getIcon(passwordValidations.lowercase, passwordValidations.typed)}
+                      Must contain at least one lowercase letter
+                    </li>
+                    <li className={`flex items-center gap-2 ${getTextColor(passwordValidations.uppercase, passwordValidations.typed)}`}>
+                      {getIcon(passwordValidations.uppercase, passwordValidations.typed)}
+                      Must contain at least one uppercase letter
+                    </li>
+                    <li className={`flex items-center gap-2 ${getTextColor(passwordValidations.number, passwordValidations.typed)}`}>
+                      {getIcon(passwordValidations.number, passwordValidations.typed)}
+                      Must contain one number
+                    </li>
+                    <li className={`flex items-center gap-2 ${getTextColor(passwordValidations.length, passwordValidations.typed)}`}>
+                      {getIcon(passwordValidations.length, passwordValidations.typed)}
+                      Must be between 8-32 characters
+                    </li>
+                  </ul>
                 </div>
 
                 <div>
@@ -103,11 +323,17 @@ export default function Register() {
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={handleConfirmPasswordChange}
                     required
-                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    className={`mt-1 block w-full rounded-lg border px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 dark:bg-gray-700 dark:text-white ${
+                      passwordError ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-indigo-500"
+                    }`}
                     placeholder="••••••••"
                   />
+                  {/* แสดงข้อความผิดพลาด ถ้ารหัสผ่านไม่ตรงกัน */}
+                  {passwordError && <p className="mt-1 text-sm text-red-500">{passwordError}</p>}
                 </div>
               </div>
 

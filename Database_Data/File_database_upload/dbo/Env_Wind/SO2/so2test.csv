@@ -1,0 +1,2 @@
+timePeriod,day1st_result_ppm,day2nd_result_ppm,day3rd_result_ppm,certifiedDate,expireDate,concentrationPPB,gasCylinder,toolAnalyst,toolCalibration,company_id,station_id,reportBy
+10:00 - 11:00,0.0080,0.0093,0.0074,2024-01-05,2025-01-04,"0, 100, 200, 300",3,1,2,1,1,1

@@ -1,0 +1,8 @@
+record_Id,index_name,result,unit,std_lower,std_higher,station_id,company_id,period_id,reportBy,sub_id
+1,Temperature,32.8,C,NULL,40.0,1,1,2,1,8
+2,ph,7.5,ph,5.5,9.0,1,1,2,1,8
+3,BOD,1.5,mg/m3,NULL,20.0,1,1,2,1,8
+4,COD,40.0,mg/m3,NULL,120.0,1,1,2,1,8
+5,Oil & Grease,0.5,mg/m3,NULL,5.0,1,1,2,1,8
+6,TDS,585.0,mg/m3,NULL,3000.0,1,1,2,1,8
+7,TSS,5.0,mg/m3,NULL,50.0,1,1,2,1,8

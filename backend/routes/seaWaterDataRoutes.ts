@@ -1,5 +1,6 @@
 import express from 'express';
 import { getSeaWaterData } from '../controllers/seaWater/index';
+import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = express.Router();
 

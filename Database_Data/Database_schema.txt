@@ -1,0 +1,492 @@
+CREATE TABLE [dbo].[Semiannual] (
+    [semiannual_id]  INT            IDENTITY (1, 1) NOT NULL,
+    [semiannual]     INT            NULL,
+    [semiannualName] NVARCHAR (MAX) NULL,
+    CONSTRAINT [PK_Semiannual] PRIMARY KEY CLUSTERED ([semiannual_id] ASC)
+);
+
+CREATE TABLE [dbo].[Daysperiod] (
+    [period_id]     INT  IDENTITY (1, 1) NOT NULL,
+    [startDate]     DATE NULL,
+    [endDate]       DATE NULL,
+    [semiannual_id] INT  NULL,
+    [year_id]       INT  NULL,
+    CONSTRAINT [PK_Daysperiod] PRIMARY KEY CLUSTERED ([period_id] ASC),
+    CONSTRAINT [FK_Daysperiod_Semiannual] FOREIGN KEY ([semiannual_id]) REFERENCES [dbo].[Semiannual] ([semiannual_id]),
+    CONSTRAINT [FK_Daysperiod_Years] FOREIGN KEY ([year_id]) REFERENCES [dbo].[Years] ([year_id])
+);
+
+CREATE TABLE [dbo].[Years] (
+    [year_id] INT IDENTITY (1, 1) NOT NULL,
+    [year]    INT NULL,
+    CONSTRAINT [PK_Years] PRIMARY KEY CLUSTERED ([year_id] ASC)
+);
+
+CREATE TABLE [dbo].[Mcategories] (
+    [main_id]  INT           IDENTITY (1, 1) NOT NULL,
+    [mainName] NVARCHAR (50) NULL,
+    CONSTRAINT [PK_Mcategories] PRIMARY KEY CLUSTERED ([main_id] ASC)
+);
+
+CREATE TABLE [dbo].[SbCategories] (
+    [sub_id]  INT            IDENTITY (1, 1) NOT NULL,
+    [subName] NVARCHAR (MAX) NULL,
+    [main_id] INT            NULL,
+    CONSTRAINT [PK_SbCategories] PRIMARY KEY CLUSTERED ([sub_id] ASC),
+    CONSTRAINT [FK_SbCategories_Mcategories] FOREIGN KEY ([main_id]) REFERENCES [dbo].[Mcategories] ([main_id])
+);
+
+CREATE TABLE [dbo].[Monitoring_Station] (
+    [station_id]  INT            IDENTITY (1, 1) NOT NULL,
+    [stationName] NVARCHAR (MAX) NULL,
+    [lat]         DECIMAL (8, 6) NULL,
+    [long]        DECIMAL (9, 6) NULL,
+    CONSTRAINT [PK_Monitoring_Station] PRIMARY KEY CLUSTERED ([station_id] ASC)
+);
+
+CREATE TABLE [dbo].[Role] (
+    [role_id]  INT IDENTITY (1, 1) NOT NULL,
+    [roleName] NVARCHAR(50) NULL,
+    CONSTRAINT [PK_Role] PRIMARY KEY CLUSTERED ([role_id] ASC)
+);
+
+CREATE TABLE [dbo].[Staff] (
+    [staff_id]   INT           IDENTITY (1, 1) NOT NULL,
+    [staffName] NVARCHAR (50) NULL,
+    [company_id] INT           NULL,
+    CONSTRAINT [PK_Staff] PRIMARY KEY CLUSTERED ([staff_id] ASC),
+    CONSTRAINT [FK_Staff_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id])
+);
+
+CREATE TABLE [dbo].[Tool] (
+    [tool_id]    INT            IDENTITY (1, 1) NOT NULL,
+    [toolName]   NVARCHAR (MAX) NULL,
+    [toolSerial] NVARCHAR (50)  NULL,
+    [toolRole]   NVARCHAR (50)  NULL,
+    CONSTRAINT [PK_Tool] PRIMARY KEY CLUSTERED ([tool_id] ASC)
+);
+
+CREATE TABLE [dbo].[Companies] (
+    [company_id]   INT            IDENTITY (1, 1) NOT NULL,
+    [companyName]  NVARCHAR (MAX) NULL,
+    [companyPhone] NVARCHAR (15)  NULL,
+    CONSTRAINT [PK_Companies] PRIMARY KEY CLUSTERED ([company_id] ASC)
+);
+
+CREATE TABLE [dbo].[Calm] (
+    [calm_id]    INT            IDENTITY (1, 1) NOT NULL,
+    [calm_value] DECIMAL (6, 4) NULL,
+    [period_id]  INT            NULL,
+    CONSTRAINT [PK_Calm] PRIMARY KEY CLUSTERED ([calm_id] ASC),
+    CONSTRAINT [FK_Calm_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id])
+);
+
+CREATE TABLE [dbo].[Env_Air_AirQuality] (
+    [record_id]  INT             IDENTITY (1, 1) NOT NULL,
+    [period_id]  INT             NULL,
+    [station_id] INT             NULL,
+    [index_name] NVARCHAR (50)   NULL,
+    [unit]       NVARCHAR (MAX)  CONSTRAINT [DEFAULT_Env_Air_AirQuality_unit] DEFAULT ('ppm') NULL,
+    [result]     DECIMAL (10, 4) NULL,
+    [std]        DECIMAL (10, 4) NULL,
+    [sub_id]     INT             CONSTRAINT [DEFAULT_Env_Air_AirQuality_sub_id] DEFAULT ((5)) NULL,
+    [company_id] INT             NULL,
+    [reportBy]   INT             NULL,
+    CONSTRAINT [PK_Env_Air_AirQuality] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_Air_AirQuality_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Air_AirQuality_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Air_AirQuality_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_Air_AirQuality_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_Air_AirQuality_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id])
+);
+
+CREATE TABLE [dbo].[Env_MarineEcology_PlanktonZoos] (
+    [record_id]       INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]      INT            NULL,
+    [phylum]          NVARCHAR (MAX) NULL,
+    [class]           NVARCHAR (MAX) NULL,
+    [order]           NVARCHAR (MAX) NULL,
+    [family]          NVARCHAR (MAX) NULL,
+    [genu]            NVARCHAR (MAX) NULL,
+    [quantity_per_m3] FLOAT (53)     NULL,
+    [sub_id]          INT            CONSTRAINT [DEFAULT_Env_MarineEcology_PlanktonZoos_sub_id] DEFAULT ((12)) NULL,
+    [reportBy]        INT            NULL,
+    [period_id]       INT            NULL,
+    [company_id]      INT            NULL,
+    CONSTRAINT [PK_Env_MarineEcology_PlanktonZoos] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_MarineEcology_PlanktonZoos_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_MarineEcology_PlanktonZoos_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_MarineEcology_PlanktonZoos_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_MarineEcology_PlanktonZoos_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_MarineEcology_PlanktonZoos_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id])
+);
+
+CREATE TABLE [dbo].[Env_MarineEcology_PlanktonPhytos] (
+    [record_id]       INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]      INT            NULL,
+    [division]        NVARCHAR (MAX) NULL,
+    [class]           NVARCHAR (MAX) NULL,
+    [order]           NVARCHAR (MAX) NULL,
+    [family]          NVARCHAR (MAX) NULL,
+    [genu]            NVARCHAR (MAX) NULL,
+    [quantity_per_m3] FLOAT (53)     NULL,
+    [sub_id]          INT            CONSTRAINT [DEFAULT_Env_MarineEcology_PlanktonPhytos_sub_id] DEFAULT ((11)) NULL,
+    [reportBy]        INT            NULL,
+    [period_id]       INT            NULL,
+    [company_id]      INT            NULL,
+    CONSTRAINT [PK_Env_MarineEcology_PlanktonPhytos] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_MarineEcology_PlanktonPhytos_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_MarineEcology_PlanktonPhytos_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_MarineEcology_PlanktonPhytos_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_MarineEcology_PlanktonPhytos_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_MarineEcology_PlanktonPhytos_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id]),
+);
+
+CREATE TABLE [dbo].[Env_MarineEcology_JuvenileAquaticAnimals] (
+    [record_id]           INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]          INT            NULL,
+    [phylum]              NVARCHAR (MAX) NULL,
+    [group_name]          NVARCHAR (MAX) NULL,
+    [quantity_per_1000m3] FLOAT (53)     NULL,
+    [sub_id]              INT            CONSTRAINT [DEFAULT_Env_MarineEcology_JuvenileAquaticAnimals_sub_id] DEFAULT ((15)) NULL,
+    [reportBy]            INT            NULL,
+    [period_id]           INT            NULL,
+    [company_id]          INT            NULL,
+    CONSTRAINT [PK_Env_MarineEcology_JuvenileAquaticAnimals] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_MarineEcology_JuvenileAquaticAnimals_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_MarineEcology_JuvenileAquaticAnimals_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_MarineEcology_JuvenileAquaticAnimals_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_MarineEcology_JuvenileAquaticAnimals_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_MarineEcology_JuvenileAquaticAnimals_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id])
+);
+
+CREATE TABLE [dbo].[Env_MarineEcology_FishLarvaeEggs] (
+    [record_id]           INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]          INT            NULL,
+    [phylum]              NVARCHAR (MAX) NULL,
+    [class]               NVARCHAR (MAX) NULL,
+    [order]               NVARCHAR (MAX) NULL,
+    [family]              NVARCHAR (MAX) NULL,
+    [genu]                NVARCHAR (MAX) NULL,
+    [quantity_per_1000m3] FLOAT (53)     NULL,
+    [sub_id]              INT            CONSTRAINT [DEFAULT_Env_MarineEcology_FishLarvaeEggs_sub_id] DEFAULT ((14)) NULL,
+    [reportBy]            INT            NULL,
+    [period_id]           INT            NULL,
+    [company_id]          INT            NULL,
+    CONSTRAINT [PK_Env_MarineEcology_FishLarvaeEggs] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_MarineEcology_FishLarvaeEggs_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_MarineEcology_FishLarvaeEggs_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_MarineEcology_FishLarvaeEggs_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_MarineEcology_FishLarvaeEggs_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_MarineEcology_FishLarvaeEggs_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id])
+);
+
+CREATE TABLE [dbo].[Env_MarineEcology_Benthos] (
+    [record_id]       INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]      INT            NULL,
+    [phylum]          NVARCHAR (MAX) NULL,
+    [class]           NVARCHAR (MAX) NULL,
+    [order]           NVARCHAR (MAX) NULL,
+    [family]          NVARCHAR (MAX) NULL,
+    [genu]            NVARCHAR (MAX) NULL,
+    [quantity_per_m2] FLOAT (53)     NULL,
+    [sub_id]          INT            CONSTRAINT [DEFAULT_Env_MarineEcology_Benthos_sub_id] DEFAULT ((13)) NULL,
+    [reportBy]        INT            NULL,
+    [period_id]       INT            NULL,
+    [company_id]      INT            NULL,
+    CONSTRAINT [PK_Env_MarineEcology_Benthos] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_MarineEcology_Benthos_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_MarineEcology_Benthos_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_MarineEcology_Benthos_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_MarineEcology_Benthos_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_MarineEcology_Benthos_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id])
+);
+
+CREATE TABLE [dbo].[Env_Noise_NoiseLevelNormal] (
+    [record_id]        INT            IDENTITY (1, 1) NOT NULL,
+    [timePeriod]       NVARCHAR (50)  NULL,
+    [day1st_result]    DECIMAL (4, 1) NULL,
+    [day2nd_result]    DECIMAL (4, 1) NULL,
+    [day3rd_result]    DECIMAL (4, 1) NULL,
+    [certifiedDate]    DATE           NULL,
+    [calibrationRefdB] DECIMAL (4, 1) NULL,
+    [slmRead]          DECIMAL (4, 1) NULL,
+    [slmAdjust]        DECIMAL (4, 1) NULL,
+    [calSheetNo]       NVARCHAR (50)  NULL,
+    [toolAnalyst]      INT            NULL,
+    [toolCalibration]  INT            NULL,
+    [company_id]       INT            NULL,
+    [period_id]        INT            NULL,
+    [station_id]       INT            NULL,
+    [sub_id]           INT            CONSTRAINT [DEFAULT_Env_Noise_NoiseLevelNormal_sub_id] DEFAULT ((6)) NULL,
+    [reportBy]         INT            NULL,
+    CONSTRAINT [PK_Env_Noise_NoiseLevelNormal] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_Noise_NoiseLevelNormal_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Noise_NoiseLevelNormal_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Noise_NoiseLevelNormal_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_Noise_NoiseLevelNormal_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_Noise_NoiseLevelNormal_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id]),
+    CONSTRAINT [FK_Env_Noise_NoiseLevelNormal_Tool_Analyst] FOREIGN KEY ([toolAnalyst]) REFERENCES [dbo].[Tool] ([tool_id]),
+    CONSTRAINT [FK_Env_Noise_NoiseLevelNormal_Tool_Calibration] FOREIGN KEY ([toolCalibration]) REFERENCES [dbo].[Tool] ([tool_id])
+);
+
+CREATE TABLE [dbo].[Env_Noise_NoiseLevel90] (
+    [record_id]        INT            IDENTITY (1, 1) NOT NULL,
+    [timePeriod]       NVARCHAR (50)  NULL,
+    [day1st_result]    DECIMAL (4, 1) NULL,
+    [day2nd_result]    DECIMAL (4, 1) NULL,
+    [day3rd_result]    DECIMAL (4, 1) NULL,
+    [certifiedDate]    DATE           NULL,
+    [calibrationRefdB] DECIMAL (4, 1) NULL,
+    [slmRead]          DECIMAL (4, 1) NULL,
+    [slmAdjust]        DECIMAL (4, 1) NULL,
+    [calSheetNo]       NVARCHAR (50)  NULL,
+    [toolAnalyst]      INT            NULL,
+    [toolCalibration]  INT            NULL,
+    [company_id]       INT            NULL,
+    [period_id]        INT            NULL,
+    [station_id]       INT            NULL,
+    [sub_id]           INT            CONSTRAINT [DEFAULT_Env_Noise_NoiseLevel90_sub_id] DEFAULT ((7)) NULL,
+    [reportBy]         INT            NULL,
+    CONSTRAINT [PK_Env_Noise_NoiseLevel90] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_Noise_NoiseLevel90_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Noise_NoiseLevel90_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Noise_NoiseLevel90_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_Noise_NoiseLevel90_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_Noise_NoiseLevel90_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id]),
+    CONSTRAINT [FK_Env_Noise_NoiseLevel90_Tool_Analyst] FOREIGN KEY ([toolAnalyst]) REFERENCES [dbo].[Tool] ([tool_id]),
+    CONSTRAINT [FK_Env_Noise_NoiseLevel90_Tool_Calibration] FOREIGN KEY ([toolCalibration]) REFERENCES [dbo].[Tool] ([tool_id])
+);
+
+CREATE TABLE [dbo].[Env_Noise_Monitorresult] (
+    [record_id]        INT            IDENTITY (1, 1) NOT NULL,
+    [timePeriod]       NVARCHAR (50)  NULL,
+    [day1st_Leq]       DECIMAL (4, 1) NULL,
+    [day1st_L90]       DECIMAL (4, 1) NULL,
+    [day2nd_Leq]       DECIMAL (4, 1) NULL,
+    [day2nd_L90]       DECIMAL (4, 1) NULL,
+    [day3rd_Leq]       DECIMAL (4, 1) NULL,
+    [day3rd_L90]       DECIMAL (4, 1) NULL,
+    [calibrationRefdB] DECIMAL (4, 1) NULL,
+    [slmRead]          DECIMAL (4, 1) NULL,
+    [slmAdjust]        DECIMAL (4, 1) NULL,
+    [certifiedDate]    DATE           NULL,
+    [calSheetNo]       NVARCHAR (50)  NULL,
+    [company_id]       INT            NULL,
+    [period_id]        INT            NULL,
+    [station_id]       INT            NULL,
+    [sub_id]           INT            CONSTRAINT [DEFAULT_Env_Noise_Monitorresult_sub_id] DEFAULT ((8)) NULL,
+    [toolAnalyst]      INT            NULL,
+    [toolCalibration]  INT            NULL,
+    [reportBy]         INT            NULL,
+    CONSTRAINT [PK_Env_Noise_Monitorresult] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_Noise_Monitorresult_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Noise_Monitorresult_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Noise_Monitorresult_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_Noise_Monitorresult_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_Noise_Monitorresult_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id]),
+    CONSTRAINT [FK_Env_Noise_Monitorresult_Tool_Analyst] FOREIGN KEY ([toolAnalyst]) REFERENCES [dbo].[Tool] ([tool_id]),
+    CONSTRAINT [FK_Env_Noise_Monitorresult_Tool_Calibration] FOREIGN KEY ([toolCalibration]) REFERENCES [dbo].[Tool] ([tool_id])
+);
+
+CREATE TABLE [dbo].[Env_SeaWater_SeaWater] (
+    [record_id]  INT             IDENTITY (1, 1) NOT NULL,
+    [parameter]  NVARCHAR (50)   NULL,
+    [result]     DECIMAL (10, 2) NULL,
+    [unit]       NVARCHAR (50)   NULL,
+    [std_lower]  DECIMAL (10, 2) NULL,
+    [std_higher] DECIMAL (10, 2) NULL,
+    [station_id] INT             NULL,
+    [company_id] INT             NULL,
+    [reportBy]   INT             NULL,
+    [period_id]  INT             NULL,
+    [sub_id]     INT             CONSTRAINT [DEFAULT_Env_SeaWater_sub_id] DEFAULT ((10)) NULL,
+    CONSTRAINT [PK_Env_SeaWater] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_SeaWater_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_SeaWater_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_SeaWater_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_SeaWater_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id])
+);
+
+CREATE TABLE [dbo].[Env_WasteWater_WasteWater] (
+    [record_id]  INT             IDENTITY (1, 1) NOT NULL,
+    [index_name] NVARCHAR (50)   NULL,
+    [result]     DECIMAL (10, 1) NULL,
+    [unit]       NVARCHAR (50)   NULL,
+    [std_lower]  DECIMAL (10, 1) NULL,
+    [std_higher] DECIMAL (10, 1) NULL,
+    [station_id] INT             NULL,
+    [company_id] INT             NULL,
+    [period_id]  INT             NULL,
+    [reportBy]   INT             NULL,
+    [sub_id]     INT             CONSTRAINT [DEFAULT_Env_WasteWater_sub_id] DEFAULT ((9)) NULL,
+    CONSTRAINT [PK_Env_WasteWater] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_WasteWater_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_WasteWater_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_WasteWater_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_WasteWater_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_WasteWater_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id])
+);
+
+CREATE TABLE [dbo].[Env_Wind_WindQuality] (
+    [record_id]     INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]    INT            NULL,
+    [parameter]     NVARCHAR (50)  NULL,
+    [unit]          NVARCHAR (50)  NULL,
+    [day1st_result] DECIMAL (6, 4) NULL,
+    [day2nd_result] DECIMAL (6, 4) NULL,
+    [day3rd_result] DECIMAL (6, 4) NULL,
+    [std]           DECIMAL (6, 4) NULL,
+    [sub_id]        INT            CONSTRAINT [DEFAULT_Env_Wind_WindQuality_sub_id] DEFAULT ((2)) NULL,
+    [period_id]     INT            NULL,
+    [company_id]    INT            NULL,
+    [reportBy]      INT            NULL,
+    CONSTRAINT [PK_Env_Wind_AirQuality] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_Wind_AirQuality_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Wind_AirQuality_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Wind_AirQuality_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_Wind_AirQuality_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_Wind_AirQuality_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id])
+);
+
+CREATE TABLE [dbo].[Env_Wind_WDWS] (
+    [record_id]      INT            IDENTITY (1, 1) NOT NULL,
+    [windDirection]  NVARCHAR (50)  NULL,
+    [ws_05_1]        DECIMAL (6, 4) NULL,
+    [ws_1_2]         DECIMAL (6, 4) NULL,
+    [ws_2_3]         DECIMAL (6, 4) NULL,
+    [ws_3_4]         DECIMAL (6, 4) NULL,
+    [ws_4_6]         DECIMAL (6, 4) NULL,
+    [ws_more_that_6] DECIMAL (6, 4) NULL,
+    [ws_total]       AS             (((((isnull([ws_05_1],(0))+isnull([ws_1_2],(0)))+isnull([ws_2_3],(0)))+isnull([ws_3_4],(0)))+isnull([ws_4_6],(0)))+isnull([ws_more_that_6],(0))),
+    [unit]           NVARCHAR (50)  CONSTRAINT [DEFAULT_Env_Wind_WDWS_unit] DEFAULT ('m/s') NULL,
+    [sub_id]         INT            CONSTRAINT [DEFAULT_Env_Wind_WDWS_sub_id] DEFAULT ((1)) NULL,
+    [period_id]      INT            NULL,
+    [station_id]     INT            NULL,
+    [company_id]     INT            NULL,
+    [reportBy]       INT            NULL,
+    CONSTRAINT [PK_WDWS] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_Wind_WDWS_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Wind_WDWS_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Wind_WDWS_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_Wind_WDWS_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_Wind_WDWS_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id])
+);
+
+CREATE TABLE [dbo].[Env_Wind_Vocs] (
+    [record_id]               INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]              INT            NULL,
+    [index_name]              NVARCHAR (MAX) NULL,
+    [day1st_result_ug_per_m3] FLOAT (53)     NULL,
+    [day2nd_result_ug_per_m3] FLOAT (53)     NULL,
+    [day3rd_result_ug_per_m3] FLOAT (53)     NULL,
+    [std_lower]               FLOAT (53)     NULL,
+    [std_higher]              FLOAT (53)     NULL,
+    [company_id]              INT            NULL,
+    [period_id]               INT            NULL,
+    [sub_id]                  INT            CONSTRAINT [DEFAULT_Env_Wind_Vocs_sub_id] DEFAULT ((4)) NULL,
+    [reportBy]                INT            NULL,
+    CONSTRAINT [PK_Env_Wind_Vocs] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_Wind_Vocs_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Wind_Vocs_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Wind_Vocs_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_Wind_Vocs_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_Wind_Vocs_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id])
+);
+
+CREATE TABLE [dbo].[Env_Wind_SO2] (
+    [record_id]         INT            IDENTITY (1, 1) NOT NULL,
+    [timePeriod]        NVARCHAR (50)  NULL,
+    [day1st_result_ppm] DECIMAL (6, 4) NULL,
+    [day2nd_result_ppm] DECIMAL (6, 4) NULL,
+    [day3rd_result_ppm] DECIMAL (6, 4) NULL,
+    [certifiedDate]     DATE           NULL,
+    [expireDate]        DATE           NULL,
+    [concentrationPPB]  NVARCHAR (50)  NULL,
+    [gasCylinder]       INT            NULL,
+    [toolAnalyst]       INT            NULL,
+    [toolCalibration]   INT            NULL,
+    [company_id]        INT            NULL,
+    [period_id]         INT            NULL,
+    [station_id]        INT            NULL,
+    [sub_id]            INT            CONSTRAINT [DEFAULT_Env_Wind_SO2_sub_id] DEFAULT ((3)) NULL,
+    [reportBy]          INT            NULL,
+    CONSTRAINT [PK_Env_Wind_SO2] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Env_Wind_SO2_Companies] FOREIGN KEY ([company_id]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Wind_SO2_Companies_Report] FOREIGN KEY ([reportBy]) REFERENCES [dbo].[Companies] ([company_id]),
+    CONSTRAINT [FK_Env_Wind_SO2_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Env_Wind_SO2_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id]),
+    CONSTRAINT [FK_Env_Wind_SO2_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id]),
+    CONSTRAINT [FK_Env_Wind_SO2_Tool_Analyst] FOREIGN KEY ([toolAnalyst]) REFERENCES [dbo].[Tool] ([tool_id]),
+    CONSTRAINT [FK_Env_Wind_SO2_Tool_Calibration] FOREIGN KEY ([toolCalibration]) REFERENCES [dbo].[Tool] ([tool_id]),
+    CONSTRAINT [FK_Env_Wind_SO2_Tool_Gas_Cylinder] FOREIGN KEY ([gasCylinder]) REFERENCES [dbo].[Tool] ([tool_id])
+);
+
+CREATE TABLE [dbo].[Users] (
+    [User_id]           INT            IDENTITY (1, 1) NOT NULL,
+    [User_name]         NVARCHAR (MAX) NOT NULL,
+    [User_role]         NVARCHAR (MAX) NULL,
+    [User_Job_Position] NVARCHAR (MAX) NOT NULL,
+    [Company_id]        INT            NULL,
+    [User_password]     VARCHAR (255)  NOT NULL,
+    [User_email]        NVARCHAR (MAX) NOT NULL,
+    [User_phone]        VARCHAR (10)   NOT NULL,
+    [User_image]        NVARCHAR (MAX) NULL,
+    CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED ([User_id] ASC),
+    CONSTRAINT [FK_User_Companies] FOREIGN KEY ([Company_id]) REFERENCES [dbo].[Companies] ([company_id])
+);
+
+CREATE TABLE [dbo].[UploadedFiles] (
+    [upload_id] INT IDENTITY(1,1) NOT NULL,
+    [filename] NVARCHAR(255) NOT NULL,
+    [upload_date] DATETIME DEFAULT GETDATE(),
+    [uploaded_by] INT NOT NULL,
+    [year_id] INT NOT NULL,
+    [period_id] INT NOT NULL,
+    [main_id] INT NOT NULL,
+    [sub_id] INT NOT NULL,
+    [status] NVARCHAR(50) DEFAULT 'รอการอนุมัติ',
+    [record_count] INT DEFAULT 0,
+    CONSTRAINT [PK_UploadedFiles] PRIMARY KEY CLUSTERED ([upload_id] ASC),
+    CONSTRAINT [FK_UploadedFiles_Users] FOREIGN KEY ([uploaded_by]) REFERENCES [dbo].[Users] ([User_id]),
+    CONSTRAINT [FK_UploadedFiles_Years] FOREIGN KEY ([year_id]) REFERENCES [dbo].[Years] ([year_id]),
+    CONSTRAINT [FK_UploadedFiles_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_UploadedFiles_Mcategories] FOREIGN KEY ([main_id]) REFERENCES [dbo].[Mcategories] ([main_id]),
+    CONSTRAINT [FK_UploadedFiles_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id])
+)
+
+CREATE TABLE [dbo].[Register] (
+    [Register_id]       INT            IDENTITY (1, 1) NOT NULL,
+    [User_name]         NVARCHAR (255) NOT NULL,
+    [User_role]         NVARCHAR (MAX) CONSTRAINT [DEFAULT_Register_User_role] DEFAULT ('member') NULL,
+    [User_Job_Position] NVARCHAR (255) NOT NULL,
+    [Company_id]        INT            NULL,
+    [User_password]     VARCHAR (255)  NOT NULL,
+    [User_email]        NVARCHAR (255) NOT NULL,
+    [User_status]       NVARCHAR (100) DEFAULT ('Pending') NOT NULL,
+    [User_phone]        VARCHAR (20)   NOT NULL,
+    [Created_at]        DATETIME       DEFAULT (getdate()) NULL,
+    PRIMARY KEY CLUSTERED ([Register_id] ASC),
+    UNIQUE NONCLUSTERED ([User_email] ASC)
+);
+
+CREATE TABLE [dbo].[News] (
+    [id]            INT            IDENTITY (1, 1) NOT NULL,
+    [News_category] NVARCHAR (255) NOT NULL,
+    [News_title]    NVARCHAR (255) NOT NULL,
+    [News_content]  NVARCHAR (MAX) NOT NULL,
+    [Create_by]     INT            NULL,
+    [Create_at]     DATETIME       DEFAULT (getdate()) NOT NULL,
+    [News_status]   NVARCHAR (255) CONSTRAINT [DEFAULT_News_News_status] DEFAULT ('Pending') NOT NULL,
+    [updated_at]    ROWVERSION     NOT NULL,
+    CONSTRAINT [PK_News] PRIMARY KEY CLUSTERED ([id] ASC)
+);
+
+CREATE TABLE [dbo].[NewsImages] (
+    [id]         INT            IDENTITY (1, 1) NOT NULL,
+    [news_id]    INT            NULL,
+    [image_url]  NVARCHAR (500) NULL,
+    [created_at] DATETIME       DEFAULT (getdate()) NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC),
+    FOREIGN KEY ([news_id]) REFERENCES [dbo].[News] ([id]) ON DELETE CASCADE
+);

@@ -1,5 +1,6 @@
 import express from 'express';
 import { getNoiseLevelNormalData, getNoiseLevel90Data, getNoiseMonitorResultData } from '../controllers/noiseLevel/index';
+import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = express.Router();
 

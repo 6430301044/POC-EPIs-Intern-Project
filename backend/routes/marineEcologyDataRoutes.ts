@@ -1,10 +1,11 @@
 import express from 'express';
 import { getMEPlanktonPhytosData, getMEPlanktonZoosData, getMEBenthosData, getMEFishEggsData, getMEJuvenileAquaticData } from '../controllers/marineEcology/index';
+import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
 // router.get(`/${encodeURIComponent('ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนพืช')}`, async (req, res) => {
-router.get("/PlanktonPhytos", async (req, res) => {
+router.get("/PlanktonPhytos", authenticateToken, async (req, res) => {
     try {
         const offset = parseInt(req.query.offset as string) || 0;
         const pageSize = parseInt(req.query.pageSize as string) || 10;
@@ -22,7 +23,7 @@ router.get("/PlanktonPhytos", async (req, res) => {
 });
 
 // router.get(`/${encodeURIComponent('ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนสัตว์')}`, async (req, res) => {
-router.get("/PlanktonZoos", async (req, res) => {
+router.get("/PlanktonZoos", authenticateToken, async (req, res) => {
     try {
         const offset = parseInt(req.query.offset as string) || 0;
         const pageSize = parseInt(req.query.pageSize as string) || 10;
@@ -40,7 +41,7 @@ router.get("/PlanktonZoos", async (req, res) => {
 });
 
 // router.get(`/${encodeURIComponent('ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์หน้าดิน')}`, async (req, res) => {
-router.get("/Benthos", async (req, res) => {
+router.get("/Benthos", authenticateToken, async (req, res) => {
     try {
         const offset = parseInt(req.query.offset as string) || 0;
         const pageSize = parseInt(req.query.pageSize as string) || 10;
@@ -58,7 +59,7 @@ router.get("/Benthos", async (req, res) => {
 });
 
 // router.get(`/${encodeURIComponent('ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของลูกปลาและไข่ปลา')}`, async (req, res) => {
-router.get("/FishLarvaeEggs", async (req, res) => {
+router.get("/FishLarvaeEggs", authenticateToken, async (req, res) => {
     try {
         const offset = parseInt(req.query.offset as string) || 0;
         const pageSize = parseInt(req.query.pageSize as string) || 10;
@@ -76,7 +77,7 @@ router.get("/FishLarvaeEggs", async (req, res) => {
 });
 
 // router.get(`/${encodeURIComponent('ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์น้ำวัยอ่อน')}`, async (req, res) => {
-router.get("/JuvenileAquaticAnimals", async (req, res) => {
+router.get("/JuvenileAquaticAnimals", authenticateToken, async (req, res) => {
     try {
         const offset = parseInt(req.query.offset as string) || 0;
         const pageSize = parseInt(req.query.pageSize as string) || 10;

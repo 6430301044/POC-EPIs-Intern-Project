@@ -1,5 +1,6 @@
 import express from 'express';
 import { getWasteWaterData } from '../controllers/wasteWater/index';
+import { authenticateToken } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
