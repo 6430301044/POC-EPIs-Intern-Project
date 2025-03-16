@@ -11,8 +11,8 @@ import AdminLayout from "@/layouts/AdminLayout";
 import Admin from "@/pages/admin/Admin";
 import Team from "@/pages/admin/Team";
 import Projects from "@/pages/admin/Projects";
-import Calendar from "@/pages/admin/Calendar";
-import Documents from "@/pages/admin/Documents";
+import News from "@/pages/admin/News";
+import Audiolog from "@/pages/admin/Audiolog";
 import Reports from "@/pages/admin/Reports";
 import Settings from "@/pages/admin/Settings";
 import Profile from "@/pages/admin/Profile";
@@ -95,12 +95,8 @@ const router = createBrowserRouter([
         element: <Projects />,
       },
       {
-        path: "/admin/calendar",
-        element: <Calendar />,
-      },
-      {
-        path: "/admin/documents",
-        element: <Documents />,
+        path: "/admin/news",
+        element: <News />,
       },
       {
         path: "/admin/reports",
@@ -122,7 +118,10 @@ const router = createBrowserRouter([
         path: "/admin/approve",
         element: <ApproveMain />,
       },
-
+      {
+        path: "/admin/audiolog",
+        element: <Audiolog/>,
+      },
     ],
   },
 ]);

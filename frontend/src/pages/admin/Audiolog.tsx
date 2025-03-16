@@ -2,16 +2,16 @@ import { Container } from '@/components/template/Container'
 import { SectionTitle } from '@/components/template/SectionTitle'
 import React from 'react'
 
-export default function Calendar() {
+export default function Adiolog() {
   return (
     <>
         <Container>
-            <SectionTitle
-                title='Calendar'
+            <SectionTitle 
+                title='Audiolog'
                 align='center'
             />
-            <div className='text-9xl text-black'>
-                Hi there! I am the Calendar.tsx page.
+            <div>
+                Hi there! I am the Audiolog.tsx page.
             </div>
         </Container>
     </>

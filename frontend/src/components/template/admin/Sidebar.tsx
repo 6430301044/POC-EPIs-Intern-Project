@@ -18,8 +18,8 @@ export default function Sidebar() {
     { name: 'Team', path: '/admin/team', icon: TeamIcon },
     { name: 'Upload', path: '/admin/upload', icon: ProjectIcon },
     { name: 'Approve', path: '/admin/approve', icon: CalendarIcon },
-    { name: 'Audiolog', path: '/admin/', icon: DocumentIcon },
-    { name: 'News', path: '/admin/', icon: ReportIcon },
+    { name: 'Audiolog', path: '/admin/audiolog', icon: DocumentIcon },
+    { name: 'News', path: '/admin/news', icon: ReportIcon },
   ]
 
   const teams = [
