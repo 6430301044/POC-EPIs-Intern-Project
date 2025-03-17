@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { uploadCSV, uploadExcel, getPendingApprovals, approveUpload, rejectUpload, deleteDataByPeriod, updateDataByPeriod, getAvailableTables } from "../controllers/upload/index";
+import { uploadCSV, uploadExcel, getPendingApprovals, approveUpload, rejectUpload, deleteDataByPeriod, updateDataByPeriod, getAvailableTables, getPreviewData } from "../controllers/upload/index";
 import { uploadEnhanceCSV, uploadEnhanceExcel } from "../controllers/enhanceTable/enhanceTableUploadController";
 import { getPeriods } from "../controllers/upload/periodController";
 import { getReferenceData, addReferenceData, updateReferenceData, deleteReferenceData } from "../controllers/upload/referenceDataController";
@@ -44,6 +44,7 @@ router.post("/", authenticateToken, authorizeRoles(['dev', 'uploader', 'approver
 router.get("/pending-approvals", authenticateToken, authorizeRoles(['dev', 'approver']), getPendingApprovals);
 router.put("/approve/:uploadId", authenticateToken, authorizeRoles(['dev', 'approver']), approveUpload);
 router.put("/reject/:uploadId", authenticateToken, authorizeRoles(['dev', 'approver']), rejectUpload);
+router.get("/preview/:uploadId", authenticateToken, authorizeRoles(['dev', 'approver']), getPreviewData);
 
 // Period data endpoint for the upload form
 router.get("/periods", authenticateToken, getPeriods);

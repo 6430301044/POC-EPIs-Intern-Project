@@ -1,2 +1,0 @@
-record_Id,station_id,phylum,class,order,family,genu,quantity_per_1000m3,sub_id,reportBy,period_id,company_id
-1,8,Chordata,Actinopterygii,Blenniiformes,Blenniidae,NULL,NULL,13,1,2,2

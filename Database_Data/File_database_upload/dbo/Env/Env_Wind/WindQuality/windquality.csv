@@ -1,5 +1,0 @@
-record_Id,station_id,parameter,unit,day1st_result,day2nd_result,day3rd_result,std,sub_id,period_id,company_id,reportBy
-1,1,TSP,mg/m3,0.0140,0.0100,0.0120,0.3300,2,1,1,NULL
-2,1,PM-10,mg/m3,0.0110,0.0080,0.0080,0.1200,2,1,1,NULL
-3,1,SO2,ppm,0.0066,0.0066,0.0067,0.3000,2,1,1,NULL
-4,1,SO2,ppm,0.0078,0.0081,0.0082,0.1200,2,1,1,NULL

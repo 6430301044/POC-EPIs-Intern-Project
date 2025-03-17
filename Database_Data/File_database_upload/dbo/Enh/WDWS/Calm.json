@@ -1,0 +1,26 @@
+[
+  {
+    "record_id": 1,
+    "station_id": 1,
+    "indexName": "Calm",
+    "calmValue": 0.5278,
+    "period_id": 2,
+    "enhance_id": 1
+  },
+  {
+    "record_id": 2,
+    "station_id": 2,
+    "indexName": "Calm",
+    "calmValue": 0.0972,
+    "period_id": 2,
+    "enhance_id": 1
+  },
+  {
+    "record_id": 3,
+    "station_id": 3,
+    "indexName": "Calm",
+    "calmValue": 0.1111,
+    "period_id": 2,
+    "enhance_id": 1
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "record_id": 1,
+    "station_id": 1,
+    "indexName": "ค่าเฉลี่ย 24 ชั่วโมง",
+    "day1st_result_ppm": 0.0078,
+    "day2nd_result_ppm": 0.0081,
+    "day3rd_result_ppm": 0.0082,
+    "period_id": 2,
+    "enhance_id": 2
+  },
+  {
+    "record_id": 2,
+    "station_id": 1,
+    "indexName": "ค่าเฉลี่ย 1 ชั่วโมงสูงสุด",
+    "day1st_result_ppm": 0.0096,
+    "day2nd_result_ppm": 0.0098,
+    "day3rd_result_ppm": 0.0098,
+    "period_id": 2,
+    "enhance_id": 2
+  },
+  {
+    "record_id": 3,
+    "station_id": 1,
+    "indexName": "ค่าเฉลี่ย 1 ชั่วโมงต่ำสุด",
+    "day1st_result_ppm": 0.0066,
+    "day2nd_result_ppm": 0.0066,
+    "day3rd_result_ppm": 0.0067,
+    "period_id": 2,
+    "enhance_id": 2
+  },
+  {
+    "record_id": 4,
+    "station_id": 2,
+    "indexName": "ค่าเฉลี่ย 24 ชั่วโมง",
+    "day1st_result_ppm": 0.0050,
+    "day2nd_result_ppm": 0.0047,
+    "day3rd_result_ppm": 0.0049,
+    "period_id": 2,
+    "enhance_id": 2
+  },
+  {
+    "record_id": 5,
+    "station_id": 2,
+    "indexName": "ค่าเฉลี่ย 1 ชั่วโมงสูงสุด",
+    "day1st_result_ppm": 0.0059,
+    "day2nd_result_ppm": 0.0057,
+    "day3rd_result_ppm": 0.0059,
+    "period_id": 2,
+    "enhance_id": 2
+  },
+  {
+    "record_id": 6,
+    "station_id": 2,
+    "indexName": "ค่าเฉลี่ย 1 ชั่วโมงต่ำสุด",
+    "day1st_result_ppm": 0.0039,
+    "day2nd_result_ppm": 0.0039,
+    "day3rd_result_ppm": 0.0041,
+    "period_id": 2,
+    "enhance_id": 2
+  },
+  {
+    "record_id": 7,
+    "station_id": 3,
+    "indexName": "ค่าเฉลี่ย 24 ชั่วโมง",
+    "day1st_result_ppm": 0.0085,
+    "day2nd_result_ppm": 0.0090,
+    "day3rd_result_ppm": 0.0091,
+    "period_id": 2,
+    "enhance_id": 2
+  },
+  {
+    "record_id": 8,
+    "station_id": 3,
+    "indexName": "ค่าเฉลี่ย 1 ชั่วโมงสูงสุด",
+    "day1st_result_ppm": 0.0104,
+    "day2nd_result_ppm": 0.0105,
+    "day3rd_result_ppm": 0.0105,
+    "period_id": 2,
+    "enhance_id": 2
+  },
+  {
+    "record_id": 9,
+    "station_id": 3,
+    "indexName": "ค่าเฉลี่ย 1 ชั่วโมงต่ำสุด",
+    "day1st_result_ppm": 0.0072,
+    "day2nd_result_ppm": 0.0072,
+    "day3rd_result_ppm": 0.0072,
+    "period_id": 2,
+    "enhance_id": 2
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "record_id": 1,
+    "station_id": 1,
+    "indexName": "Leq(24)",
+    "day1st_result": 64.2,
+    "day2nd_result": 64.4,
+    "day3rd_result": 63.5,
+    "period_id": 2,
+    "enhance_id": 3
+  },
+  {
+    "record_id": 2,
+    "station_id": 1,
+    "indexName": "Ldn",
+    "day1st_result": 68.1,
+    "day2nd_result": 68.2,
+    "day3rd_result": 67.8,
+    "period_id": 2,
+    "enhance_id": 3
+  },
+  {
+    "record_id": 3,
+    "station_id": 1,
+    "indexName": "Lmax",
+    "day1st_result": 95.5,
+    "day2nd_result": 96.0,
+    "day3rd_result": 92.1,
+    "period_id": 2,
+    "enhance_id": 3
+  },
+  {
+    "record_id": 4,
+    "station_id": 2,
+    "indexName": "Leq(24)",
+    "day1st_result": 55.1,
+    "day2nd_result": 56.6,
+    "day3rd_result": 55.5,
+    "period_id": 2,
+    "enhance_id": 3
+  },
+  {
+    "record_id": 5,
+    "station_id": 2,
+    "indexName": "Ldn",
+    "day1st_result": 60.4,
+    "day2nd_result": 62.7,
+    "day3rd_result": 61.9,
+    "period_id": 2,
+    "enhance_id": 3
+  },
+  {
+    "record_id": 6,
+    "station_id": 2,
+    "indexName": "Lmax",
+    "day1st_result": 82.4,
+    "day2nd_result": 88.3,
+    "day3rd_result": 88.4,
+    "period_id": 2,
+    "enhance_id": 3
+  },
+  {
+    "record_id": 7,
+    "station_id": 3,
+    "indexName": "Leq(24)",
+    "day1st_result": 60.0,
+    "day2nd_result": 59.3,
+    "day3rd_result": 59.0,
+    "period_id": 2,
+    "enhance_id": 3
+  },
+  {
+    "record_id": 8,
+    "station_id": 3,
+    "indexName": "Ldn",
+    "day1st_result": 65.8,
+    "day2nd_result": 65.0,
+    "day3rd_result": 66.1,
+    "period_id": 2,
+    "enhance_id": 3
+  },
+  {
+    "record_id": 9,
+    "station_id": 3,
+    "indexName": "Lmax",
+    "day1st_result": 87.3,
+    "day2nd_result": 87.3,
+    "day3rd_result": 87.3,
+    "period_id": 2,
+    "enhance_id": 3
+  }
+]

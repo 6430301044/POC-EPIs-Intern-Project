@@ -1,2 +1,0 @@
-record_Id,timePeriod,day1st_Leq,day1st_L90,day2nd_Leq,day2nd_L90,day3rd_Leq,day3rd_L90,calibrationRefdB,slmRead,slmAdjust,certifiedDate,calSheetNo,company_id,period_id,station_id,sub_id,toolAnalyst,toolCalibration,reportBy
-1,10:00 - 10:05,63.9,58.4,63.8,54.5,64.0,54.4,94.0,93.7,0.0,2024-04-09,CR-515-2024-154,1,1,1,7,1,2,1

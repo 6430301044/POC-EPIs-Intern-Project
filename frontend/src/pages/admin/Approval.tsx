@@ -2,6 +2,7 @@ import { Container } from "@/components/template/Container";
 import { SectionTitle } from "@/components/template/SectionTitle";
 import { useState, useEffect } from "react";
 import API_BASE_URL from "@/config/apiConfig";
+import DataPreviewModal from "@/components/admin/DataPreviewModal";
 
 interface PendingApproval {
   id: string;
@@ -20,6 +21,8 @@ export default function Approval() {
   const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [selectedUploadId, setSelectedUploadId] = useState<string | null>(null);
   const [toast, setToast] = useState<{
     show: boolean;
     title: string;
@@ -200,6 +203,18 @@ export default function Approval() {
       minute: '2-digit'
     });
   };
+  
+  // ฟังก์ชันสำหรับเปิด modal แสดงตัวอย่างข้อมูล
+  const handlePreviewData = (id: string) => {
+    setSelectedUploadId(id);
+    setPreviewModalOpen(true);
+  };
+  
+  // ฟังก์ชันสำหรับปิด modal
+  const handleClosePreviewModal = () => {
+    setPreviewModalOpen(false);
+    setSelectedUploadId(null);
+  };
 
   return (
     <>
@@ -263,6 +278,13 @@ export default function Approval() {
                         <td className="py-3 px-4 border-b text-center">
                           <div className="flex justify-center space-x-2">
                             <button
+                              onClick={() => handlePreviewData(approval.id)}
+                              disabled={processingId === approval.id}
+                              className="px-3 py-1 rounded text-white bg-blue-600 hover:bg-blue-700"
+                            >
+                              Preview
+                            </button>
+                            <button
                               onClick={() => handleApprove(approval.id)}
                               disabled={processingId === approval.id}
                               className={`px-3 py-1 rounded text-white ${processingId === approval.id ? 'bg-green-400' : 'bg-green-600 hover:bg-green-700'}`}
@@ -297,6 +319,13 @@ export default function Approval() {
             <p>{toast.message}</p>
           </div>
         )}
+        
+        {/* Data Preview Modal */}
+        <DataPreviewModal 
+          uploadId={selectedUploadId}
+          isOpen={previewModalOpen}
+          onClose={handleClosePreviewModal}
+        />
       </Container>
     </>
   );

@@ -1,2 +1,0 @@
-record_Id,station_id,phylum,class,order,family,genu,quantity_per_m3,sub_id,reportBy,period_id,company_id
-1,8,Protozoa,Sarcodina,Radiolarida,NULL,Acanthometron sp.,10000,11,1,2,2
