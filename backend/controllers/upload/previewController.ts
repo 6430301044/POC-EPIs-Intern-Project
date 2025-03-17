@@ -18,64 +18,52 @@ export const getPreviewData = async (req: Request, res: Response) => {
         
         const pool = await connectToDB();
         
-        // Get the temporary table name from UploadTempTables
-        const tempTableResult = await pool.request()
-            .input("uploadId", uploadId)
-            .query(`
-                SELECT temp_table_name, target_table 
-                FROM dbo.UploadTempTables 
-                WHERE upload_id = @uploadId
-            `);
-        
-        if (tempTableResult.recordset.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "ไม่พบข้อมูลตัวอย่างสำหรับไฟล์ที่อัปโหลด"
-            });
-        }
-        
-        const { temp_table_name } = tempTableResult.recordset[0];
-        
-        // Get data from the temporary table
-        const dataResult = await pool.request()
-            .query(`SELECT TOP 100 * FROM ${temp_table_name}`);
-        
-        // Get column information
-        const columnResult = await pool.request()
-            .query(`
-                SELECT COLUMN_NAME, DATA_TYPE 
-                FROM INFORMATION_SCHEMA.COLUMNS 
-                WHERE TABLE_NAME = '${temp_table_name.replace(/\[|\]/g, '')}'
-            `);
-        
-        // Get upload information
+        // Get the upload data including parsed JSON data and target table
         const uploadResult = await pool.request()
             .input("uploadId", uploadId)
             .query(`
                 SELECT 
-                    u.filename, 
-                    u.upload_date, 
-                    u.period_id,
-                    COUNT(*) as total_rows 
-                FROM 
-                    dbo.UploadedFiles u 
-                WHERE 
-                    u.upload_id = @uploadId
-                GROUP BY 
-                    u.filename, u.upload_date, u.period_id
+                    upload_id, filename, period_id, 
+                    parsed_data, target_table, column_mapping
+                FROM dbo.UploadedFiles 
+                WHERE upload_id = @uploadId
             `);
         
-        // Count total rows in the temporary table
-        const countResult = await pool.request()
-            .query(`SELECT COUNT(*) as total FROM ${temp_table_name}`);
+        if (uploadResult.recordset.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "ไม่พบข้อมูลสำหรับไฟล์ที่อัปโหลด"
+            });
+        }
+        
+        const uploadData = uploadResult.recordset[0];
+        const parsedData = JSON.parse(uploadData.parsed_data || '[]');
+        const columnMapping = JSON.parse(uploadData.column_mapping || '{}');
+        
+        // Create column information from the column mapping
+        const columns = Object.entries(columnMapping).map(([fieldName, columnName]) => ({
+            COLUMN_NAME: fieldName,
+            DATA_TYPE: 'varchar'
+        }));
+        
+        // Use the parsed data as rows
+        const rows = parsedData;
+        
+        // Prepare file information
+        const fileInfo = {
+            filename: uploadData.filename,
+            upload_date: uploadData.upload_date,
+            period_id: uploadData.period_id,
+            total_rows: parsedData.length
+        };
         
         res.status(200).json({
             success: true,
             data: {
-                columns: columnResult.recordset,
-                rows: dataResult.recordset,
-                totalRows: countResult.recordset[0].total,
-                fileInfo: uploadResult.recordset[0] || {}
+                columns: columns,
+                rows: rows,
+                totalRows: parsedData.length,
+                fileInfo: fileInfo
             }
         });
         

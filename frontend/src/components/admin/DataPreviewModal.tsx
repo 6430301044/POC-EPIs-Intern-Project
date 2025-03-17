@@ -47,6 +47,10 @@ const DataPreviewModal: React.FC<DataPreviewModalProps> = ({ uploadId, isOpen, o
       setError(null);
       
       const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found. Please log in again.');
+      }
+      
       const response = await fetch(`${API_BASE_URL}/upload/preview/${id}`, {
         method: 'GET',
         headers: {
@@ -167,7 +171,7 @@ const DataPreviewModal: React.FC<DataPreviewModalProps> = ({ uploadId, isOpen, o
                             key={`${rowIndex}-${column.COLUMN_NAME}`}
                             className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300"
                           >
-                            {row[column.COLUMN_NAME] !== null ? row[column.COLUMN_NAME].toString() : 'null'}
+                            {row[column.COLUMN_NAME] !== null && row[column.COLUMN_NAME] !== undefined ? row[column.COLUMN_NAME].toString() : row[column.COLUMN_NAME] === null ? 'null' : 'undefined'}
                           </td>
                         ))}
                       </tr>

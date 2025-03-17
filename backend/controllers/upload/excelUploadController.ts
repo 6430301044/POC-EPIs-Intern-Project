@@ -93,8 +93,8 @@ const saveForApproval = async (data: any[], mainCategory: string, subCategory: s
         const yearId = yearIdResult.recordset[0].year_id;
 
         const uploadRequest = pool.request()
-            .input("filename", originalFilename)
-            .input("systemFilename", systemFilename)
+        .input("filename", originalFilename)
+        .input("systemFilename", systemFilename)
             .input("fileSize", fileSize)
             .input("mimeType", mimeType)
             .input("periodId", periodId)
@@ -108,7 +108,7 @@ const saveForApproval = async (data: any[], mainCategory: string, subCategory: s
             INSERT INTO dbo.UploadedFiles (
                 filename, period_id, year_id, main_id, sub_id, uploaded_by, status, upload_date
             ) VALUES (
-                @filename, @periodId, @yearId, @mainId, @subId, @uploadedBy, @status, GETDATE()
+                @filename,@periodId, @yearId, @mainId, @subId, @uploadedBy, @status, GETDATE()
             );
             SELECT SCOPE_IDENTITY() AS upload_id;
         `);

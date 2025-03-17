@@ -13,7 +13,7 @@ export const getPendingApprovals = async (req: Request, res: Response) => {
                     u.filename as file_name,
                     u.upload_date,
                     u.period_id,
-                    CASE 
+                    CASE
                         WHEN s.semiannual = 1 THEN 'ม.ค. - มิ.ย.'
                         WHEN s.semiannual = 2 THEN 'ก.ค. - ธ.ค.'
                         ELSE 'Unknown'

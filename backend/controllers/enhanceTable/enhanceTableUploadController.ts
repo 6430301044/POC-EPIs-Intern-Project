@@ -207,26 +207,7 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
     let transaction = null;
 
     try {
-        // Check if UploadTempTables table exists, create it if it doesn't
-        const tableExistsResult = await pool.request().query(`
-            SELECT OBJECT_ID('dbo.UploadTempTables') AS table_id
-        `);
-        
-        if (!tableExistsResult.recordset[0].table_id) {
-            console.log("Creating UploadTempTables table as it doesn't exist");
-            await pool.request().query(`
-                CREATE TABLE dbo.UploadTempTables (
-                    id INT IDENTITY(1,1) PRIMARY KEY,
-                    upload_id INT NOT NULL,
-                    temp_table_name NVARCHAR(255) NOT NULL,
-                    target_table NVARCHAR(255) NOT NULL,
-                    created_at DATETIME DEFAULT GETDATE()
-                )
-            `);
-        }
-        
-        // Create a temporary table to store the data
-        const tempTableName = `#Temp_${enhanceTableId}_${Date.now()}`;
+        // Get enhance table information
         const enhanceTableResult = await pool.request()
             .input("enhanceId", enhanceTableId)
             .query("SELECT * FROM dbo.EnhanceTable WHERE enhance_id = @enhanceId");
@@ -241,43 +222,8 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
         transaction = pool.transaction();
         await transaction.begin();
         
-        // Create a permanent temp table with a unique name
-        const permanentTempTableName = `dbo.Temp_${enhanceTable.enhanceName}_${Date.now()}`;
-        
         // Get column mapping for the enhance table
         const columnMapping = getColumnMapping(enhanceTableId);
-        
-        // Create columns for the temp table based on the first row of data
-        const columns = Object.keys(data[0]).map(key => {
-            // Map the column name if it exists in the mapping
-            const mappedName = columnMapping[key.toLowerCase()] || key;
-            return `[${mappedName}] NVARCHAR(MAX)`;
-        }).join(', ');
-        
-        // Create the permanent temp table
-        await transaction.request().query(`
-            CREATE TABLE ${permanentTempTableName} (
-                [id] INT IDENTITY(1,1) PRIMARY KEY,
-                ${columns}
-            )
-        `);
-        
-        // Insert data into the permanent temp table
-        for (const row of data) {
-            const columnNames = Object.keys(row).map(key => {
-                const mappedName = columnMapping[key.toLowerCase()] || key;
-                return `[${mappedName}]`;
-            }).join(', ');
-            
-            const columnValues = Object.keys(row).map(key => {
-                return `'${row[key]?.toString().replace(/'/g, "''")}' `;
-            }).join(', ');
-            
-            await transaction.request().query(`
-                INSERT INTO ${permanentTempTableName} (${columnNames})
-                VALUES (${columnValues})
-            `);
-        }
         
         // Get year_id from period_id
         const periodResult = await transaction.request()
@@ -323,13 +269,15 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
         
         // Save file information
         const fileResult = await transaction.request()
-            .input('filename', systemFilename)
+            .input('filename', originalFilename)
+            .input('systemFilename', systemFilename)
+            .input('fileSize', fileSize)
+            .input('mimeType', mimeType)
             .input('periodId', periodId)
             .input('yearId', yearId)
             .input('mainId', mainId)
             .input('subId', subId)
             .input('uploadedBy', userId)
-            .input('recordCount', data.length)
             .query(`
                 INSERT INTO dbo.UploadedFiles (
                     filename, 
@@ -339,8 +287,7 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
                     sub_id,
                     uploaded_by,
                     status,
-                    upload_date,
-                    record_count
+                    upload_date
                 )
                 VALUES (
                     @filename,
@@ -350,8 +297,7 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
                     @subId,
                     @uploadedBy,
                     'รอการอนุมัติ',
-                    GETDATE(),
-                    @recordCount
+                    GETDATE()
                 );
                 SELECT SCOPE_IDENTITY() AS upload_id;
             `);
@@ -381,10 +327,9 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
         await transaction.commit();
         
         return {
-            uploadId,
-            tempTableName: permanentTempTableName,
-            recordCount: data.length,
-            enhanceTable: enhanceTable.enhanceName
+            success: true,
+            count: data.length,
+            uploadId
         };
     } catch (error) {
         // Rollback the transaction if there's an error
