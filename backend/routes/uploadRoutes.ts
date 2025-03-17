@@ -9,11 +9,11 @@ const router = express.Router();
 const upload = multer({ dest: "uploads/" }); // กำหนดโฟลเดอร์อัปโหลด
 
 // Specific endpoints for CSV and Excel uploads
-router.post("/upload-csv", authenticateToken, authorizeRoles(['admin', 'member', 'approver']), upload.single("file"), uploadCSV);
-router.post("/upload-excel", authenticateToken, authorizeRoles(['admin', 'member', 'approver']), upload.single("file"), uploadExcel);
+router.post("/upload-csv", authenticateToken, authorizeRoles(['dev', 'uploader', 'approver']), upload.single("file"), uploadCSV);
+router.post("/upload-excel", authenticateToken, authorizeRoles(['dev', 'uploader', 'approver']), upload.single("file"), uploadExcel);
 
 // General upload endpoint that routes to the appropriate controller based on file type
-router.post("/", authenticateToken, authorizeRoles(['admin', 'member', 'approver']), upload.single("file"), (req, res) => {
+router.post("/", authenticateToken, authorizeRoles(['dev', 'uploader', 'approver']), upload.single("file"), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: "กรุณาอัปโหลดไฟล์" });
     }
@@ -36,9 +36,9 @@ router.post("/", authenticateToken, authorizeRoles(['admin', 'member', 'approver
 });
 
 // Approval management routes
-router.get("/pending-approvals", authenticateToken, authorizeRoles(['admin', 'approver']), getPendingApprovals);
-router.put("/approve/:uploadId", authenticateToken, authorizeRoles(['admin', 'approver']), approveUpload);
-router.put("/reject/:uploadId", authenticateToken, authorizeRoles(['admin', 'approver']), rejectUpload);
+router.get("/pending-approvals", authenticateToken, authorizeRoles(['dev', 'approver']), getPendingApprovals);
+router.put("/approve/:uploadId", authenticateToken, authorizeRoles(['dev', 'approver']), approveUpload);
+router.put("/reject/:uploadId", authenticateToken, authorizeRoles(['dev', 'approver']), rejectUpload);
 
 // Period data endpoint for the upload form
 router.get("/periods", authenticateToken, getPeriods);
@@ -47,13 +47,13 @@ router.get("/periods", authenticateToken, getPeriods);
 router.get("/available-tables", authenticateToken, getAvailableTables);
 
 // Data management routes
-router.delete("/delete-data", authenticateToken, authorizeRoles(['admin']), deleteDataByPeriod);
-router.put("/update-data", authenticateToken, authorizeRoles(['admin']), updateDataByPeriod);
+router.delete("/delete-data", authenticateToken, authorizeRoles(['dev', 'approver']), deleteDataByPeriod);
+router.put("/update-data", authenticateToken, authorizeRoles(['dev', 'approver']), updateDataByPeriod);
 
 // Reference data management routes
 router.get("/reference/:table", authenticateToken, getReferenceData);
-router.post("/reference/:table", authenticateToken, authorizeRoles(['admin']), addReferenceData);
-router.put("/reference/:table/:id", authenticateToken, authorizeRoles(['admin']), updateReferenceData);
-router.delete("/reference/:table/:id", authenticateToken, authorizeRoles(['admin']), deleteReferenceData);
+router.post("/reference/:table", authenticateToken, authorizeRoles(['dev', 'approver']), addReferenceData);
+router.put("/reference/:table/:id", authenticateToken, authorizeRoles(['dev', 'approver']), updateReferenceData);
+router.delete("/reference/:table/:id", authenticateToken, authorizeRoles(['dev', 'approver']), deleteReferenceData);
 
 export default router;
