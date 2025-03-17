@@ -1,7 +1,6 @@
 import { Container } from "@/components/template/Container";
 import { SectionTitle } from "@/components/template/SectionTitle";
 import React, { useState, useEffect, useRef } from "react";
-import { fetchMainCategories, fetchSubCategories } from "@/services/environmentService";
 import API_BASE_URL from "@/config/apiConfig";
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';

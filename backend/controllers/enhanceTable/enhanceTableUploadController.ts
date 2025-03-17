@@ -119,6 +119,83 @@ const parseExcel = async (filePath: string, enhanceTableId: string, periodId: st
 };
 
 /**
+ * Get table name for the EnhanceTable
+ */
+const getTableName = (enhanceName: string): string => {
+    return `Enh_${enhanceName}`;
+};
+
+/**
+ * Get column mapping for the EnhanceTable
+ */
+const getColumnMapping = (enhanceId: string): { [key: string]: string } => {
+    // Define default column mappings for all enhance tables
+    const defaultMapping = {
+        "station_id": "station_id",
+        "indexName": "indexName",
+        "period_id": "period_id"
+    };
+    
+    // Add specific mappings based on enhanceId
+    // This can be expanded based on the specific requirements of each enhance table
+    const specificMappings: { [key: string]: { [key: string]: string } } = {
+        "1": { // WDWS_Calm
+            ...defaultMapping,
+            "calmValue": "calmValue"
+        },
+        "2": { // SO2
+            ...defaultMapping,
+            "day1st_result_ppm": "day1st_result_ppm",
+            "day2nd_result_ppm": "day2nd_result_ppm",
+            "day3rd_result_ppm": "day3rd_result_ppm"
+        },
+        "3": { // NoiseLevelNormal
+            ...defaultMapping,
+            "day1st_result": "day1st_result",
+            "day2nd_result": "day2nd_result",
+            "day3rd_result": "day3rd_result"
+        },
+        "4": { // NoiseLevel90_Average
+            ...defaultMapping,
+            "day1st_result": "day1st_result",
+            "day2nd_result": "day2nd_result",
+            "day3rd_result": "day3rd_result"
+        },
+        "5": { // Monitorresult
+            ...defaultMapping,
+            "day1st_Leq": "day1st_Leq",
+            "day1st_L90": "day1st_L90",
+            "day2nd_Leq": "day2nd_Leq",
+            "day2nd_L90": "day2nd_L90",
+            "day3rd_Leq": "day3rd_Leq",
+            "day3rd_L90": "day3rd_L90"
+        },
+        "6": { // PlanktonPhytos
+            ...defaultMapping,
+            "quantity_per_m3": "quantity_per_m3"
+        },
+        "7": { // PlanktonZoos
+            ...defaultMapping,
+            "quantity_per_m3": "quantity_per_m3"
+        },
+        "8": { // Benthos
+            ...defaultMapping,
+            "quantity_per_m2": "quantity_per_m2"
+        },
+        "9": { // FishLarvaeEggs
+            ...defaultMapping,
+            "quantity_per_1000m3": "quantity_per_1000m3"
+        },
+        "10": { // JuvenileAquaticAnimals
+            ...defaultMapping,
+            "quantity_per_1000m3": "quantity_per_1000m3"
+        }
+    };
+    
+    return specificMappings[enhanceId] || defaultMapping;
+};
+
+/**
  * Save EnhanceTable data for approval process
  */
 const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string) => {
@@ -158,27 +235,36 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
         const yearId = yearIdResult.recordset[0].year_id;
         const userId = 1; // Using a valid user ID (Admin) - should be replaced with actual user ID from auth
 
+        // Get the main_id from the sub_id in EnhanceTable
+        const mainIdResult = await pool.request()
+            .input("subId", enhanceTable.sub_id)
+            .query("SELECT main_id FROM dbo.SbCategories WHERE sub_id = @subId");
+        
+        if (mainIdResult.recordset.length === 0 || !mainIdResult.recordset[0].main_id) {
+            throw new Error(`ไม่พบ main_id สำหรับ sub_id: ${enhanceTable.sub_id}`);
+        }
+        
+        const mainId = mainIdResult.recordset[0].main_id;
+        
         // Record the upload in the UploadedFiles table
         const uploadRequest = pool.request()
             .input("filename", originalFilename)
-            .input("systemFilename", systemFilename)
-            .input("fileSize", fileSize)
-            .input("mimeType", mimeType)
             .input("periodId", periodId)
             .input("yearId", yearId)
-            .input("enhanceTableId", enhanceTableId)
+            .input("mainId", mainId)
+            .input("subId", enhanceTable.sub_id)
             .input("userId", userId)
-            .input("status", "pending"); // Initial status is pending for approval
+            .input("status", "รอการอนุมัติ"); // Initial status is pending for approval
         
         const uploadResult = await uploadRequest.query(`
             INSERT INTO dbo.UploadedFiles 
-            (filename, system_filename, file_size, mime_type, upload_date, period_id, year_id, enhance_table_id, uploaded_by, status) 
+            (filename, period_id, year_id, main_id, sub_id, uploaded_by, status, upload_date) 
             VALUES 
-            (@filename, @systemFilename, @fileSize, @mimeType, GETDATE(), @periodId, @yearId, @enhanceTableId, @userId, @status);
-            SELECT SCOPE_IDENTITY() AS uploadId;
+            (@filename, @periodId, @yearId, @mainId, @subId, @userId, @status, GETDATE());
+            SELECT SCOPE_IDENTITY() AS upload_id;
         `);
         
-        const uploadId = uploadResult.recordset[0].uploadId;
+        const uploadId = uploadResult.recordset[0].upload_id;
         
         // Store the data in a temporary table for approval
         const tempTableName = `Temp_${tableName}_${uploadId}`;
