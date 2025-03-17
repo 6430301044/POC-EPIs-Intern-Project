@@ -8,6 +8,8 @@ import { hasEditPermission } from '@/utils/authUtils';
 interface Period {
   period_id: string;
   year: number;
+  semiannual: number;
+  semiannual_id: number;
   periodName: string;
   startDate: string;
   endDate: string;
@@ -23,6 +25,8 @@ export default function DataManagement() {
   // State for form data and UI
   const [periods, setPeriods] = useState<Period[]>([]);
   const [tables, setTables] = useState<Table[]>([]);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [selectedSemiannual, setSelectedSemiannual] = useState<number | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<string>('');
   const [selectedTable, setSelectedTable] = useState<string>('');
   const [updateFields, setUpdateFields] = useState<{[key: string]: any}>({});
@@ -32,6 +36,16 @@ export default function DataManagement() {
   const [showConfirmUpdate, setShowConfirmUpdate] = useState(false);
   const [result, setResult] = useState<{success: boolean; message: string; data?: any} | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  // Derived state for filtered periods
+  const availableYears = [...new Set(periods.map(period => period.year))].sort((a, b) => b - a);
+  const availableSemiannuals = selectedYear ? 
+    [...new Set(periods.filter(period => period.year === selectedYear)
+      .map(period => period.semiannual))].sort() : 
+    [];
+  const availablePeriods = (selectedYear && selectedSemiannual) ? 
+    periods.filter(period => period.year === selectedYear && period.semiannual === selectedSemiannual) : 
+    [];
   
   // Fetch periods and available tables on component mount
   useEffect(() => {
@@ -194,11 +208,26 @@ export default function DataManagement() {
 
   // Reset the form
   const resetForm = () => {
+    setSelectedYear(null);
+    setSelectedSemiannual(null);
     setSelectedPeriod('');
     setSelectedTable('');
     setUpdateFields({});
     setResult(null);
     setError(null);
+  };
+  
+  // Handle year selection
+  const handleYearChange = (year: number | null) => {
+    setSelectedYear(year);
+    setSelectedSemiannual(null);
+    setSelectedPeriod('');
+  };
+  
+  // Handle semiannual selection
+  const handleSemiannualChange = (semiannual: number | null) => {
+    setSelectedSemiannual(semiannual);
+    setSelectedPeriod('');
   };
 
   return (
@@ -235,19 +264,55 @@ export default function DataManagement() {
           )}
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            {/* Period Selection */}
+            {/* Year Selection */}
             <div>
-              <label className="block text-gray-700 mb-2">ช่วงเวลา</label>
+              <label className="block text-gray-700 mb-2">ปี</label>
+              <select
+                className="w-full p-2 border rounded"
+                value={selectedYear || ''}
+                onChange={(e) => handleYearChange(e.target.value ? parseInt(e.target.value) : null)}
+                disabled={loading}
+              >
+                <option value="">-- เลือกปี --</option>
+                {availableYears.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Semiannual Selection */}
+            <div>
+              <label className="block text-gray-700 mb-2">ช่วงที่มาเก็บข้อมูล</label>
+              <select
+                className="w-full p-2 border rounded"
+                value={selectedSemiannual || ''}
+                onChange={(e) => handleSemiannualChange(e.target.value ? parseInt(e.target.value) : null)}
+                disabled={loading || !selectedYear}
+              >
+                <option value="">-- เลือกช่วงที่มาเก็บข้อมูล --</option>
+                {availableSemiannuals.map((semiannual) => (
+                  <option key={semiannual} value={semiannual}>
+                    {semiannual === 1 ? 'ม.ค. - มิ.ย.' : 'ก.ค. - ธ.ค.'}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            {/* Period Selection with Start/End Dates */}
+            <div>
+              <label className="block text-gray-700 mb-2">วันที่เก็บข้อมูล</label>
               <select
                 className="w-full p-2 border rounded"
                 value={selectedPeriod}
                 onChange={(e) => setSelectedPeriod(e.target.value)}
-                disabled={loading}
+                disabled={loading || !selectedYear || !selectedSemiannual}
               >
-                <option value="">-- เลือกช่วงเวลา --</option>
-                {periods.map((period) => (
+                <option value="">-- เลือกวันที่เก็บข้อมูล --</option>
+                {availablePeriods.map((period) => (
                   <option key={period.period_id} value={period.period_id}>
-                    {period.year} ({period.periodName}) รอบการเก็บข้อมูลครั้งที่: {period.semiannual} | {formatDayMonth(period.startDate)} ถึง {formatDayMonth(period.endDate)}
+                    {formatDayMonth(period.startDate)} ถึง {formatDayMonth(period.endDate)}
                   </option>
                 ))}
               </select>
