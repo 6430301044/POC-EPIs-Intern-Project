@@ -73,9 +73,9 @@ export default function Approval() {
   };
 
 
-   const fetchPendingApprovals = async () => {
+  const fetchPendingApprovals = async () => {
     if (!checkTokenExpiration()) return; // ❌ หยุดถ้า Token หมดอายุ
-
+  
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
@@ -85,21 +85,23 @@ export default function Approval() {
           "Content-Type": "application/json"
         }
       });
-
+  
       if (response.status === 401 || response.status === 403) {
         console.warn("🚨 Unauthorized! Redirecting to login...");
         navigate("/login");
         return;
       }
-
+  
       const data = await response.json();
-      setPendingApprovals(data || []);
+      console.log('Pending Approvals Data:', data); // Log the data to check its structure
+      setPendingApprovals(Array.isArray(data) ? data : []); // Ensure it's an array
     } catch (error) {
       console.error("❌ Failed to fetch pending approvals:", error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleApprove = async (Register_id: number | undefined) => {
     if (!Register_id) return;

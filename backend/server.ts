@@ -8,6 +8,7 @@ import { verifyToken } from './middleware/authMiddleware';
 import uploadProfileRoutes from "./routes/uploadProfileRoutes";
 import uploadNewsRoutes from "./routes/uploadNewsRoutes";
 import uploadWebImageRoutes from "./routes/uploadWebImageRoutes";
+import newsRoutes from './routes/NewsRoutes';
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ app.use('/api', apiRoutes);
 
 app.use("/register", registerRoutes);
 
-app.use('/login', login);
+app.use("/login", login);
 
 app.use("/upload/profile", uploadProfileRoutes);
 
@@ -29,6 +30,7 @@ app.use("/upload/news", uploadNewsRoutes);
 
 app.use("/upload/webimage", uploadWebImageRoutes);
 
+app.use('/news', newsRoutes);
 
 app.listen(PORT, () => {
     console.log(`🚀 Server running at http://localhost:${PORT}`);

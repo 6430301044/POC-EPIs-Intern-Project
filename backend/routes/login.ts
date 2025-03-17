@@ -1,4 +1,4 @@
-import express from "express";
+import express from "express";  
 import bcrypt from "bcryptjs";
 import sql from "mssql";
 import jwt from "jsonwebtoken";
@@ -58,8 +58,12 @@ router.post("/", async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Database connection failed" });
       }
 
-      // ดึงข้อมูลผู้ใช้จากฐานข้อมูล
-      const query = "SELECT User_id, User_name, User_email, User_password FROM dbo.Users WHERE User_email = @Email";
+      // ดึงข้อมูลผู้ใช้จากฐานข้อมูล รวมถึง Role ของผู้ใช้
+      const query = `
+        SELECT User_id, User_name, User_email, User_password, User_role 
+        FROM dbo.Users 
+        WHERE User_email = @Email
+      `;
       console.log("Executing query:", query);
       
       const result = await pool.request().input("Email", sql.NVarChar, User_email).query(query);
@@ -78,24 +82,34 @@ router.post("/", async (req: Request, res: Response) => {
         return res.status(401).json({ message: "Invalid email or password" });
       }
 
-      // สร้าง JWT Token
+      // สร้าง JWT Token โดยเพิ่ม role
       const token = jwt.sign(
-        { userId: user.User_id, name: user.User_name, email: user.User_email },
+        { 
+          userId: user.User_id, 
+          name: user.User_name, 
+          email: user.User_email, 
+          role: user.User_role // เพิ่ม role ของผู้ใช้
+        },
         process.env.JWT_SECRET!,
         { expiresIn: process.env.JWT_EXPIRES_IN || "1h" } // กำหนดอายุ Token
       );
 
       // ส่ง token และข้อมูลผู้ใช้กลับไปยัง frontend
       res.status(200).json({
-      message: "Login successful",
-      token,
-      user: { userId: user.User_id, name: user.User_name, email: user.User_email },
-    });
+        message: "Login successful",
+        token,
+        user: { 
+          userId: user.User_id, 
+          name: user.User_name, 
+          email: user.User_email,
+          role: user.User_role 
+        },
+      });
   
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ message: "Server error" });
-  }
+    } catch (err) {
+      console.error("Login error:", err);
+      res.status(500).json({ message: "Server error" });
+    }
 });
   
 

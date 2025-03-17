@@ -24,6 +24,7 @@ import Visualization from "@/components/main/Visualization";
 // import ApproveUsere from "@/pages/admin/ApproveUser";
 // import Approval from "@/pages/admin/Approval";
 import ApproveMain from "@/pages/admin/ApproveMain";
+import NewsPage from "@/pages/NewsPage";
 
 
 const router = createBrowserRouter([
@@ -58,7 +59,11 @@ const router = createBrowserRouter([
       {
         path: "/environment",
         element: <Visualization />,
-      }
+      },
+      {
+        path: "/news",
+        element: <NewsPage />
+      },
     ],
   },
   {

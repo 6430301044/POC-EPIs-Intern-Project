@@ -306,7 +306,6 @@ export default function HeroSection() {
               <li className="hover:text-yellow-300">Highlight / กิจกรรม</li>
               <li className="hover:text-yellow-300">รายงานประจำปี</li>
               <li className="hover:text-yellow-300">ข้อมูลเผยแพร่</li>
-              <li className="hover:text-yellow-300">เยี่ยมชม ปตท.</li>
             </ul>
           </div>
           

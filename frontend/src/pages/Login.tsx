@@ -1,19 +1,43 @@
-import { Container } from "@/components/template/Container"
-import DarkSwitch from "@/components/template/DarkSwitch"
-import { SectionTitle } from "@/components/template/SectionTitle"
-import { Link } from "react-router"
+import { Container } from "@/components/template/Container";
+import DarkSwitch from "@/components/template/DarkSwitch";
+import { SectionTitle } from "@/components/template/SectionTitle";
+import { Link } from "react-router";
 import { useState, useEffect } from "react";
-import { Eye, EyeOff }  from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode }  from 'jwt-decode';
-
-
+import { jwtDecode } from 'jwt-decode';
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [toast, setToast] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+    type: 'success' | 'error' | 'warning';
+  }>({
+    show: false,
+    title: '',
+    message: '',
+    type: 'success'
+  });
   const navigate = useNavigate();
+
+  // ฟังก์ชันสำหรับแสดง toast
+  const showToast = (title: string, message: string, type: 'success' | 'error' | 'warning') => {
+    setToast({
+      show: true,
+      title,
+      message,
+      type
+    });
+    
+    // ซ่อน toast หลังจาก 3 วินาที
+    setTimeout(() => {
+      setToast(prev => ({ ...prev, show: false }));
+    }, 3000);
+  };
 
   // ✅ **ตรวจสอบ Token ว่าหมดอายุหรือยัง**
   useEffect(() => {
@@ -27,34 +51,43 @@ export default function Login() {
           const currentTime = Date.now() / 1000; // เวลาปัจจุบัน (วินาที)
           console.log("Current Time:", currentTime);
           console.log("Token Expiry (exp):", decoded.exp);
-  
+
           if (decoded.exp < currentTime) {
             console.log("⏳ Token expired, redirecting to login...");
             localStorage.removeItem("token");
-            localStorage.removeItem("user");
+            localStorage.removeItem("initialToken");
             navigate("/login"); // พาไปหน้า Login
+          }
+
+          // เปรียบเทียบค่า token ที่เก็บใน localStorage กับ token ปัจจุบัน
+          const initialToken = localStorage.getItem("initialToken");
+          if (initialToken && initialToken !== token) {
+            console.log("⚠️ Token mismatch detected! Redirecting to login...");
+            localStorage.removeItem("token");
+            localStorage.removeItem("initialToken");
+            navigate("/login");
           }
         } catch (error) {
           console.error("❌ Invalid token:", error);
           localStorage.removeItem("token");
-          localStorage.removeItem("user");
+          localStorage.removeItem("initialToken");
           navigate("/login");
         }
       }
-    }
-  
+    };
+
     checkTokenExpiration(); // ตรวจสอบตอนเข้าเว็บ
     const interval = setInterval(checkTokenExpiration, 1000); // เช็คทุก 1 นาที
-  
+
     // กำหนด listener สำหรับการเปลี่ยนแปลงใน localStorage
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === "token" || event.key === "user") {
+      if (event.key === "token") {
         checkTokenExpiration();
       }
     };
-  
+
     window.addEventListener("storage", handleStorageChange);
-  
+
     return () => {
       clearInterval(interval); // ล้าง interval ตอนออกจากหน้า
       window.removeEventListener("storage", handleStorageChange); // ลบ event listener
@@ -87,29 +120,27 @@ export default function Login() {
       console.log("Response Data:", data);
 
       if (response.ok) {
-        alert("Login successful!");
+        showToast("Success", "Login successful!", "success");
 
         // Decode token
         const decodedToken = jwtDecode(data.token);
 
-        // บันทึก token และข้อมูลที่เกี่ยวข้องลงใน localStorage
+        // บันทึก token ลงใน localStorage
         localStorage.setItem("token", data.token); // ใส่ token ลงใน localStorage
-        localStorage.setItem("user", JSON.stringify({
-          userId: decodedToken.userId,
-          name: decodedToken.name,
-          email: decodedToken.email
-        }));
 
-        const user = decodedToken;
-        console.log("Logged in user:", user);
+        // เก็บ initialToken สำหรับการตรวจสอบในอนาคต
+        localStorage.setItem("initialToken", data.token);
+
+        // ใช้ข้อมูลจาก token ที่ decode มาโดยตรงแทนการเก็บ user ใน localStorage
+        console.log("Logged in user:", decodedToken);
 
         navigate("/admin");
       } else {
-        alert(data.message || "Invalid email or password");
+        showToast("Error", data.message || "Invalid email or password", "error");
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("Something went wrong. Please try again.");
+      showToast("Error", "Something went wrong. Please try again.", "error");
     }
   };
 
@@ -231,6 +262,14 @@ export default function Login() {
           </div>
         </div>
       </Container>
+
+      {/* แสดง Toast */}
+      {toast.show && (
+        <div className={`toast toast-${toast.type} absolute top-4 right-4 p-4 rounded-lg shadow-md bg-${toast.type === 'success' ? 'green' : toast.type === 'error' ? 'red' : 'yellow'}-500 text-white`}>
+          <strong>{toast.title}</strong>
+          <p>{toast.message}</p>
+        </div>
+      )}
     </div>
   );
 }

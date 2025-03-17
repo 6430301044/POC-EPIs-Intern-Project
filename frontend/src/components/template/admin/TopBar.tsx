@@ -1,53 +1,60 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router'
 import DarkSwitch from '@/components/template/DarkSwitch'
-
+import { jwtDecode } from "jwt-decode";
 // กำหนด interface สำหรับ SVG props
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string
 }
 
 export default function TopBar() {
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [userName, setUserName] = useState("Guest");
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // Click outside handler
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsProfileOpen(false)
+        setIsProfileOpen(false);
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  // ดึงข้อมูลชื่อผู้ใช้จาก localStorage
+  // ดึงข้อมูลชื่อผู้ใช้จาก token
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUserName(parsedUser.name); // ใช้ name ที่เก็บใน localStorage
+    const token = localStorage.getItem("token"); // ดึง token จาก localStorage
+
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token); // decode JWT token
+        const { name } = decoded; // ดึงข้อมูลจาก decoded token
+
+        setUserName(name || "Guest"); // ตั้งค่าชื่อผู้ใช้จาก token หรือใช้ "Guest" ถ้าไม่มีข้อมูล
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
     }
   }, []);
 
   // Close dropdown when clicking menu items
   const handleMenuClick = () => {
-    setIsProfileOpen(false)
-  }
+    setIsProfileOpen(false);
+  };
 
   const handleSignOut = () => {
     // ลบข้อมูลจาก localStorage
-    localStorage.removeItem('user')
-    localStorage.removeItem('token')
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
 
     // นำทางไปหน้า login
-    navigate('/login')
-  }
+    navigate('/login');
+  };
 
   return (
     <header className="flex-shrink-0 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
