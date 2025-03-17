@@ -5,6 +5,7 @@ import { getPendingRegistrations, approveRegistration, rejectRegistration } from
 import { registerUser } from "../controllers/user/registerController";
 import { getCompanies } from "../controllers/user/companyController";
 import { uploadUserImage, getUserImage } from "../controllers/user/userImageController";
+import { refreshToken } from "../controllers/user/tokenController";
 import { authenticateToken, authorizeApperover, authorizeRoles } from "../middleware/authMiddleware";
 
 const router = express.Router();
@@ -30,5 +31,8 @@ router.post("/register/reject/:registerId", authenticateToken, authorizeApperove
 // User image routes
 router.post("/image/upload", authenticateToken, upload.single("file"), uploadUserImage);
 router.get("/image/:user_id", authenticateToken, getUserImage);
+
+// Token routes
+router.post("/token/refresh", authenticateToken, refreshToken);
 
 export default router;

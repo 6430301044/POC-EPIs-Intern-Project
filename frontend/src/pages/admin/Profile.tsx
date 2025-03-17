@@ -3,6 +3,7 @@ import { SectionTitle } from '@/components/template/SectionTitle'
 import React, { useState, useEffect } from 'react'
 import { getDecodedToken } from '@/utils/authUtils'
 import API_BASE_URL from '@/config/apiConfig'
+import { refreshTokenWithNewImage } from '@/utils/tokenUtils'
 
 interface UserProfile {
   userId: string
@@ -118,7 +119,7 @@ export default function Profile() {
 
       const formData = new FormData()
       formData.append('file', selectedFile)
-      formData.append('user_id', profile.userId)
+      formData.append('User_id', profile.userId)
 
       const response = await fetch(`${API_BASE_URL}/user/image/upload`, {
         method: 'POST',
@@ -132,16 +133,25 @@ export default function Profile() {
 
       if (response.ok) {
         setSuccess('อัพโหลดรูปภาพสำเร็จ')
+        
         // อัพเดทข้อมูลโปรไฟล์
         setProfile({
           ...profile,
-          imageUrl: data.imageUrl
+          imageUrl: data.User_image
         })
         
-        // รีเฟรชหน้าเว็บหลังจากอัพโหลดสำเร็จเพื่อให้รปโปรไฟล์อัพเดท
-        setTimeout(() => {
-          window.location.reload()
-        }, 1500) // รอให้ผู้ใช้เห็นข้อความสำเร็จก่อน
+        // อัพเดท token ด้วยรูปภาพใหม่แทนการรีเฟรชหน้า
+        
+        // เรียกใช้ฟังก์ชันรีเฟรช token
+        refreshTokenWithNewImage(data.User_image)
+          .then(success => {
+            if (!success) {
+              console.error('Failed to refresh token with new image')
+            }
+          })
+          .catch(err => {
+            console.error('Error refreshing token:', err)
+          })
       } else {
         setError(data.message || 'เกิดข้อผิดพลาดในการอัพโหลดรูปภาพ')
       }

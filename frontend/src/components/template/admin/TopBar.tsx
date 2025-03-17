@@ -15,8 +15,8 @@ export default function TopBar() {
   const [userImage, setUserImage] = useState<string>('https://episstorageblob.blob.core.windows.net/profile/defaultProfileImage.jpg')
   const dropdownRef = useRef<HTMLDivElement>(null)
   
-  useEffect(() => {
-    // ดึงข้อมูลผู้ใช้จาก token
+  // ฟังก์ชันสำหรับอัพเดทข้อมูลผู้ใช้จาก token
+  const updateUserFromToken = () => {
     const decoded = getDecodedToken()
     if (decoded) {
       if (decoded.name) {
@@ -27,6 +27,31 @@ export default function TopBar() {
       if (decoded.imageUrl) {
         setUserImage(decoded.imageUrl)
       }
+    }
+  }
+  
+  // เรียกใช้เมื่อ component mount
+  useEffect(() => {
+    updateUserFromToken()
+    
+    // สร้าง event listener สำหรับการเปลี่ยนแปลง localStorage
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'token') {
+        updateUserFromToken()
+      }
+    }
+    
+    // เพิ่ม event listener
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Custom event สำหรับการอัพเดทภายในแอพเดียวกัน
+    const handleTokenRefresh = () => updateUserFromToken()
+    window.addEventListener('token-refreshed', handleTokenRefresh)
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('token-refreshed', handleTokenRefresh)
     }
   }, [])
 
