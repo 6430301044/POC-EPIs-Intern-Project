@@ -73,14 +73,6 @@ CREATE TABLE [dbo].[Companies] (
     CONSTRAINT [PK_Companies] PRIMARY KEY CLUSTERED ([company_id] ASC)
 );
 
-CREATE TABLE [dbo].[Calm] (
-    [calm_id]    INT            IDENTITY (1, 1) NOT NULL,
-    [calm_value] DECIMAL (6, 4) NULL,
-    [period_id]  INT            NULL,
-    CONSTRAINT [PK_Calm] PRIMARY KEY CLUSTERED ([calm_id] ASC),
-    CONSTRAINT [FK_Calm_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id])
-);
-
 CREATE TABLE [dbo].[Env_Air_AirQuality] (
     [record_id]  INT             IDENTITY (1, 1) NOT NULL,
     [period_id]  INT             NULL,
@@ -489,4 +481,143 @@ CREATE TABLE [dbo].[NewsImages] (
     [created_at] DATETIME       DEFAULT (getdate()) NULL,
     PRIMARY KEY CLUSTERED ([id] ASC),
     FOREIGN KEY ([news_id]) REFERENCES [dbo].[News] ([id]) ON DELETE CASCADE
+);
+
+CREATE TABLE [dbo].[EnhanceTable] (
+    [enhance_id]  INT            IDENTITY (1, 1) NOT NULL,
+    [enhanceName] NVARCHAR (MAX) NULL,
+    [sub_id]      INT            NULL,
+    CONSTRAINT [PK_EnhanceTable] PRIMARY KEY CLUSTERED ([enhance_id] ASC),
+    CONSTRAINT [FK_EnhanceTable_SbCategories] FOREIGN KEY ([sub_id]) REFERENCES [dbo].[SbCategories] ([sub_id])
+);
+
+CREATE TABLE [dbo].[Enh_WDWS_Calm] (
+    [record_id]  INT            IDENTITY (1, 1) NOT NULL,
+    [station_id] INT            NULL,
+    [indexName]  NVARCHAR (MAX) NULL,
+    [calmValue]  DECIMAL (6, 4) NULL,
+    [period_id]  INT            NULL,
+    [enhance_id] INT            CONSTRAINT [DEFAULT_Enh_WDWS_Calm_enhance_id] DEFAULT ((1)) NULL,
+    CONSTRAINT [PK_Enh_WDWS_Calm] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Enh_WDWS_Calm_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Enh_WDWS_Calm_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id])
+);
+
+CREATE TABLE [dbo].[Enh_SO2] (
+    [record_id] INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [day1st_result_ppm] DECIMAL (6, 4) NULL,
+    [day2nd_result_ppm] DECIMAL (6, 4) NULL,
+    [day3rd_result_ppm] DECIMAL (6, 4) NULL,
+    [period_id]  INT            NULL,
+    [enhance_id] INT            CONSTRAINT [DEFAULT_Enh_SO2_enhance_id] DEFAULT ((2)) NULL,
+    CONSTRAINT [PK_Enh_SO2] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Enh_SO2_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Enh_SO2_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id])
+);
+
+CREATE TABLE [dbo].[Enh_NoiseLevelNormal] (
+    [record_id] INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [day1st_result]    DECIMAL (4, 1) NULL,
+    [day2nd_result]    DECIMAL (4, 1) NULL,
+    [day3rd_result]    DECIMAL (4, 1) NULL,
+    [period_id]  INT            NULL,
+    [enhance_id] INT            CONSTRAINT [DEFAULT_Enh_NoiseLevelNormal_enhance_id] DEFAULT ((3)) NULL,
+    CONSTRAINT [PK_Enh_NoiseLevelNormal] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Enh_NoiseLevelNormal_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Enh_NoiseLevelNormal_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id])
+);
+
+CREATE TABLE [dbo].[Enh_NoiseLevel90_Average] (
+    [record_id] INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [day1st_result]    DECIMAL (4, 1) NULL,
+    [day2nd_result]    DECIMAL (4, 1) NULL,
+    [day3rd_result]    DECIMAL (4, 1) NULL,
+    [period_id]  INT            NULL,
+    [enhance_id] INT            CONSTRAINT [DEFAULT_Enh_NoiseLevel90_Average_enhance_id] DEFAULT ((4)) NULL,
+    CONSTRAINT [PK_Enh_NoiseLevel90_Average] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Enh_NoiseLevel90_Average_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Enh_NoiseLevel90_Average_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id])
+);
+
+CREATE TABLE [dbo].[Enh_Monitorresult] (
+    [record_id] INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [day1st_Leq]       DECIMAL (4, 1) NULL,
+    [day1st_L90]       DECIMAL (4, 1) NULL,
+    [day2nd_Leq]       DECIMAL (4, 1) NULL,
+    [day2nd_L90]       DECIMAL (4, 1) NULL,
+    [day3rd_Leq]       DECIMAL (4, 1) NULL,
+    [day3rd_L90]       DECIMAL (4, 1) NULL,
+    [period_id]  INT            NULL,
+    [enhance_id] INT            CONSTRAINT [DEFAULT_Enh_Monitorresult_enhance_id] DEFAULT ((5)) NULL,
+    CONSTRAINT [PK_Enh_Monitorresult] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Enh_Monitorresult_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Enh_Monitorresult_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id])
+);
+
+CREATE TABLE [dbo].[Enh_PlanktonPhytos] (
+    [record_id] INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [quantity_per_m3] FLOAT (53)     NULL,
+    [period_id]  INT            NULL,
+    [enhance_id] INT            CONSTRAINT [DEFAULT_Enh_PlanktonPhytos_enhance_id] DEFAULT ((6)) NULL,
+    CONSTRAINT [PK_Enh_PlanktonPhytos] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Enh_PlanktonPhytos_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Enh_PlanktonPhytos_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id])
+);
+
+CREATE TABLE [dbo].[Enh_PlanktonZoos] (
+    [record_id] INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [quantity_per_m3] FLOAT (53)     NULL,
+    [period_id]  INT            NULL,
+    [enhance_id] INT            CONSTRAINT [DEFAULT_Enh_PlanktonZoos_enhance_id] DEFAULT ((7)) NULL,
+    CONSTRAINT [PK_Enh_PlanktonZoos] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Enh_PlanktonZoos_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Enh_PlanktonZoos_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id])
+);
+
+CREATE TABLE [dbo].[Enh_Benthos] (
+    [record_id] INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [quantity_per_m2] FLOAT (53)     NULL,
+    [period_id]  INT            NULL,
+    [enhance_id] INT            CONSTRAINT [DEFAULT_Enh_Benthos_enhance_id] DEFAULT ((8)) NULL,
+    CONSTRAINT [PK_Enh_Benthos] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Enh_Benthos_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Enh_Benthos_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id])
+);
+
+CREATE TABLE [dbo].[Enh_FishLarvaeEggs] (
+    [record_id] INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [quantity_per_1000m3] FLOAT (53)     NULL,
+    [period_id]  INT            NULL,
+    [enhance_id] INT            CONSTRAINT [DEFAULT_Enh_FishLarvaeEggs_enhance_id] DEFAULT ((9)) NULL,
+    CONSTRAINT [PK_Enh_FishLarvaeEggs] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Enh_FishLarvaeEggs_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Enh_FishLarvaeEggs_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id])
+);
+
+CREATE TABLE [dbo].[Enh_JuvenileAquaticAnimals] (
+    [record_id] INT            IDENTITY (1, 1) NOT NULL,
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [quantity_per_1000m3] FLOAT (53)     NULL,
+    [period_id]  INT            NULL,
+    [enhance_id] INT            CONSTRAINT [DEFAULT_Enh_JuvenileAquaticAnimals_enhance_id] DEFAULT ((10)) NULL,
+    CONSTRAINT [PK_Enh_JuvenileAquaticAnimals] PRIMARY KEY CLUSTERED ([record_id] ASC),
+    CONSTRAINT [FK_Enh_JuvenileAquaticAnimals_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
+    CONSTRAINT [FK_Enh_JuvenileAquaticAnimals_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id])
 );

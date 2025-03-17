@@ -180,3 +180,98 @@
     - quantity_per_1000m3 (float): ปริมาณต่อ 1000 ลูกบาศก์เมตร
     - company_id (int): รหัสบริษัทตรวจวัด
     - reportBy (int): รหัสบริษัททำรายงาน
+
+ [dbo].[Enh_WDWS_Calm]
+    [station_id] INT            NULL,
+    [indexName]  NVARCHAR (MAX) NULL,
+    [calmValue]  DECIMAL (6, 4) NULL,
+
+[dbo].[Enh_SO2] 
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [day1st_result_ppm] DECIMAL (6, 4) NULL,
+    [day2nd_result_ppm] DECIMAL (6, 4) NULL,
+    [day3rd_result_ppm] DECIMAL (6, 4) NULL,
+
+[dbo].[Enh_NoiseLevelNormal] 
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [day1st_result]    DECIMAL (4, 1) NULL,
+    [day2nd_result]    DECIMAL (4, 1) NULL,
+    [day3rd_result]    DECIMAL (4, 1) NULL,
+
+[dbo].[Enh_NoiseLevel90_Average] 
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [day1st_result]    DECIMAL (4, 1) NULL,
+    [day2nd_result]    DECIMAL (4, 1) NULL,
+    [day3rd_result]    DECIMAL (4, 1) NULL,
+
+[dbo].[Enh_Monitorresult] 
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [day1st_Leq]       DECIMAL (4, 1) NULL,
+    [day1st_L90]       DECIMAL (4, 1) NULL,
+    [day2nd_Leq]       DECIMAL (4, 1) NULL,
+    [day2nd_L90]       DECIMAL (4, 1) NULL,
+    [day3rd_Leq]       DECIMAL (4, 1) NULL,
+    [day3rd_L90]       DECIMAL (4, 1) NULL,
+
+[dbo].[Enh_PlanktonPhytos] 
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [quantity_per_m3] FLOAT (53)     NULL,
+
+[dbo].[Enh_PlanktonZoos] 
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [quantity_per_m3] FLOAT (53)     NULL,
+
+[dbo].[Enh_Benthos] 
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [quantity_per_m2] FLOAT (53)     NULL,
+
+[dbo].[Enh_FishLarvaeEggs] 
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [quantity_per_1000m3] FLOAT (53)     NULL,
+
+[dbo].[Enh_JuvenileAquaticAnimals] 
+    [station_id]      INT            NULL,
+    [indexName] NVARCHAR (MAX) NULL,
+    [quantity_per_1000m3] FLOAT (53)     NULL,
+
+[dbo].[Semiannual]
+    [semiannual]     INT            NULL,
+    [semiannualName] NVARCHAR (MAX) NULL,
+
+[dbo].[Daysperiod]
+    [startDate]     DATE NULL,
+    [endDate]       DATE NULL,
+    [semiannual_id] INT  NULL,
+    [year_id]       INT  NULL,
+
+[dbo].[Years]
+    [year]    INT NULL,
+
+[dbo].[Mcategories]
+    [mainName] NVARCHAR (50) NULL,
+
+[dbo].[SbCategories]
+    [subName] NVARCHAR (MAX) NULL,
+    [main_id] INT            NULL,
+
+[dbo].[Monitoring_Station]
+    [stationName] NVARCHAR (MAX) NULL,
+    [lat]         DECIMAL (8, 6) NULL,
+    [long]        DECIMAL (9, 6) NULL,
+
+[dbo].[Tool]
+    [toolName]   NVARCHAR (MAX) NULL,
+    [toolSerial] NVARCHAR (50)  NULL,
+    [toolRole]   NVARCHAR (50)  NULL,
+
+[dbo].[Companies]
+    [companyName]  NVARCHAR (MAX) NULL,
+    [companyPhone] NVARCHAR (15)  NULL,

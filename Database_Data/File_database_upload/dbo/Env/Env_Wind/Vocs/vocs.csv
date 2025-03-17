@@ -1,0 +1,2 @@
+record_Id,station_id,index_name,day1st_result_ug_per_m3,day2nd_result_ug_per_m3,day3rd_result_ug_per_m3,std_lower,std_higher,company_id,period_id,sub_id,reportBy
+1,1,อะซิทัลดีไฮด์,4.28,1.91,1.28,860,NULL,1,1,4,1
