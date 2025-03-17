@@ -207,11 +207,26 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
     let transaction = null;
 
     try {
-        // Begin transaction
-        transaction = pool.transaction();
-        await transaction.begin();
-
-        // Get the enhance table information
+        // Check if UploadTempTables table exists, create it if it doesn't
+        const tableExistsResult = await pool.request().query(`
+            SELECT OBJECT_ID('dbo.UploadTempTables') AS table_id
+        `);
+        
+        if (!tableExistsResult.recordset[0].table_id) {
+            console.log("Creating UploadTempTables table as it doesn't exist");
+            await pool.request().query(`
+                CREATE TABLE dbo.UploadTempTables (
+                    id INT IDENTITY(1,1) PRIMARY KEY,
+                    upload_id INT NOT NULL,
+                    temp_table_name NVARCHAR(255) NOT NULL,
+                    target_table NVARCHAR(255) NOT NULL,
+                    created_at DATETIME DEFAULT GETDATE()
+                )
+            `);
+        }
+        
+        // Create a temporary table to store the data
+        const tempTableName = `#Temp_${enhanceTableId}_${Date.now()}`;
         const enhanceTableResult = await pool.request()
             .input("enhanceId", enhanceTableId)
             .query("SELECT * FROM dbo.EnhanceTable WHERE enhance_id = @enhanceId");
@@ -221,96 +236,156 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
         }
         
         const enhanceTable = enhanceTableResult.recordset[0];
-        const tableName = `Enh_${enhanceTable.enhanceName}`;
         
-        // Get the year_id from the period_id
-        const yearIdResult = await pool.request()
-            .input("periodId", periodId)
-            .query("SELECT year_id FROM dbo.Daysperiod WHERE period_id = @periodId");
+        // Start a transaction
+        transaction = pool.transaction();
+        await transaction.begin();
         
-        if (yearIdResult.recordset.length === 0 || !yearIdResult.recordset[0].year_id) {
-            throw new Error(`ไม่พบ year_id สำหรับ period_id: ${periodId}`);
+        // Create a permanent temp table with a unique name
+        const permanentTempTableName = `dbo.Temp_${enhanceTable.enhanceName}_${Date.now()}`;
+        
+        // Get column mapping for the enhance table
+        const columnMapping = getColumnMapping(enhanceTableId);
+        
+        // Create columns for the temp table based on the first row of data
+        const columns = Object.keys(data[0]).map(key => {
+            // Map the column name if it exists in the mapping
+            const mappedName = columnMapping[key.toLowerCase()] || key;
+            return `[${mappedName}] NVARCHAR(MAX)`;
+        }).join(', ');
+        
+        // Create the permanent temp table
+        await transaction.request().query(`
+            CREATE TABLE ${permanentTempTableName} (
+                [id] INT IDENTITY(1,1) PRIMARY KEY,
+                ${columns}
+            )
+        `);
+        
+        // Insert data into the permanent temp table
+        for (const row of data) {
+            const columnNames = Object.keys(row).map(key => {
+                const mappedName = columnMapping[key.toLowerCase()] || key;
+                return `[${mappedName}]`;
+            }).join(', ');
+            
+            const columnValues = Object.keys(row).map(key => {
+                return `'${row[key]?.toString().replace(/'/g, "''")}' `;
+            }).join(', ');
+            
+            await transaction.request().query(`
+                INSERT INTO ${permanentTempTableName} (${columnNames})
+                VALUES (${columnValues})
+            `);
         }
         
-        const yearId = yearIdResult.recordset[0].year_id;
-        const userId = 1; // Using a valid user ID (Admin) - should be replaced with actual user ID from auth
-
-        // Get the main_id from the sub_id in EnhanceTable
-        const mainIdResult = await pool.request()
-            .input("subId", enhanceTable.sub_id)
-            .query("SELECT main_id FROM dbo.SbCategories WHERE sub_id = @subId");
+        // Get year_id from period_id
+        const periodResult = await transaction.request()
+            .input('periodId', periodId)
+            .query(`
+                SELECT year_id FROM dbo.Daysperiod WHERE period_id = @periodId
+            `);
         
-        if (mainIdResult.recordset.length === 0 || !mainIdResult.recordset[0].main_id) {
-            throw new Error(`ไม่พบ main_id สำหรับ sub_id: ${enhanceTable.sub_id}`);
+        if (periodResult.recordset.length === 0) {
+            throw new Error(`ไม่พบข้อมูล period_id: ${periodId}`);
+        }
+        
+        const yearId = periodResult.recordset[0].year_id;
+        
+        // Get sub_id from enhance_table
+        const subIdResult = await transaction.request()
+            .input('enhanceId', enhanceTableId)
+            .query(`
+                SELECT sub_id FROM dbo.EnhanceTable WHERE enhance_id = @enhanceId
+            `);
+        
+        if (subIdResult.recordset.length === 0) {
+            throw new Error(`ไม่พบข้อมูล sub_id สำหรับ enhance_id: ${enhanceTableId}`);
+        }
+        
+        const subId = subIdResult.recordset[0].sub_id;
+        
+        // Get main_id from sub_id
+        const mainIdResult = await transaction.request()
+            .input('subId', subId)
+            .query(`
+                SELECT main_id FROM dbo.SbCategories WHERE sub_id = @subId
+            `);
+        
+        if (mainIdResult.recordset.length === 0) {
+            throw new Error(`ไม่พบข้อมูล main_id สำหรับ sub_id: ${subId}`);
         }
         
         const mainId = mainIdResult.recordset[0].main_id;
         
-        // Record the upload in the UploadedFiles table
-        const uploadRequest = pool.request()
-            .input("filename", originalFilename)
-            .input("periodId", periodId)
-            .input("yearId", yearId)
-            .input("mainId", mainId)
-            .input("subId", enhanceTable.sub_id)
-            .input("userId", userId)
-            .input("status", "รอการอนุมัติ"); // Initial status is pending for approval
+        // Get current user ID (for now using a default value of 1 since we don't have authentication context)
+        const userId = 1; // This should be replaced with the actual user ID from authentication context
         
-        const uploadResult = await uploadRequest.query(`
-            INSERT INTO dbo.UploadedFiles 
-            (filename, period_id, year_id, main_id, sub_id, uploaded_by, status, upload_date) 
-            VALUES 
-            (@filename, @periodId, @yearId, @mainId, @subId, @userId, @status, GETDATE());
-            SELECT SCOPE_IDENTITY() AS upload_id;
-        `);
-        
-        const uploadId = uploadResult.recordset[0].upload_id;
-        
-        // Store the data in a temporary table for approval
-        const tempTableName = `Temp_${tableName}_${uploadId}`;
-        
-        // Create temporary table with the same structure as the target table
-        await pool.request().query(`
-            SELECT * INTO ${tempTableName} FROM ${tableName} WHERE 1=0;
-        `);
-        
-        // Insert data into temporary table
-        for (const row of data) {
-            const insertRequest = pool.request();
-            
-            // Add parameters for each field in the row
-            Object.keys(row).forEach(key => {
-                insertRequest.input(key, row[key]);
-            });
-            
-            // Add period_id
-            insertRequest.input("periodId", periodId);
-            
-            // Build the SQL query dynamically based on the fields in the row
-            const fields = Object.keys(row).join(', ');
-            const paramNames = Object.keys(row).map(key => `@${key}`).join(', ');
-            
-            await insertRequest.query(`
-                INSERT INTO ${tempTableName} (${fields}, period_id) 
-                VALUES (${paramNames}, @periodId);
-            `);
-        }
-        
-        // Record the mapping between upload and temporary table
-        await pool.request()
-            .input("uploadId", uploadId)
-            .input("tempTableName", tempTableName)
-            .input("targetTable", tableName)
+        // Save file information
+        const fileResult = await transaction.request()
+            .input('filename', systemFilename)
+            .input('periodId', periodId)
+            .input('yearId', yearId)
+            .input('mainId', mainId)
+            .input('subId', subId)
+            .input('uploadedBy', userId)
+            .input('recordCount', data.length)
             .query(`
-                INSERT INTO dbo.UploadTempTables (upload_id, temp_table_name, target_table) 
-                VALUES (@uploadId, @tempTableName, @targetTable);
+                INSERT INTO dbo.UploadedFiles (
+                    filename, 
+                    period_id,
+                    year_id,
+                    main_id,
+                    sub_id,
+                    uploaded_by,
+                    status,
+                    upload_date,
+                    record_count
+                )
+                VALUES (
+                    @filename,
+                    @periodId,
+                    @yearId,
+                    @mainId,
+                    @subId,
+                    @uploadedBy,
+                    'รอการอนุมัติ',
+                    GETDATE(),
+                    @recordCount
+                );
+                SELECT SCOPE_IDENTITY() AS upload_id;
             `);
+        
+        const uploadId = fileResult.recordset[0].upload_id;
+        
+        // Store the parsed data as JSON for later processing after approval
+        const jsonData = JSON.stringify(data);
+        
+        // Store the JSON data and table information in the UploadedFiles table
+        await transaction.request()
+            .input('uploadId', uploadId)
+            .input('jsonData', jsonData)
+            .input('tableName', getTableName(enhanceTable.enhanceName))
+            .input('columnMapping', JSON.stringify(columnMapping))
+            .query(`
+                UPDATE dbo.UploadedFiles 
+                SET parsed_data = @jsonData,
+                    target_table = @tableName,
+                    column_mapping = @columnMapping
+                WHERE upload_id = @uploadId
+            `);
+        
+        console.log(`Stored parsed data for upload ID: ${uploadId} (pending approval)`);
         
         // Commit the transaction
         await transaction.commit();
         
-        return { uploadId, rowCount: data.length };
-        
+        return {
+            uploadId,
+            tempTableName: permanentTempTableName,
+            recordCount: data.length,
+            enhanceTable: enhanceTable.enhanceName
+        };
     } catch (error) {
         // Rollback the transaction if there's an error
         if (transaction) {
