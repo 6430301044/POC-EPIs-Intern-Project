@@ -21,6 +21,7 @@ export default function Sidebar() {
     { name: 'Documents', path: '/admin/documents', icon: DocumentIcon },
     { name: 'Reports', path: '/admin/reports', icon: ReportIcon },
     { name: 'Upload', path: '/admin/upload', icon: UploadIcon },
+  { name: 'EnhanceTable Upload', path: '/admin/enhance-table-upload', icon: UploadIcon },
     { name: 'Approval Center', path: '/admin/approval-center', icon: ApprovalIcon },
     { name: 'Data Management', path: '/admin/data-management', icon: DataIcon },
     { name: 'Reference Data', path: '/admin/reference-data', icon: ReferenceDataIcon },

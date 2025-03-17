@@ -1,6 +1,7 @@
 import { Container } from "@/components/template/Container";
 import { SectionTitle } from "@/components/template/SectionTitle";
 import { useState, useEffect } from "react";
+import API_BASE_URL from "@/config/apiConfig";
 
 interface PendingApproval {
   id: string;
@@ -50,7 +51,23 @@ export default function Approval() {
   const fetchPendingApprovals = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/upload/pending-approvals");
+      const token = localStorage.getItem("token"); // ดึง Token จาก Local Storage
+      
+      const response = await fetch(`${API_BASE_URL}/upload/pending-approvals`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // ส่ง Token ไปด้วย
+        }
+      });
+      
+      if (response.status === 401) {
+        // Token หมดอายุ ให้ Redirect ไปหน้า Login หรือแจ้งเตือน
+        showToast("Session Expired", "Please log in again.", "error");
+        localStorage.removeItem("token"); // ลบ Token ที่หมดอายุออก
+        window.location.href = "/login"; // Redirect ไปหน้า Login
+        return;
+      }
       
       if (!response.ok) {
         throw new Error("Failed to fetch pending approvals");
@@ -79,20 +96,30 @@ export default function Approval() {
   const handleApprove = async (id: string) => {
     try {
       setProcessingId(id);
-      const response = await fetch(`http://localhost:5000/api/upload/approve/${id}`, {
+      const token = localStorage.getItem("token");
+  
+      const response = await fetch(`${API_BASE_URL}/upload/approve/${id}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
           userId: "admin" // ควรใช้ ID ของผู้ใช้ที่ login อยู่
         })
       });
-
+  
+      if (response.status === 401) {
+        showToast("Session Expired", "Please log in again.", "error");
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        return;
+      }
+  
       if (!response.ok) {
         throw new Error("Failed to approve upload");
       }
-
+  
       showToast(
         "Success",
         "Upload approved successfully",
@@ -117,21 +144,31 @@ export default function Approval() {
   const handleReject = async (id: string, reason: string = "") => {
     try {
       setProcessingId(id);
-      const response = await fetch(`http://localhost:5000/api/upload/reject/${id}`, {
+      const token = localStorage.getItem("token");
+  
+      const response = await fetch(`${API_BASE_URL}/upload/reject/${id}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
           userId: "admin", // ควรใช้ ID ของผู้ใช้ที่ login อยู่
           rejectionReason: reason
         })
       });
-
+  
+      if (response.status === 401) {
+        showToast("Session Expired", "Please log in again.", "error");
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        return;
+      }
+  
       if (!response.ok) {
         throw new Error("Failed to reject upload");
       }
-
+  
       showToast(
         "Success",
         "Upload rejected successfully",

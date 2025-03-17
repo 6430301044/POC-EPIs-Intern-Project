@@ -1,6 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { uploadCSV, uploadExcel, getPendingApprovals, approveUpload, rejectUpload, deleteDataByPeriod, updateDataByPeriod, getAvailableTables } from "../controllers/upload/index";
+import { uploadEnhanceCSV, uploadEnhanceExcel } from "../controllers/enhanceTable/enhanceTableUploadController";
 import { getPeriods } from "../controllers/upload/periodController";
 import { getReferenceData, addReferenceData, updateReferenceData, deleteReferenceData } from "../controllers/upload/referenceDataController";
 import { authenticateToken, authorizeRoles } from "../middleware/authMiddleware";
@@ -11,6 +12,10 @@ const upload = multer({ dest: "uploads/" }); // กำหนดโฟลเด�
 // Specific endpoints for CSV and Excel uploads
 router.post("/upload-csv", authenticateToken, authorizeRoles(['dev', 'uploader', 'approver']), upload.single("file"), uploadCSV);
 router.post("/upload-excel", authenticateToken, authorizeRoles(['dev', 'uploader', 'approver']), upload.single("file"), uploadExcel);
+
+// EnhanceTable upload endpoints
+router.post("/upload-enhance-csv", authenticateToken, authorizeRoles(['dev', 'uploader', 'approver']), upload.single("file"), uploadEnhanceCSV);
+router.post("/upload-enhance-excel", authenticateToken, authorizeRoles(['dev', 'uploader', 'approver']), upload.single("file"), uploadEnhanceExcel);
 
 // General upload endpoint that routes to the appropriate controller based on file type
 router.post("/", authenticateToken, authorizeRoles(['dev', 'uploader', 'approver']), upload.single("file"), (req, res) => {

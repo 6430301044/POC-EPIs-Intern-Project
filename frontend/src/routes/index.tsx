@@ -17,6 +17,7 @@ import Reports from "@/pages/admin/Reports";
 import Settings from "@/pages/admin/Settings";
 import Profile from "@/pages/admin/Profile";
 import Upload from "@/pages/admin/Upload";
+import EnhanceTableUpload from "@/pages/admin/EnhanceTableUpload";
 import Approval from "@/pages/admin/Approval";
 import DataManagement from "@/pages/admin/DataManagement";
 import ReferenceDataManagement from "@/pages/admin/ReferenceDataManagement";
@@ -110,6 +111,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/upload",
         element: <Upload />,
+      },
+      {
+        path: "/admin/enhance-table-upload",
+        element: <EnhanceTableUpload />,
       },
       {
         path: "/admin/approval",
