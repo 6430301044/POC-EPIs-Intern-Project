@@ -4,11 +4,15 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Container } from '@/components/template/Container';
 import { SectionTitle } from '@/components/template/SectionTitle';
 import { getAllUsers } from '@/services/userService';
 import { hasEditPermission } from '@/utils/authUtils';
 import { UploadFile } from '@mui/icons-material';
+import EditUserModal from '@/components/admin/EditUserModal';
+import DeleteUserModal from '@/components/admin/DeleteUserModal';
 
 interface User {
   User_id: string;
@@ -25,6 +29,9 @@ export default function Team() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const canEdit = hasEditPermission();
 
   useEffect(() => {
@@ -47,6 +54,38 @@ export default function Team() {
 
     fetchUsers();
   }, []);
+
+  const handleEditClick = (user: User) => {
+    setSelectedUser(user);
+    setEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (user: User) => {
+    setSelectedUser(user);
+    setDeleteModalOpen(true);
+  };
+
+  const handleEditSuccess = () => {
+    // Refresh the user list after successful edit
+    getAllUsers()
+      .then(response => {
+        if (response.success) {
+          setUsers(response.data);
+        }
+      })
+      .catch(err => console.error('Error refreshing users:', err));
+  };
+
+  const handleDeleteSuccess = () => {
+    // Refresh the user list after successful delete
+    getAllUsers()
+      .then(response => {
+        if (response.success) {
+          setUsers(response.data);
+        }
+      })
+      .catch(err => console.error('Error refreshing users:', err));
+  };
 
   // Define columns for the DataGrid
   const columns: GridColDef[] = [
@@ -108,6 +147,41 @@ export default function Team() {
             </Typography>
           </Box>
         );
+      },
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      renderCell: ({ row }) => {
+        return canEdit ? (
+          <Box display="flex" justifyContent="center" gap={1}>
+            <Tooltip title="Edit User">
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEditClick(row);
+                }}
+                color="primary"
+                size="small"
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete User">
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteClick(row);
+                }}
+                color="error"
+                size="small"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        ) : null;
       },
     },
   ];
@@ -175,6 +249,22 @@ export default function Team() {
           />
         )}
       </Box>
+
+      {/* Edit User Modal */}
+      <EditUserModal
+        open={editModalOpen}
+        user={selectedUser}
+        onClose={() => setEditModalOpen(false)}
+        onSuccess={handleEditSuccess}
+      />
+
+      {/* Delete User Modal */}
+      <DeleteUserModal
+        open={deleteModalOpen}
+        user={selectedUser}
+        onClose={() => setDeleteModalOpen(false)}
+        onSuccess={handleDeleteSuccess}
+      />
     </Container>
   );
 }
