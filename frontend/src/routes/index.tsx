@@ -26,6 +26,7 @@ import { ThemeProvider } from "@/contexts/ThemeProvider";
 import TestAPICall from "@/components/TestAPICall";
 import ApproveUser from "@/pages/admin/ApproveUser";
 import ApprovalCenter from "@/pages/admin/ApprovalCenter";
+import NewsDetail from "@/pages/NewsDetail";
 
 
 const router = createBrowserRouter([
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       {
         path: "/legal",
         element: <Legal />,
+      },
+      {
+        path: "/news/:id",
+        element: <NewsDetail />,
       },
       {
         path: "/about",

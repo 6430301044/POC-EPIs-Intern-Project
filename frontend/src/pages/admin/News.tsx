@@ -1,17 +1,17 @@
-import { Container } from '@/components/template/Container'
-import { SectionTitle } from '@/components/template/SectionTitle'
-import  API_BASE_URL  from '@/config/apiConfig'
-import React, { useState } from 'react'
+import { Container } from "@/components/template/Container";
+import { SectionTitle } from "@/components/template/SectionTitle";
+import API_BASE_URL from "@/config/apiConfig";
+import React, { useState } from "react";
 
 export default function NewsUpload() {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [category, setCategory] = useState('General');
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [category, setCategory] = useState("General");
   const [images, setImages] = useState<File[]>([]); // ใช้ array สำหรับหลายไฟล์
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [showPreview, setShowPreview] = useState(false);
-  
+
   // ฟังก์ชันจัดการการอัปโหลดไฟล์
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -29,53 +29,53 @@ export default function NewsUpload() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
-    setMessage('');
+    setMessage("");
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        setMessage('❌ กรุณาเข้าสู่ระบบก่อนอัปโหลดข่าว');
+        setMessage("❌ กรุณาเข้าสู่ระบบก่อนอัปโหลดข่าว");
         setLoading(false);
         return;
       }
 
       // ดึงข้อมูลผู้ใช้จาก token
-      const decoded = JSON.parse(atob(token.split('.')[1]));
+      const decoded = JSON.parse(atob(token.split(".")[1]));
       const userId = decoded.userId;
 
       const formData = new FormData();
-      formData.append('title', title);
-      formData.append('content', content);
-      formData.append('category', category);
-      formData.append('Create_by', userId.toString());
+      formData.append("title", title);
+      formData.append("content", content);
+      formData.append("category", category);
+      formData.append("Create_by", userId.toString());
 
       // ส่งไฟล์ภาพหลายไฟล์
       images.forEach((image) => {
-        formData.append('file', image);
+        formData.append("file", image);
       });
 
       const response = await fetch(`${API_BASE_URL}/news/upload`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Failed to upload news');
+        throw new Error("Failed to upload news");
       }
 
       const data = await response.json();
-      setMessage('✅ ข่าวถูกอัปโหลดเรียบร้อย!');
-      setTitle('');
-      setContent('');
-      setCategory('General');
+      setMessage("✅ ข่าวถูกอัปโหลดเรียบร้อย!");
+      setTitle("");
+      setContent("");
+      setCategory("General");
       setImages([]); // Clear images after upload
       setShowPreview(false);
     } catch (error) {
-      setMessage('❌ อัปโหลดข่าวไม่สำเร็จ!');
-      console.error('Error:', error);
+      setMessage("❌ อัปโหลดข่าวไม่สำเร็จ!");
+      console.error("Error:", error);
     } finally {
       setLoading(false);
     }
@@ -98,10 +98,9 @@ export default function NewsUpload() {
               onChange={(e) => setCategory(e.target.value)}
               className="w-full p-2 border rounded"
             >
-              <option value="General">ทั่วไป</option>
-              <option value="Technology">เทคโนโลยี</option>
-              <option value="Sports">กีฬา</option>
-              <option value="Business">ธุรกิจ</option>
+              <option value="Activity">Highlight / กิจกรรม</option>
+              <option value="AnnualReport">รายงานประจำปี</option>
+              <option value="Publication">ข้อมูลเผยแพร่</option>
             </select>
           </div>
 
@@ -145,7 +144,7 @@ export default function NewsUpload() {
               className="w-1/2 p-2 bg-gray-500 text-white font-bold rounded hover:bg-gray-600"
               onClick={() => setShowPreview(!showPreview)} // สลับการแสดงผลของ Preview
             >
-              {showPreview ? '❌ ซ่อนตัวอย่าง' : '👀 Preview'}
+              {showPreview ? "❌ ซ่อนตัวอย่าง" : "👀 Preview"}
             </button>
 
             <button
@@ -153,7 +152,7 @@ export default function NewsUpload() {
               className="w-1/2 p-2 bg-blue-500 text-white font-bold rounded hover:bg-blue-600"
               disabled={loading}
             >
-              {loading ? 'กำลังอัปโหลด...' : '📤 อัปโหลดข่าว'}
+              {loading ? "กำลังอัปโหลด..." : "📤 อัปโหลดข่าว"}
             </button>
           </div>
         </form>
