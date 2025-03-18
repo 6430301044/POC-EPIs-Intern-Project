@@ -2,6 +2,7 @@ import { Container } from "@/components/template/Container";
 import { SectionTitle } from "@/components/template/SectionTitle";
 import { useState, useEffect } from "react";
 import API_BASE_URL from "@/config/apiConfig";
+import BUDDHA_YRARS from "@/utils/buddhaYears";
 import DataPreviewModal from "@/components/admin/DataPreviewModal";
 
 interface PendingApproval {
@@ -252,7 +253,7 @@ export default function Approval() {
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200">
                   <thead>
-                    <tr className="bg-gray-100">
+                    <tr className="bg-gray-100 text-black">
                       <th className="py-3 px-4 border-b text-left">File Name</th>
                       <th className="py-3 px-4 border-b text-left">Upload Date</th>
                       <th className="py-3 px-4 border-b text-left">Year</th>
@@ -265,10 +266,10 @@ export default function Approval() {
                   </thead>
                   <tbody>
                     {pendingApprovals.map((approval) => (
-                      <tr key={approval.id} className="hover:bg-gray-50">
+                      <tr key={approval.id} className="hover:bg-gray-50 text-black">
                         <td className="py-3 px-4 border-b">{approval.file_name}</td>
                         <td className="py-3 px-4 border-b">{formatDate(approval.upload_date)}</td>
-                        <td className="py-3 px-4 border-b">{approval.year}</td>
+                        <td className="py-3 px-4 border-b">{approval.year + BUDDHA_YRARS}</td>
                         <td className="py-3 px-4 border-b">
                           {approval.period_name}
                         </td>

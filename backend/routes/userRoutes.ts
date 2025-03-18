@@ -37,6 +37,6 @@ router.get("/image/:user_id", authenticateToken, getUserImage);
 router.post("/token/refresh", authenticateToken, refreshToken);
 
 // User management routes
-router.get("/all", authenticateToken, authorizeRoles(['admin', 'approver', 'dev']), getAllUsers);
+router.get("/all", authenticateToken, authorizeRoles(['approver', 'dev']), getAllUsers);
 
 export default router;

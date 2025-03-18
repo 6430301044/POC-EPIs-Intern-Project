@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router'
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string
@@ -9,6 +10,7 @@ export default function Sidebar() {
   const location = useLocation()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { theme } = useTheme();
   
   // แยก Dashboard ออกมา
   const admin = { name: 'Admin', path: '/admin', icon: HomeIcon }
@@ -16,10 +18,10 @@ export default function Sidebar() {
   // เมนูหลัก
   const mainMenus = [
     { name: 'Team', path: '/admin/team', icon: TeamIcon },
-    { name: 'Projects', path: '/admin/projects', icon: ProjectIcon },
-    { name: 'Calendar', path: '/admin/calendar', icon: CalendarIcon },
-    { name: 'Documents', path: '/admin/documents', icon: DocumentIcon },
-    { name: 'Reports', path: '/admin/reports', icon: ReportIcon },
+    // { name: 'Projects', path: '/admin/projects', icon: ProjectIcon },
+    // { name: 'Calendar', path: '/admin/calendar', icon: CalendarIcon },
+    // { name: 'Documents', path: '/admin/documents', icon: DocumentIcon },
+    // { name: 'Reports', path: '/admin/reports', icon: ReportIcon },
     { name: 'Upload', path: '/admin/upload', icon: UploadIcon },
   { name: 'EnhanceTable Upload', path: '/admin/enhance-table-upload', icon: UploadIcon },
     { name: 'Approval Center', path: '/admin/approval-center', icon: ApprovalIcon },
@@ -28,11 +30,11 @@ export default function Sidebar() {
     { name: 'News', path: '/admin/news', icon: ReportIcon },
   ]
 
-  const teams = [
-    { name: 'Heroicons', path: '#heroicons', initial: 'H' },
-    { name: 'Tailwind Labs', path: '#tailwind', initial: 'T' },
-    { name: 'Workcation', path: '#workcation', initial: 'W' },
-  ]
+  // const teams = [
+  //   { name: 'Heroicons', path: '#heroicons', initial: 'H' },
+  //   { name: 'Tailwind Labs', path: '#tailwind', initial: 'T' },
+  //   { name: 'Workcation', path: '#workcation', initial: 'W' },
+  // ]
 
   // เพิ่มฟังก์ชันสำหรับจัดการการคลิกเมนู
   const handleMenuClick = () => {
@@ -71,8 +73,7 @@ export default function Sidebar() {
             {!isCollapsed && (
               <div className="flex items-center flex-shrink-0">
                 <Link to="/admin" className="flex items-center">
-                  <img className="w-8" src="/images/wrlogo.png" alt="" />
-                    <span className="ml-2 text-xl font-semibold text-gray-900 dark:text-white">WindReact</span>
+                  <img className="w-20 items-center justify-center" src={theme === "light" ? "/images/pttwm.svg" : "/images/pttdm.svg"} alt="" />
                 </Link>
               </div>
             )}
@@ -121,6 +122,7 @@ export default function Sidebar() {
             </div>
 
             {/* Teams Section */}
+            {/*
             {!isCollapsed && (
               <div className="pt-6">
                 <div className="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -143,6 +145,7 @@ export default function Sidebar() {
                 </div>
               </div>
             )}
+            */}
           </nav>
 
           {/* Settings - Fixed at bottom */}
@@ -257,29 +260,29 @@ function TeamIcon(props: IconProps) {
   )
 }
 
-function ProjectIcon(props: IconProps) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-    </svg>
-  )
-}
+// function ProjectIcon(props: IconProps) {
+//   return (
+//     <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+//     </svg>
+//   )
+// }
 
-function CalendarIcon(props: IconProps) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-    </svg>
-  )
-}
+// function CalendarIcon(props: IconProps) {
+//   return (
+//     <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+//     </svg>
+//   )
+// }
 
-function DocumentIcon(props: IconProps) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-    </svg>
-  )
-}
+// function DocumentIcon(props: IconProps) {
+//   return (
+//     <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+//     </svg>
+//   )
+// }
 
 function ReportIcon(props: IconProps) {
   return (

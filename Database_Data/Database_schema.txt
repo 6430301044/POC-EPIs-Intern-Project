@@ -459,8 +459,9 @@ CREATE TABLE [dbo].[Register] (
     [User_phone]        VARCHAR (20)   NOT NULL,
     [Created_at]        DATETIME       DEFAULT (getdate()) NULL,
     PRIMARY KEY CLUSTERED ([Register_id] ASC),
+    CONSTRAINT [FK_Register_Companies] FOREIGN KEY ([Company_id]) REFERENCES [dbo].[Companies] ([company_id]),
     UNIQUE NONCLUSTERED ([User_email] ASC)
-);
+);;
 
 CREATE TABLE [dbo].[News] (
     [id]            INT            IDENTITY (1, 1) NOT NULL,

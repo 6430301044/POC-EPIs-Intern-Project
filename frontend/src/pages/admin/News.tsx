@@ -85,7 +85,7 @@ export default function NewsUpload() {
     <Container>
       <SectionTitle title="News" align="center" />
 
-      <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-md">
+      <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-md text-black">
         <h2 className="text-2xl font-bold mb-4">📰 อัปโหลดข่าวสาร</h2>
 
         {/* ฟอร์มอัปโหลดข่าว */}

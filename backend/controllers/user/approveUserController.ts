@@ -9,14 +9,17 @@ export const getPendingRegistrations = async (req: Request, res: Response) => {
     const result = await pool.request()
       .query(`
         SELECT 
-          Register_id,
-          User_name,
-          User_email,
-          User_phone,
-          User_Job_Position,
-          Company_id
+          r.Register_id,
+          r.User_name,
+          r.User_email,
+          r.User_phone,
+          r.User_Job_Position,
+          c.companyName,
+          r.Created_at
         FROM 
-          dbo.Register
+          dbo.Register r
+        JOIN
+          dbo.Companies c ON c.company_id = r.Company_id
         WHERE 
           User_status = 'pending'
         ORDER BY 

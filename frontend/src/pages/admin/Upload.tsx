@@ -3,6 +3,7 @@ import { SectionTitle } from "@/components/template/SectionTitle";
 import React, { useState, useEffect, useRef } from "react";
 import { fetchMainCategories, fetchSubCategories } from "@/services/environmentService";
 import API_BASE_URL from "@/config/apiConfig";
+import BUDDHA_YRARS from "@/utils/buddhaYears";
 import * as XLSX from 'xlsx';
 import Papa from 'papaparse';
 import { formatDayMonth } from "@/utils/dateUtils";
@@ -676,7 +677,7 @@ export default function Upload() {
                 </option>
                 {periods.map((period) => (
                   <option key={period.period_id} value={period.period_id}>
-                    {formatDayMonth(period.startDate)} ถึง {formatDayMonth(period.endDate)} ปี พ.ศ. {period.year}  |  รอบการเก็บข้อมูลครั้งที่: {period.semiannual}  |  ระหว่างเดือน {period.periodName}
+                    {formatDayMonth(period.startDate)} ถึง {formatDayMonth(period.endDate)} ปี พ.ศ. {period.year + BUDDHA_YRARS}  |  รอบการเก็บข้อมูลครั้งที่: {period.semiannual}  |  ระหว่างเดือน {period.periodName}
                   </option>
                 ))}
               </select>

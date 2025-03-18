@@ -3,6 +3,7 @@ import { SectionTitle } from "@/components/template/SectionTitle";
 import { useState, useEffect } from "react";
 import API_BASE_URL from '@/config/apiConfig';
 import { hasEditPermission } from '@/utils/authUtils';
+import BUDDHA_YRARS from '@/utils/buddhaYears';
 
 interface PendingApproval {
   Register_id: number;  
@@ -10,7 +11,8 @@ interface PendingApproval {
   User_email: string;
   User_phone: string;
   User_Job_Position: string;
-  Company_id: string | null;
+  companyName: string | null;
+  Created_at: string;
 }
 
 export default function ApproveUser() {
@@ -119,6 +121,32 @@ export default function ApproveUser() {
     }
   };
 
+  // ฟังก์ชันสำหรับแปลงวันที่ให้อยู่ในรูปแบบที่อ่านง่าย
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'ไม่ระบุวันที่';
+    
+    try {
+      const date = new Date(dateString);
+      
+      // ตรวจสอบว่าวันที่ถูกต้องหรือไม่
+      if (isNaN(date.getTime())) {
+        return 'วันที่ไม่ถูกต้อง';
+      }
+      
+      // ใช้วิธีการเดียวกับที่ใช้ใน Approval.tsx
+      return date.toLocaleString('th-TH', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }) + ` (${date.getFullYear() + BUDDHA_YRARS} พ.ศ.)`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'วันที่ไม่ถูกต้อง';
+    }
+  };
+
   return (
     <Container>
       <SectionTitle title="User Approval" align="center" />
@@ -129,7 +157,7 @@ export default function ApproveUser() {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">รายการผู้ใช้ที่รอการอนุมัติ</h2>
               {hasEditPermission() && (
-                <button onClick={fetchPendingApprovals} className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300" disabled={loading}>
+                <button onClick={fetchPendingApprovals} className="px-4 py-2 text-black bg-gray-200 rounded hover:bg-gray-300" disabled={loading}>
                   {loading ? (
                     <span className="flex items-center">
                       <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -156,21 +184,25 @@ export default function ApproveUser() {
             <div className="overflow-x-auto">
               <table className="min-w-full bg-white border border-gray-200">
                 <thead>
-                  <tr className="bg-gray-100">
+                  <tr className="bg-gray-100 text-black">
                     <th className="py-3 px-4 border-b text-left">User Name</th>
+                    <th className="py-3 px-4 border-b text-left">Job Position</th>
+                    <th className="py-3 px-4 border-b text-left">Company</th>
                     <th className="py-3 px-4 border-b text-left">Email</th>
                     <th className="py-3 px-4 border-b text-left">Phone</th>
-                    <th className="py-3 px-4 border-b text-left">Job Position</th>
+                    <th className="py-3 px-4 border-b text-left">Date</th>
                     <th className="py-3 px-4 border-b text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pendingApprovals.map((approval) => (
-                    <tr key={approval.Register_id} className="hover:bg-gray-50">
+                    <tr key={approval.Register_id} className="hover:bg-gray-50 text-black">
                       <td className="py-3 px-4 border-b">{approval.User_name}</td>
+                      <td className="py-3 px-4 border-b">{approval.User_Job_Position}</td>
+                      <td className="py-3 px-4 border-b">{approval.companyName}</td>
                       <td className="py-3 px-4 border-b">{approval.User_email}</td>
                       <td className="py-3 px-4 border-b">{approval.User_phone}</td>
-                      <td className="py-3 px-4 border-b">{approval.User_Job_Position}</td>
+                      <td className="py-3 px-4 border-b">{formatDate(approval.Created_at)}</td>
                       <td className="py-3 px-4 border-b text-center">
                         {hasEditPermission() && (
                           <div className="flex justify-center space-x-2">

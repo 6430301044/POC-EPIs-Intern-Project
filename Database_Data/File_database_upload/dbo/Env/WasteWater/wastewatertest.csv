@@ -1,0 +1,29 @@
+index_name,result,unit,std_lower,std_higher,station_id,company_id,reportBy
+Temperature,32.8,C,,40.0,4,1,1
+ph,7.5,ph,5.5,9.0,4,1,1
+BOD,1.5,mg/m3,,20.0,4,1,1
+COD,40.0,mg/m3,,120.0,4,1,1
+Oil & Grease,0.5,mg/m3,,5.0,4,1,1
+TDS,585.0,mg/m3,,3000.0,4,1,1
+TSS,5.0,mg/m3,,50.0,4,1,1
+Temperature,32.7,C,,40.0,5,1,1
+ph,7.55,ph,5.5,9.0,5,1,1
+BOD,1.0,mg/m3,,20.0,5,1,1
+COD,40.0,mg/m3,,120.0,5,1,1
+Oil & Grease,0.5,mg/m3,,5.0,5,1,1
+TDS,1472.0,mg/m3,,3000.0,5,1,1
+TSS,5.0,mg/m3,,50.0,5,1,1
+Temperature,32.2,C,,40.0,6,1,1
+ph,7.98,ph,5.5,9.0,6,1,1
+BOD,1.0,mg/m3,,20.0,6,1,1
+COD,40.0,mg/m3,,120.0,6,1,1
+Oil & Grease,0.5,mg/m3,,5.0,6,1,1
+TDS,244.0,mg/m3,,3000.0,6,1,1
+TSS,5.0,mg/m3,,50.0,6,1,1
+Temperature,37.5,C,,40.0,7,1,1
+ph,8.19,ph,5.5,9.0,7,1,1
+BOD,2.4,mg/m3,,20.0,7,1,1
+COD,40.0,mg/m3,,120.0,7,1,1
+Oil & Grease,0.5,mg/m3,,5.0,7,1,1
+TDS,254.0,mg/m3,,3000.0,7,1,1
+TSS,5.0,mg/m3,,50.0,7,1,1

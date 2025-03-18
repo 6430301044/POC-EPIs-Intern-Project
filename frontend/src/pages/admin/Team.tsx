@@ -8,6 +8,7 @@ import { Container } from '@/components/template/Container';
 import { SectionTitle } from '@/components/template/SectionTitle';
 import { getAllUsers } from '@/services/userService';
 import { hasEditPermission } from '@/utils/authUtils';
+import { UploadFile } from '@mui/icons-material';
 
 interface User {
   User_id: string;
@@ -98,9 +99,10 @@ export default function Team() {
             }
             borderRadius="4px"
           >
-            {role === 'admin' && <AdminPanelSettingsOutlinedIcon />}
+            {role === 'dev' && <AdminPanelSettingsOutlinedIcon />}
             {role === 'approver' && <SecurityOutlinedIcon />}
-            {(role === 'user' || role === 'uploader' || role === 'dev') && <LockOpenOutlinedIcon />}
+            {role === 'uploader' && <UploadFile />}
+            {(role !== 'dev' && role !== 'approver' && role !== 'uploader')&& <LockOpenOutlinedIcon />}
             <Typography color="#fff" sx={{ ml: '5px' }}>
               {role}
             </Typography>
@@ -132,7 +134,7 @@ export default function Team() {
           '& .MuiDataGrid-columnHeaders': {
             backgroundColor: '#3da58a',
             borderBottom: 'none',
-            color: '#ffffff',
+            color: '#000000',
           },
           '& .MuiDataGrid-virtualScroller': {
             backgroundColor: '#f2f0f0',

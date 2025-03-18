@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container } from "@/components/template/Container";
 import { SectionTitle } from "@/components/template/SectionTitle";
 import API_BASE_URL from "@/config/apiConfig";
+import BUDDHA_YRARS from '@/utils/buddhaYears';
 import { formatDayMonth } from "@/utils/dateUtils";
 import { hasEditPermission } from '@/utils/authUtils';
 
@@ -236,7 +237,7 @@ export default function DataManagement() {
       
       <div className="p-8">
         {/* Form Section */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6 text-black">
           <h2 className="text-xl font-semibold mb-4">เลือกข้อมูลที่ต้องการจัดการ</h2>
           
           {error && (
@@ -276,7 +277,7 @@ export default function DataManagement() {
                 <option value="">-- เลือกปี --</option>
                 {availableYears.map((year) => (
                   <option key={year} value={year}>
-                    {year}
+                    {year + BUDDHA_YRARS}
                   </option>
                 ))}
               </select>
@@ -370,7 +371,7 @@ export default function DataManagement() {
         </div>
         
         {/* Update Fields Section */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6 text-black">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">ข้อมูลที่ต้องการอัพเดท</h2>
             {hasEditPermission() && (
