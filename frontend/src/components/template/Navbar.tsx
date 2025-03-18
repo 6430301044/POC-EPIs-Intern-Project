@@ -37,13 +37,12 @@ export default function Navbar() {
   }, []);
 
   const navigation = [
-    { name: "Fist Section", id: "firstSection" },
-    { name: "Second Section", id: "secondSection" },
-    { name: "Third Section", id: "thirdSection" },
-    { name: "Four Section", id: "fourSection" },
-    { name: "Data visualization", id: "visualization" },
-    { name: "Table", id: "table" },
-    { name: "Contact Us", id: "contact" },
+    { name: "หน้าแรก", path: "/", id: "firstSection" },
+    { name: "เกี่ยวกับเรา", path: "/", id: "secondSection" },
+    { name: "ข้อมูลสิ่งแวดล้อม", path: "/", id: "thirdSection" },
+    { name: "ข่าวสารและกิจกรรม", path: "/", id: "fourSection" },
+    { name: "ตารางข้อมูลสิ่งแวดล้อม", path: "/visualization", id: "visualization" },
+    { name: "ติดต่อเรา", path: "/contact", id: "contact" },
   ];
 
   return (
@@ -57,10 +56,10 @@ export default function Navbar() {
                 {/* Left menu items - show only on desktop */}
                 <div className="hidden lg:flex space-x-4">
                   <a href="#" className="hover:underline">
-                    ขนาดตัวอักษร
+                    {/* ขนาดตัวอักษร */}
                   </a>
                   <a href="#" className="hover:underline">
-                    การแสดงผล
+                    {/* การแสดงผล */}
                   </a>
                 </div>
               </div>
@@ -96,7 +95,7 @@ export default function Navbar() {
                     onClick={() => setLanguage(language === "ไทย" ? "En" : "ไทย")}
                     className="hover:underline"
                   >
-                    {language}
+                    {/* {language} */}
                   </button>
 
                   <Link to="/login">

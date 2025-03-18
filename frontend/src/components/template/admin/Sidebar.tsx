@@ -149,7 +149,7 @@ export default function Sidebar() {
           </nav>
 
           {/* Settings - Fixed at bottom */}
-          <div className="px-3 pb-4">
+          {/* <div className="px-3 pb-4">
             <Link
               to="/admin/settings"
               onClick={handleMenuClick}
@@ -162,7 +162,7 @@ export default function Sidebar() {
               <SettingsIcon className="w-6 h-6 mr-3" />
               {!isCollapsed && 'Settings'}
             </Link>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

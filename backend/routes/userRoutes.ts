@@ -8,6 +8,7 @@ import { uploadUserImage, getUserImage } from "../controllers/user/userImageCont
 import { refreshToken } from "../controllers/user/tokenController";
 import { getAllUsers } from "../controllers/user/userController";
 import { authenticateToken, authorizeApperover, authorizeRoles } from "../middleware/authMiddleware";
+import { updateUser, deleteUser } from "../controllers/user/userManagementController";
 
 const router = express.Router();
 
@@ -38,5 +39,7 @@ router.post("/token/refresh", authenticateToken, refreshToken);
 
 // User management routes
 router.get("/all", authenticateToken, authorizeRoles(['approver', 'dev']), getAllUsers);
+router.put("/:userId", authenticateToken, authorizeRoles(['approver', 'dev']), updateUser);
+router.delete("/:userId", authenticateToken, authorizeRoles(['approver', 'dev']), deleteUser);
 
 export default router;

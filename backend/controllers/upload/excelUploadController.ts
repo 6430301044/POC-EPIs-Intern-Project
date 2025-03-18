@@ -16,6 +16,9 @@ export const uploadExcel = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "กรุณาระบุ periodId, mainCategory และ subCategory" });
         }
 
+        // Get the authenticated user's ID from the request object
+        const userId = (req as any).user?.userId; // Use authenticated user ID or fallback to admin (1)
+
         const result = await parseExcel(req.file.path, mainCategory, subCategory, periodId, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype);
         res.status(200).json({ message: "อัปโหลดสำเร็จ", data: result });
 
@@ -25,7 +28,7 @@ export const uploadExcel = async (req: Request, res: Response) => {
     }
 };
 
-export const parseExcel = async (filePath: string, mainCategory: string, subCategory: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string) => {
+export const parseExcel = async (filePath: string, mainCategory: string, subCategory: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
     return new Promise((resolve, reject) => {
         try {
             // Read the Excel file
@@ -39,7 +42,7 @@ export const parseExcel = async (filePath: string, mainCategory: string, subCate
             const results = XLSX.utils.sheet_to_json(worksheet);
             
             // Process the data for approval
-            saveForApproval(results, mainCategory, subCategory, periodId, originalFilename, systemFilename, fileSize, mimeType)
+            saveForApproval(results, mainCategory, subCategory, periodId, originalFilename, systemFilename, fileSize, mimeType, userId)
                 .then((savedData) => {
                     // Delete the temporary file after processing
                     fs.unlink(filePath, (err) => {
@@ -56,7 +59,7 @@ export const parseExcel = async (filePath: string, mainCategory: string, subCate
 };
 
 // Function to save uploaded data for approval process
-const saveForApproval = async (data: any[], mainCategory: string, subCategory: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string) => {
+const saveForApproval = async (data: any[], mainCategory: string, subCategory: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
     if (!data || data.length === 0) {
         throw new Error("ไม่พบข้อมูลในไฟล์ Excel");
     }
@@ -79,7 +82,6 @@ const saveForApproval = async (data: any[], mainCategory: string, subCategory: s
         // First, record the upload in the UploadedFiles table
         const mainCategoryId = await getMainCategoryId(pool, mainCategory);
         const subCategoryId = await getSubCategoryId(pool, subCategory);
-        const userId = 1; // Using a valid user ID (Chanatip, Admin) instead of string "system"
         
         // Get the year_id from the period_id
         const yearIdResult = await pool.request()

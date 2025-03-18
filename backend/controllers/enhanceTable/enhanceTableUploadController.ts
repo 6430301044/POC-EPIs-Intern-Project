@@ -19,6 +19,8 @@ export const uploadEnhanceCSV = async (req: Request, res: Response) => {
         if (!periodId || !enhanceTableId) {
             return res.status(400).json({ message: "กรุณาระบุ periodId และ enhanceTableId" });
         }
+        // Get the authenticated user's ID from the request object
+        const userId = (req as any).user?.userId; // Use authenticated user ID or fallback to admin (1)
 
         const result = await parseCSV(req.file.path, enhanceTableId, periodId, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype);
         res.status(200).json({ message: "อัปโหลดสำเร็จ", data: result });
@@ -88,7 +90,7 @@ const parseCSV = async (filePath: string, enhanceTableId: string, periodId: stri
 /**
  * Parse Excel file for EnhanceTable data
  */
-const parseExcel = async (filePath: string, enhanceTableId: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string) => {
+const parseExcel = async (filePath: string, enhanceTableId: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
     return new Promise((resolve, reject) => {
         try {
             // Read the Excel file
@@ -102,7 +104,7 @@ const parseExcel = async (filePath: string, enhanceTableId: string, periodId: st
             const results = XLSX.utils.sheet_to_json(worksheet);
             
             // Process the data for approval
-            saveEnhanceDataForApproval(results, enhanceTableId, periodId, originalFilename, systemFilename, fileSize, mimeType)
+            saveEnhanceDataForApproval(results, enhanceTableId, periodId, originalFilename, systemFilename, fileSize, mimeType, userId)
                 .then((savedData) => {
                     // Delete the temporary file after processing
                     fs.unlink(filePath, (err) => {
@@ -198,7 +200,7 @@ const getColumnMapping = (enhanceId: string): { [key: string]: string } => {
 /**
  * Save EnhanceTable data for approval process
  */
-const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string) => {
+const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
     if (!data || data.length === 0) {
         throw new Error("ไม่พบข้อมูลในไฟล์");
     }
@@ -263,9 +265,6 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
         }
         
         const mainId = mainIdResult.recordset[0].main_id;
-        
-        // Get current user ID (for now using a default value of 1 since we don't have authentication context)
-        const userId = 1; // This should be replaced with the actual user ID from authentication context
         
         // Save file information
         const fileResult = await transaction.request()

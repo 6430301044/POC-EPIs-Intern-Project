@@ -16,7 +16,10 @@ export const uploadCSV = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "กรุณาระบุ periodId, mainCategory และ subCategory" });
         }
 
-        const result = await parseCSV(req.file.path, mainCategory, subCategory, periodId, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype);
+        // Get the authenticated user's ID from the request object
+        const userId = (req as any).user?.userId; // Use authenticated user ID or fallback to admin (1)
+        
+        const result = await parseCSV(req.file.path, mainCategory, subCategory, periodId, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype, userId);
         res.status(200).json({ message: "อัปโหลดสำเร็จ", data: result });
 
     } catch (error) {
@@ -25,7 +28,7 @@ export const uploadCSV = async (req: Request, res: Response) => {
     }
 };
 
-export const parseCSV = async (filePath: string, mainCategory: string, subCategory: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string) => {
+export const parseCSV = async (filePath: string, mainCategory: string, subCategory: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
     return new Promise((resolve, reject) => {
         const results: any[] = [];
 
@@ -37,7 +40,7 @@ export const parseCSV = async (filePath: string, mainCategory: string, subCatego
             .on("end", async () => {
                 try {
                     // Save file info and data for approval
-                    const savedData = await saveForApproval(results, mainCategory, subCategory, periodId, originalFilename, systemFilename, fileSize, mimeType);
+                    const savedData = await saveForApproval(results, mainCategory, subCategory, periodId, originalFilename, systemFilename, fileSize, mimeType, userId);
                     
                     // Delete the temporary file after processing
                     fs.unlink(filePath, (err) => {
@@ -54,7 +57,7 @@ export const parseCSV = async (filePath: string, mainCategory: string, subCatego
 };
 
 // Function to save uploaded data for approval process
-const saveForApproval = async (data: any[], mainCategory: string, subCategory: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string) => {
+const saveForApproval = async (data: any[], mainCategory: string, subCategory: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
     if (!data || data.length === 0) {
         throw new Error("ไม่พบข้อมูลในไฟล์ CSV");
     }
@@ -77,7 +80,6 @@ const saveForApproval = async (data: any[], mainCategory: string, subCategory: s
         // First, record the upload in the UploadedFiles table
         const mainCategoryId = await getMainCategoryId(pool, mainCategory);
         const subCategoryId = await getSubCategoryId(pool, subCategory);
-        const userId = 1; // Using a valid user ID (Chanatip, Admin) instead of string "system"
         
         // Get the year_id from the period_id
         const yearIdResult = await pool.request()

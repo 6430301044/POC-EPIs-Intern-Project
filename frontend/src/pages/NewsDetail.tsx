@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
 import { fetchNewsById, NewsItem } from '@/services/newsService';
-import MainLayout from '@/layouts/MainLayout';
+import { SectionTitle } from '@/components/template/SectionTitle';
 
 export default function NewsDetail() {
   const { id } = useParams<{ id: string }>();
@@ -30,7 +30,7 @@ export default function NewsDetail() {
   }, [id]);
 
   return (
-    <div className="bg-gradient-to-tr from-[#0a3d91] to-[#9d1b31] min-h-screen py-12">
+    <div className="bg-gradient-to-tr from-[#0a3d91] to-[#9d1b31] min-h-screen py-35 text-black">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
         {loading ? (
           <div className="flex justify-center items-center h-64">
@@ -84,6 +84,12 @@ export default function NewsDetail() {
               </div>
             </div>
             
+            {/* หัวข้อข่าว */}
+            <SectionTitle title={news.News_title}
+              preTitle={news.News_category}
+              align='center'
+            />
+
             {/* เนื้อหาข่าว */}
             <div className="p-6">
               <div className="prose max-w-none">

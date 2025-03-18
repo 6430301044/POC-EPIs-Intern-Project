@@ -3,7 +3,6 @@ import { SectionTitle } from "@/components/template/SectionTitle";
 import { useState, useEffect } from "react";
 import API_BASE_URL from '@/config/apiConfig';
 import { hasEditPermission } from '@/utils/authUtils';
-import BUDDHA_YRARS from '@/utils/buddhaYears';
 
 interface PendingApproval {
   Register_id: number;  
@@ -140,7 +139,7 @@ export default function ApproveUser() {
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
-      }) + ` (${date.getFullYear() + BUDDHA_YRARS} พ.ศ.)`;
+      }) + ` น.`;
     } catch (error) {
       console.error('Error formatting date:', error);
       return 'วันที่ไม่ถูกต้อง';

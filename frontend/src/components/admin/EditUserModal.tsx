@@ -139,11 +139,9 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ open, user, onClose, onSu
             label="Role"
             onChange={handleRoleChange}
           >
-            <MenuItem value="admin">Admin</MenuItem>
             <MenuItem value="approver">Approver</MenuItem>
             <MenuItem value="uploader">Uploader</MenuItem>
             <MenuItem value="dev">Developer</MenuItem>
-            <MenuItem value="user">User</MenuItem>
           </Select>
         </FormControl>
       </DialogContent>

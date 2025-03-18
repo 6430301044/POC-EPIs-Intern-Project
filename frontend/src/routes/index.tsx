@@ -27,6 +27,8 @@ import TestAPICall from "@/components/TestAPICall";
 import ApproveUser from "@/pages/admin/ApproveUser";
 import ApprovalCenter from "@/pages/admin/ApprovalCenter";
 import NewsDetail from "@/pages/NewsDetail";
+import Data from "@/pages/Data";
+import Contact from "@/pages/ContactUs";
 
 
 const router = createBrowserRouter([
@@ -57,6 +59,14 @@ const router = createBrowserRouter([
       {
         path: "/about",
         element: <TestAPICall />
+      },
+      {
+        path: "/data",
+        element: <Data />,
+      },
+      {
+        path: "/contact",
+        element: <Contact />,
       }
     ],
   },

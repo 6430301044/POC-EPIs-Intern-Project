@@ -202,7 +202,7 @@ export default function Approval() {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    });
+    }) + ` น.`;
   };
   
   // ฟังก์ชันสำหรับเปิด modal แสดงตัวอย่างข้อมูล
