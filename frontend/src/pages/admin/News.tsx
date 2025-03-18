@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
+
 export default function NewsUpload() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -102,6 +103,7 @@ export default function NewsUpload() {
   };
 
   return (
+    
     <Container>
       <SectionTitle title="News" align="center" />
 

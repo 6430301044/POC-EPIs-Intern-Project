@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Container } from "@/components/template/Container"; // Component สำหรับ Layout
 import { SectionTitle } from "@/components/template/SectionTitle"; // Title Section
+import { useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHome } from '@fortawesome/free-solid-svg-icons';
 
 interface News {
   id: number;
@@ -38,8 +41,56 @@ export default function NewsPage() {
       setLoading(false);
     }
   };
+  const location = useLocation();
+  const pathnames = location.pathname.split('/').filter(Boolean);
 
   return (
+    <>
+    {/* Breadcrumb Section */}
+    <section className="relative w-full min-h-[670px] overflow-x-auto flex flex-col md:flex-row items-center justify-center px-4 md:px-[192px]"style={{
+        backgroundImage: 'url("/images/PTT_Terminal.jpg")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+      >
+        <div className="absolute inset-0 bg-[#0066a1]/53 z-0"></div>
+        
+        <div className="text-center text-white z-10">
+          <div className="mb-4">
+            <span className="text-4xl">{'📰'}</span>
+            <h2 className="text-3xl font-semibold">{'News'}</h2>
+          </div>
+  
+          <div className="text-lg mt-2 flex items-center space-x-2">
+            <a
+              href="/"
+              className="text-white hover:text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105"
+            >
+              <FontAwesomeIcon icon={faHome} className="mr-1" />
+              หน้าหลัก
+            </a>
+            {pathnames.length > 0 && (
+              <>
+                <span className="text-white-500">/</span>
+                {pathnames.map((name, index) => (
+                  <React.Fragment key={index}>
+                    {index !== pathnames.length - 1 ? (
+                      <>
+                        <span className="text-white">{name}</span>
+                        <span className="text-gray-500">/</span>
+                      </>
+                    ) : (
+                      <span className="text-white font-semibold">{name}</span>
+                    )}
+                  </React.Fragment>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
+      </section>
+
     <Container>
       <SectionTitle title="Latest News" align="center" />
       <div className="p-8">
@@ -77,5 +128,6 @@ export default function NewsPage() {
         )}
       </div>
     </Container>
+  </>
   );
 }
