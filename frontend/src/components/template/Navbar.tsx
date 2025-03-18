@@ -37,12 +37,12 @@ export default function Navbar() {
   }, []);
 
   const navigation = [
-    { name: "หน้าแรก", path: "/", id: "firstSection" },
-    { name: "เกี่ยวกับเรา", path: "/", id: "secondSection" },
-    { name: "ข้อมูลสิ่งแวดล้อม", path: "/", id: "thirdSection" },
-    { name: "ข่าวสารและกิจกรรม", path: "/", id: "fourSection" },
-    { name: "ตารางข้อมูลสิ่งแวดล้อม", path: "/visualization", id: "visualization" },
-    { name: "ติดต่อเรา", path: "/contact", id: "contact" },
+    { name: "หน้าแรก", id: "/" },
+    { name: "เกี่ยวกับเรา", id: "#about" },
+    { name: "ข้อมูลสิ่งแวดล้อม", id: "/environment" },
+    { name: "ข่าวสารและกิจกรรม", id: "/news" },
+    { name: "ตารางข้อมูลสิ่งแวดล้อม", id: "/data" },
+    { name: "ติดต่อเรา", id: "/contact" },
   ];
 
   return (
@@ -146,16 +146,15 @@ export default function Navbar() {
                   <div className="flex flex-col w-full py-4 px-6">
                     {/* Navigation items */}
                     {navigation.map((item) => (
-                      <button
-                        key={item.name}
-                        onClick={() => {
-                          scrollToSection(item.id);
-                          setIsOpened(false);
-                        }}
-                        className="w-full px-4 py-3 text-lg font-normal text-left text-white hover:bg-[#005a8e] border-b border-[#0077b8]"
+                      <Link
+                        key={item.id}
+                        to={item.id}
+                        onClick={() => setIsOpened(false)}
+                        className={`w-full px-4 py-3 text-lg font-normal text-left text-white hover:bg-[#005a8e] border-b border-[#0077b8] block
+                                  ${location.pathname === item.id ? "bg-[#005a8e]" : ""}`}
                       >
                         {item.name}
-                      </button>
+                      </Link>
                     ))}
                     
                     {/* Login button in mobile menu */}
@@ -199,17 +198,21 @@ export default function Navbar() {
               </Link>
 
               {/* Desktop menu */}
-              <div className="flex items-center">
-                <ul className="flex items-center space-x-2">
-                  {/* Navigation items */}
+              <div className="hidden text-center lg:flex lg:items-center">
+                <ul className="flex space-x-6">
                   {navigation.map((item) => (
-                    <li key={item.name}>
-                      <button
-                        onClick={() => scrollToSection(item.id)}
-                        className="px-4 py-2 text-lg font-normal rounded-md hover:text-indigo-300 focus:outline-none"
+                    <li key={item.id}>
+                      <Link
+                        to={item.id}
+                        className={`relative block px-4 py-2 text-lg font-normal rounded-md cursor-pointer 
+                                  hover:text-[#00AEEF] transition-all ease-in-out 
+                                  before:transition-[width] before:ease-in-out before:duration-700 
+                                  before:absolute before:h-[3px] before:w-0 before:bottom-0 before:left-0 
+                                  before:bg-[linear-gradient(to_right,#06b6d4,#3b82f6)] hover:before:w-full
+                                  ${location.pathname === item.id ? "text-[#00AEEF] before:w-full" : "text-white"}`}
                       >
                         {item.name}
-                      </button>
+                      </Link>
                     </li>
                   ))}
                 </ul>

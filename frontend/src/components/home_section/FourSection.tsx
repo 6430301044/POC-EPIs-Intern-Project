@@ -81,7 +81,7 @@ export default function FourSection() {
   return (
     <>
       {/*  News */}
-      <section className="relative w-full h-screen flex items-center bg-gradient-to-tr from-[#0a3d91] to-[#9d1b31] justify-center ">
+      <section className="relative w-full h-screen flex items-center bg-gradient-to-tr from-[#0a3d91] to-[#9d1b31] justify-center text-black">
         <div className="flex flex-col sm:flex-row max-w-6xl mx-auto p-4">
           {/* เมนูนำทาง */}
           <div className="w-full sm:w-1/3 bg-blue-900 text-white p-6 rounded-lg">
