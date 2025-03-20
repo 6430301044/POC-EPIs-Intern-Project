@@ -71,29 +71,28 @@ export default function Navbar() {
           </Link>
 
           {/* เมนูด้านซ้าย (ซ่อนไปในจอเล็ก) */}
-          <div className="hidden lg:flex space-x-4">
+          {/* <div className="hidden lg:flex space-x-4">
             <a href="#" className="hover:underline">ขนาดตัวอักษร</a>
             <a href="#" className="hover:underline">การแสดงผล</a>
-          </div>
+          </div> */}
 
           {/* เมนูด้านขวา (ซ่อนไปในจอเล็ก) */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <a href="#" className="hover:underline">ศูนย์ข้อมูลข่าวสาร</a>
-            <a href="#" className="hover:underline">1365 Contact Center</a>
+          <div className="hidden lg:flex items-center space-x-4 justify-end w-full">
+            {/* <a href="#" className="hover:underline">ศูนย์ข้อมูลข่าวสาร</a>
+            <a href="#" className="hover:underline">1365 Contact Center</a> */}
 
             {/* ปุ่มเปลี่ยนภาษา */}
-            <button
+            {/* <button
               onClick={() => setLanguage(language === "ไทย" ? "En" : "ไทย")}
               className="hover:underline"
             >
               {language}
-            </button>
+            </button> */}
 
-            <Link to="/login">
-              <button className="relative z-0 h-12 rounded-full bg-blue-500 px-6 text-neutral-50 after:absolute after:left-0 after:top-0 after:-z-10 after:h-full after:w-full after:rounded-full after:bg-blue-500 hover:after:scale-x-125 hover:after:scale-y-150 hover:after:opacity-0 hover:after:transition hover:after:duration-500">
-                Login
-              </button>
-            </Link>
+            <a href="/login" className="hover:underline">
+              สำหรับเจ้าหน้าที่
+            </a>
+
           </div>
 
           {/* Dark Mode Toggle (แสดงในทั้งมือถือและเดสก์ท็อป) */}
