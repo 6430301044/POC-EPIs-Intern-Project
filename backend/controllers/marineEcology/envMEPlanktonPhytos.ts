@@ -57,7 +57,7 @@ export async function getMEPlanktonPhytosData(
               ms.stationName,
               mep.division,
               mep.class,
-              mep.[order],
+              mep.orderName,
               mep.family,
               mep.genu,
               mep.quantity_per_m3,

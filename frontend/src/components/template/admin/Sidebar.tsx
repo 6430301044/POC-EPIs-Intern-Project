@@ -22,11 +22,10 @@ export default function Sidebar() {
     // { name: 'Calendar', path: '/admin/calendar', icon: CalendarIcon },
     // { name: 'Documents', path: '/admin/documents', icon: DocumentIcon },
     // { name: 'Reports', path: '/admin/reports', icon: ReportIcon },
-    { name: 'Upload', path: '/admin/upload', icon: UploadIcon },
-  { name: 'EnhanceTable Upload', path: '/admin/enhance-table-upload', icon: UploadIcon },
+    { name: 'Upload Center', path: '/admin/upload-center', icon: UploadIcon },
     { name: 'Approval Center', path: '/admin/approval-center', icon: ApprovalIcon },
     { name: 'Data Management', path: '/admin/data-management', icon: DataIcon },
-    { name: 'Reference Data', path: '/admin/reference-data', icon: ReferenceDataIcon },
+    { name: 'Bulk Data Deletion', path: '/admin/bulk-data-deletion', icon: TrashIcon },
     { name: 'News', path: '/admin/news', icon: ReportIcon },
   ]
 
@@ -334,4 +333,24 @@ function MenuIcon(props: IconProps) {
       />
     </svg>
   )
+}
+
+// เพิ่ม Trash Icon
+function TrashIcon(props: IconProps) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+      />
+    </svg>
+  );
 }

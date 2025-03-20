@@ -66,3 +66,37 @@ export const fetchNewsById = async (id: number): Promise<NewsItem> => {
     throw error;
   }
 };
+
+/**
+ * Deletes a news item by its ID
+ * @param id - The ID of the news item to delete
+ * @returns Promise with the result of the delete operation
+ */
+export const deleteNewsById = async (id: number): Promise<{success: boolean; message: string; data?: any}> => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Authentication token not found');
+    }
+    
+    const response = await fetch(`${API_BASE_URL}/news/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to delete news');
+    }
+    
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error deleting news by ID:', error);
+    throw error;
+  }
+};

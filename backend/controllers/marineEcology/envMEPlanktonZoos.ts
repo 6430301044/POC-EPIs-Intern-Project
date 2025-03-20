@@ -57,7 +57,7 @@ export async function getMEPlanktonZoosData(
               ms.stationName,
               mez.phylum,
               mez.class,
-              mez.[order],
+              mez.orderName,
               mez.family,
               mez.genu,
               mez.quantity_per_m3,

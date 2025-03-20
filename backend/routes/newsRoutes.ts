@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { uploadNews, getAllNews, getNewsById } from "../controllers/news/index";
+import { uploadNews, getAllNews, getNewsById, deleteNewsById } from "../controllers/news/index";
 import { authenticateToken, authorizeRoles } from "../middleware/authMiddleware";
 
 const router = express.Router();
@@ -17,5 +17,6 @@ const upload = multer({
 router.post("/upload", authenticateToken, authorizeRoles(['dev', 'approver']), upload.array("file", 10), uploadNews);
 router.get("/", getAllNews);
 router.get("/:id", getNewsById);
+router.delete("/:id", authenticateToken, authorizeRoles(['dev', 'approver']), deleteNewsById);
 
 export default router;

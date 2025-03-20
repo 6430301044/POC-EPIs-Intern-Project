@@ -41,12 +41,18 @@ export default function Team() {
         const response = await getAllUsers();
         if (response.success) {
           setUsers(response.data);
+          // ถ้าไม่มีข้อมูลผู้ใช้ ให้แสดงข้อความที่เป็นมิตรกับผู้ใช้
+          if (response.data.length === 0) {
+            setError('ไม่พบข้อมูลผู้ใช้ในระบบ');
+          } else {
+            setError(null);
+          }
         } else {
-          setError('Failed to fetch users');
+          setError('ไม่สามารถดึงข้อมูลผู้ใช้ได้ กรุณาลองใหม่อีกครั้ง');
         }
       } catch (err) {
         console.error('Error fetching users:', err);
-        setError('Error fetching users. Please try again later.');
+        setError('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์ กรุณาลองใหม่ภายหลัง');
       } finally {
         setLoading(false);
       }
@@ -154,34 +160,44 @@ export default function Team() {
       headerName: 'Actions',
       width: 120,
       renderCell: ({ row }) => {
-        return canEdit ? (
-          <Box display="flex" justifyContent="center" gap={1}>
-            <Tooltip title="Edit User">
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleEditClick(row);
-                }}
-                color="primary"
-                size="small"
-              >
-                <EditIcon />
-              </IconButton>
+        if (canEdit) {
+          return (
+            <Box display="flex" justifyContent="center" gap={1}>
+              <Tooltip title="Edit User">
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditClick(row);
+                  }}
+                  color="primary"
+                  size="small"
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Delete User">
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteClick(row);
+                  }}
+                  color="error"
+                  size="small"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          );
+        } else {
+          return (
+            <Tooltip title="คุณไม่มีสิทธิ์ในการแก้ไขข้อมูลผู้ใช้">
+              <Box sx={{ color: 'text.disabled', fontSize: '0.75rem', textAlign: 'center' }}>
+                ไม่มีสิทธิ์แก้ไข
+              </Box>
             </Tooltip>
-            <Tooltip title="Delete User">
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteClick(row);
-                }}
-                color="error"
-                size="small"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        ) : null;
+          );
+        }
       },
     },
   ];
@@ -192,6 +208,13 @@ export default function Team() {
         title='Team Management'
         align='center'
       />
+      {!canEdit && (
+        <Box sx={{ mt: 2, p: 2, bgcolor: '#fff9c4', borderRadius: 1, textAlign: 'center' }}>
+          <Typography variant="body2" color="warning.dark">
+            คุณกำลังดูข้อมูลในโหมดอ่านอย่างเดียว เนื่องจากคุณไม่มีสิทธิ์ในการแก้ไขข้อมูลผู้ใช้
+          </Typography>
+        </Box>
+      )}
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -246,6 +269,11 @@ export default function Team() {
               },
             }}
             pageSizeOptions={[5, 10, 25, 50]}
+            sx={{
+              '& .MuiDataGrid-row': {
+                cursor: canEdit ? 'pointer' : 'default',
+              },
+            }}
           />
         )}
       </Box>

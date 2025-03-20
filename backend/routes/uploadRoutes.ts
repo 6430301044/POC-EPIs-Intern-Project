@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { uploadCSV, uploadExcel, getPendingApprovals, approveUpload, rejectUpload, deleteDataByPeriod, updateDataByPeriod, getAvailableTables, getPreviewData } from "../controllers/upload/index";
+import { uploadCSV, uploadExcel, getPendingApprovals, approveUpload, rejectUpload, deleteDataByPeriod, updateDataByPeriod, getAvailableTables, getPreviewData, uploadReferenceCSV, uploadReferenceExcel } from "../controllers/upload/index";
 import { uploadEnhanceCSV, uploadEnhanceExcel } from "../controllers/enhanceTable/enhanceTableUploadController";
 import { getPeriods } from "../controllers/upload/periodController";
 import { getReferenceData, addReferenceData, updateReferenceData, deleteReferenceData } from "../controllers/upload/referenceDataController";
@@ -61,5 +61,9 @@ router.get("/reference/:table", authenticateToken, getReferenceData);
 router.post("/reference/:table", authenticateToken, authorizeRoles(['dev', 'approver']), addReferenceData);
 router.put("/reference/:table/:id", authenticateToken, authorizeRoles(['dev', 'approver']), updateReferenceData);
 router.delete("/reference/:table/:id", authenticateToken, authorizeRoles(['dev', 'approver']), deleteReferenceData);
+
+// Reference data upload routes
+router.post("/upload-reference-csv", authenticateToken, authorizeRoles(['dev', 'approver']), upload.single("file"), uploadReferenceCSV);
+router.post("/upload-reference-excel", authenticateToken, authorizeRoles(['dev', 'approver']), upload.single("file"), uploadReferenceExcel);
 
 export default router;

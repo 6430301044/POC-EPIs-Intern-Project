@@ -80,12 +80,9 @@ export default function Approval() {
       const data = await response.json();
       setPendingApprovals(data.data || []);
     } catch (error) {
-      showToast(
-        "Error",
-        "Failed to load pending approvals",
-        "error"
-      );
+      // ปรับปรุงข้อความแจ้งเตือนให้เป็นมิตรกับผู้ใช้มากขึ้น
       console.error("Error fetching pending approvals:", error);
+      // ไม่แสดง toast เมื่อไม่มีข้อมูล เพราะจะแสดงข้อความในหน้าจออยู่แล้ว
     } finally {
       setLoading(false);
     }
@@ -247,7 +244,8 @@ export default function Approval() {
               </div>
             ) : pendingApprovals.length === 0 ? (
               <div className="bg-gray-100 p-8 rounded text-center">
-                <p className="text-gray-500">No pending approvals found.</p>
+                <p className="text-gray-500">ไม่พบรายการที่รอการอนุมัติในขณะนี้</p>
+                <p className="text-gray-400 text-sm mt-2">หากคุณเพิ่งอัปโหลดไฟล์ กรุณาลองรีเฟรชหน้านี้</p>
               </div>
             ) : (
               <div className="overflow-x-auto">

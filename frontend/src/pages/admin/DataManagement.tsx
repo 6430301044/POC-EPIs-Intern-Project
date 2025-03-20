@@ -4,7 +4,7 @@ import { SectionTitle } from "@/components/template/SectionTitle";
 import API_BASE_URL from "@/config/apiConfig";
 import BUDDHA_YRARS from '@/utils/buddhaYears';
 import { formatDayMonth } from "@/utils/dateUtils";
-import { hasEditPermission } from '@/utils/authUtils';
+import { hasApprovePermission } from '@/utils/authUtils';
 
 interface Period {
   period_id: string;
@@ -340,7 +340,7 @@ export default function DataManagement() {
           
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-2 mt-6">
-            {hasEditPermission() && (
+            {hasApprovePermission() && (
               <>
                 <button
                   className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
@@ -350,13 +350,13 @@ export default function DataManagement() {
                   ลบข้อมูล
                 </button>
                 
-                <button
+                {/* <button
                   className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50"
                   onClick={() => setShowConfirmUpdate(true)}
                   disabled={!selectedPeriod || !selectedTable || Object.keys(updateFields).length === 0 || loading || actionLoading}
                 >
                   อัพเดทข้อมูล
-                </button>
+                </button> */}
               </>
             )}
             
@@ -371,10 +371,10 @@ export default function DataManagement() {
         </div>
         
         {/* Update Fields Section */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6 text-black">
+        {/* <div className="bg-white p-6 rounded-lg shadow-md mb-6 text-black">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">ข้อมูลที่ต้องการอัพเดท</h2>
-            {hasEditPermission() && (
+            {hasApprovePermission() && (
               <button
                 className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
                 onClick={addUpdateField}
@@ -424,7 +424,7 @@ export default function DataManagement() {
               ))}
             </div>
           )}
-        </div>
+        </div> */}
       </div>
       
       {/* Delete Confirmation Modal */}

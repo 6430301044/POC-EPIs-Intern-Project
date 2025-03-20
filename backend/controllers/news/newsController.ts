@@ -158,3 +158,71 @@ export const getNewsById = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Error fetching news", error: error.message });
   }
 };
+
+// ฟังก์ชันลบข่าวตาม ID
+export const deleteNewsById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const pool = await connectToDB();
+    let transaction = null;
+    
+    try {
+      // เริ่ม transaction
+      transaction = pool.transaction();
+      await transaction.begin();
+      
+      // ตรวจสอบว่ามีข่าวที่ต้องการลบหรือไม่
+      const checkRequest = transaction.request();
+      checkRequest.input('id', sql.Int, id);
+      
+      const checkResult = await checkRequest.query(`
+        SELECT COUNT(*) as count 
+        FROM dbo.News 
+        WHERE id = @id
+      `);
+      
+      const recordCount = checkResult.recordset[0].count;
+      
+      if (recordCount === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "ไม่พบข้อมูลข่าวที่ต้องการลบ"
+        });
+      }
+      
+      // ลบข้อมูลจากตาราง News
+      // หมายเหตุ: NewsImages จะถูกลบอัตโนมัติเนื่องจากมีการกำหนด CASCADE constraint
+      const deleteRequest = transaction.request();
+      deleteRequest.input('id', sql.Int, id);
+      
+      await deleteRequest.query(`
+        DELETE FROM dbo.News 
+        WHERE id = @id
+      `);
+      
+      // Commit transaction
+      await transaction.commit();
+      
+      res.status(200).json({
+        success: true,
+        message: `ลบข้อมูลข่าวเรียบร้อยแล้ว`,
+        data: {
+          id: id
+        }
+      });
+      
+    } catch (error) {
+      // ถ้ามีข้อผิดพลาด ให้ rollback transaction
+      if (transaction) await transaction.rollback();
+      throw error;
+    }
+    
+  } catch (error) {
+    console.error("Error deleting news by id:", error);
+    res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาดในการลบข้อมูลข่าว",
+      error: error.message
+    });
+  }
+};

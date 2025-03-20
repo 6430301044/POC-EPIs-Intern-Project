@@ -1,1 +1,1 @@
-export { uploadNews, getAllNews, getNewsById } from './newsController';
+export { uploadNews, getAllNews, getNewsById, deleteNewsById } from './newsController';

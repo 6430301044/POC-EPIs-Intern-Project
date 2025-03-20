@@ -60,7 +60,15 @@ export const hasRole = (role: string | string[]): boolean => {
  * @returns True if user has edit permission
  */
 export const hasEditPermission = (): boolean => {
-  return hasRole(['admin', 'approver', 'dev']);
+  return hasRole(['dev']);
+};
+
+/**
+ * Checks if the user has approve permission
+ * @returns True if user has approve permission
+ */
+export const hasApprovePermission = (): boolean => {
+  return hasRole(['approver', 'dev']);
 };
 
 /**

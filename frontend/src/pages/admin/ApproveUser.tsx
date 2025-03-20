@@ -2,7 +2,7 @@ import { Container } from "@/components/template/Container";
 import { SectionTitle } from "@/components/template/SectionTitle";
 import { useState, useEffect } from "react";
 import API_BASE_URL from '@/config/apiConfig';
-import { hasEditPermission } from '@/utils/authUtils';
+import { hasApprovePermission } from '@/utils/authUtils';
 
 interface PendingApproval {
   Register_id: number;  
@@ -155,7 +155,7 @@ export default function ApproveUser() {
             <h2 className="text-2xl font-bold">Pending User Approvals</h2>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">รายการผู้ใช้ที่รอการอนุมัติ</h2>
-              {hasEditPermission() && (
+              {hasApprovePermission() && (
                 <button onClick={fetchPendingApprovals} className="px-4 py-2 text-black bg-gray-200 rounded hover:bg-gray-300" disabled={loading}>
                   {loading ? (
                     <span className="flex items-center">
@@ -203,7 +203,7 @@ export default function ApproveUser() {
                       <td className="py-3 px-4 border-b">{approval.User_phone}</td>
                       <td className="py-3 px-4 border-b">{formatDate(approval.Created_at)}</td>
                       <td className="py-3 px-4 border-b text-center">
-                        {hasEditPermission() && (
+                        {hasApprovePermission() && (
                           <div className="flex justify-center space-x-2">
                             <button onClick={() => handleApprove(approval.Register_id)} disabled={processingId === approval.Register_id} className={`px-3 py-1 rounded text-white ${processingId === approval.Register_id ? 'bg-green-400' : 'bg-green-600 hover:bg-green-700'}`}>
                               {processingId === approval.Register_id ? 'Processing...' : 'Approve'}
@@ -213,7 +213,7 @@ export default function ApproveUser() {
                             </button>
                           </div>
                         )}
-                        {!hasEditPermission() && (
+                        {!hasApprovePermission() && (
                           <span className="text-gray-500">ไม่มีสิทธิ์ดำเนินการ</span>
                         )}
                       </td>

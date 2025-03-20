@@ -57,7 +57,7 @@ export async function getMEBenthosData(
               ms.stationName,
               meb.phylum,
               meb.class,
-              meb.[order],
+              meb.orderName,
               meb.family,
               meb.genu,
               meb.quantity_per_m2,

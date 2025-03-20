@@ -22,7 +22,7 @@ export const uploadEnhanceCSV = async (req: Request, res: Response) => {
         // Get the authenticated user's ID from the request object
         const userId = (req as any).user?.userId; // Use authenticated user ID or fallback to admin (1)
 
-        const result = await parseCSV(req.file.path, enhanceTableId, periodId, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype);
+        const result = await parseCSV(req.file.path, enhanceTableId, periodId, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype, userId);
         res.status(200).json({ message: "อัปโหลดสำเร็จ", data: result });
 
     } catch (error) {
@@ -59,7 +59,7 @@ export const uploadEnhanceExcel = async (req: Request, res: Response) => {
 /**
  * Parse CSV file for EnhanceTable data
  */
-const parseCSV = async (filePath: string, enhanceTableId: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string) => {
+const parseCSV = async (filePath: string, enhanceTableId: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
     return new Promise((resolve, reject) => {
         const results: any[] = [];
 
@@ -71,7 +71,7 @@ const parseCSV = async (filePath: string, enhanceTableId: string, periodId: stri
             .on("end", async () => {
                 try {
                     // Save file info and data for approval
-                    const savedData = await saveEnhanceDataForApproval(results, enhanceTableId, periodId, originalFilename, systemFilename, fileSize, mimeType);
+                    const savedData = await saveEnhanceDataForApproval(results, enhanceTableId, periodId, originalFilename, systemFilename, fileSize, mimeType, userId);
                     
                     // Delete the temporary file after processing
                     fs.unlink(filePath, (err) => {

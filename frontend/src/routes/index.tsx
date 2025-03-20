@@ -29,6 +29,9 @@ import ApprovalCenter from "@/pages/admin/ApprovalCenter";
 import NewsDetail from "@/pages/NewsDetail";
 import Data from "@/pages/Data";
 import Contact from "@/pages/ContactUs";
+import ReferenceDataUpload from "@/pages/admin/ReferenceDataUpload";
+import UploadCenter from "@/pages/admin/UploadCenter";
+import BulkDataDeletion from "@/pages/admin/BulkDataDeletion";
 
 
 const router = createBrowserRouter([
@@ -154,6 +157,18 @@ const router = createBrowserRouter([
       {
         path: "/admin/news",
         element: <News />,
+      },
+      {
+        path: "/admin/reference-data-upload",
+        element: <ReferenceDataUpload />, 
+      },
+      {
+        path: "/admin/upload-center",
+        element: <UploadCenter />,
+      },
+      {
+        path: "/admin/bulk-data-deletion",
+        element: <BulkDataDeletion />,
       }
     ],
   },

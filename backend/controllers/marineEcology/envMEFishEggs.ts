@@ -57,7 +57,7 @@ export async function getMEFishEggsData(
               ms.stationName,
               mefg.phylum,
               mefg.class,
-              mefg.[order],
+              mefg.orderName,
               mefg.family,
               mefg.genu,
               mefg.quantity_per_1000m3,
