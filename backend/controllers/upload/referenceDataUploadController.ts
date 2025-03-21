@@ -3,6 +3,7 @@ import fs from "fs";
 import csvParser from "csv-parser";
 import * as XLSX from "xlsx";
 import { connectToDB } from "../../db/dbConfig";
+import path from "path";
 
 /**
  * Controller for handling CSV uploads to Reference Tables
@@ -22,9 +23,10 @@ export const uploadReferenceCSV = async (req: Request, res: Response) => {
         
         // Get the authenticated user's ID from the request object
         const userId = (req as any).user?.userId;
+        const userName = (req as any).user?.userName || "Unknown User";
 
-        const result = await parseCSV(req.file.path, tableName, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype, userId);
-        res.status(200).json({ message: "อัปโหลดสำเร็จ", data: result });
+        const result = await parseCSV(req.file.path, tableName, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype, userId, userName);
+        res.status(200).json({ message: "อัปโหลดสำเร็จ รอการอนุมัติ", data: result });
 
     } catch (error) {
         console.error("Reference Data CSV Upload Error:", error);
@@ -49,9 +51,10 @@ export const uploadReferenceExcel = async (req: Request, res: Response) => {
         }
 
         const userId = (req as any).user?.userId;
+        const userName = (req as any).user?.userName || "Unknown User";
         
-        const result = await parseExcel(req.file.path, tableName, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype, userId);
-        res.status(200).json({ message: "อัปโหลดสำเร็จ", data: result });
+        const result = await parseExcel(req.file.path, tableName, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype, userId, userName);
+        res.status(200).json({ message: "อัปโหลดสำเร็จ รอการอนุมัติ", data: result });
 
     } catch (error) {
         console.error("Reference Data Excel Upload Error:", error);
@@ -62,7 +65,7 @@ export const uploadReferenceExcel = async (req: Request, res: Response) => {
 /**
  * Parse CSV file for Reference Table data
  */
-const parseCSV = async (filePath: string, tableName: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
+const parseCSV = async (filePath: string, tableName: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number, userName: string) => {
     return new Promise((resolve, reject) => {
         const results: any[] = [];
 
@@ -73,12 +76,24 @@ const parseCSV = async (filePath: string, tableName: string, originalFilename: s
             })
             .on("end", async () => {
                 try {
-                    // Save data directly to the reference table
-                    const savedData = await saveReferenceData(results, tableName, originalFilename, userId);
+                    // Save data to pending approval table instead of directly to reference table
+                    const savedData = await saveToPendingApproval(results, tableName, originalFilename, systemFilename, fileSize, mimeType, userId, userName);
                     
-                    // Delete the temporary file after processing
-                    fs.unlink(filePath, (err) => {
-                        if (err) console.error("Error deleting temporary file:", err);
+                    // We'll keep the file for approval process
+                    // Move the file to a permanent location for later processing
+                    const uploadsDir = path.join(__dirname, '../../../uploads/reference');
+                    if (!fs.existsSync(uploadsDir)) {
+                        fs.mkdirSync(uploadsDir, { recursive: true });
+                    }
+                    
+                    const newFilePath = path.join(uploadsDir, systemFilename);
+                    fs.copyFile(filePath, newFilePath, (err) => {
+                        if (err) console.error("Error copying file to permanent location:", err);
+                        
+                        // Delete the temporary file after copying
+                        fs.unlink(filePath, (unlinkErr) => {
+                            if (unlinkErr) console.error("Error deleting temporary file:", unlinkErr);
+                        });
                     });
                     
                     resolve(savedData);
@@ -93,7 +108,7 @@ const parseCSV = async (filePath: string, tableName: string, originalFilename: s
 /**
  * Parse Excel file for Reference Table data
  */
-const parseExcel = async (filePath: string, tableName: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
+const parseExcel = async (filePath: string, tableName: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number, userName: string) => {
     return new Promise((resolve, reject) => {
         try {
             // Read the Excel file
@@ -106,12 +121,24 @@ const parseExcel = async (filePath: string, tableName: string, originalFilename:
             // Convert to JSON
             const results = XLSX.utils.sheet_to_json(worksheet);
             
-            // Save data directly to the reference table
-            saveReferenceData(results, tableName, originalFilename, userId)
+            // Save data to pending approval table instead of directly to reference table
+            saveToPendingApproval(results, tableName, originalFilename, systemFilename, fileSize, mimeType, userId, userName)
                 .then((savedData) => {
-                    // Delete the temporary file after processing
-                    fs.unlink(filePath, (err) => {
-                        if (err) console.error("Error deleting temporary file:", err);
+                    // We'll keep the file for approval process
+                    // Move the file to a permanent location for later processing
+                    const uploadsDir = path.join(__dirname, '../../../uploads/reference');
+                    if (!fs.existsSync(uploadsDir)) {
+                        fs.mkdirSync(uploadsDir, { recursive: true });
+                    }
+                    
+                    const newFilePath = path.join(uploadsDir, systemFilename);
+                    fs.copyFile(filePath, newFilePath, (err) => {
+                        if (err) console.error("Error copying file to permanent location:", err);
+                        
+                        // Delete the temporary file after copying
+                        fs.unlink(filePath, (unlinkErr) => {
+                            if (unlinkErr) console.error("Error deleting temporary file:", unlinkErr);
+                        });
                     });
                     
                     resolve(savedData);
@@ -136,9 +163,9 @@ const validateTableName = (tableName: string): boolean => {
 };
 
 /**
- * Save data directly to the reference table
+ * Save data to pending approval table instead of directly to reference table
  */
-const saveReferenceData = async (data: any[], tableName: string, originalFilename: string, userId: number) => {
+const saveToPendingApproval = async (data: any[], tableName: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number, userName: string) => {
     if (!data || data.length === 0) {
         throw new Error("ไม่พบข้อมูลในไฟล์");
     }
@@ -170,15 +197,45 @@ const saveReferenceData = async (data: any[], tableName: string, originalFilenam
         // Log upload activity
         await pool.request()
             .input("userId", userId)
-            .input("action", `Bulk upload to ${tableName}`)
-            .input("details", `Uploaded ${data.length} records from ${originalFilename}`)
+            .input("action", `Reference data upload to ${tableName} (pending approval)`)
+            .input("details", `Uploaded ${data.length} records from ${originalFilename} (pending approval)`)
             .query(`
                 INSERT INTO dbo.UserActivity (user_id, action_type, action_details, action_timestamp)
                 VALUES (@userId, @action, @details, GETDATE())
             `);
+        
+        // Save the parsed data as JSON string
+        const parsedData = JSON.stringify(data);
+        
+        // Insert into ReferenceDataPendingApproval table
+        const uploadResult = await pool.request()
+            .input("filename", originalFilename)
+            .input("systemFilename", systemFilename)
+            .input("fileSize", fileSize)
+            .input("mimeType", mimeType)
+            .input("uploadedBy", userId)
+            .input("uploadedByName", userName)
+            .input("targetTable", tableName)
+            .input("parsedData", parsedData)
+            .input("columnMapping", JSON.stringify(validColumns.reduce((obj, col) => ({ ...obj, [col]: col }), {})))
+            .query(`
+                INSERT INTO dbo.ReferenceDataPendingApproval (
+                    filename, system_filename, file_size, mime_type, 
+                    uploaded_by, uploaded_by_name, upload_date, status, 
+                    target_table, parsed_data, column_mapping
+                )
+                VALUES (
+                    @filename, @systemFilename, @fileSize, @mimeType,
+                    @uploadedBy, @uploadedByName, GETDATE(), 'รอการอนุมัติ',
+                    @targetTable, @parsedData, @columnMapping
+                );
+                SELECT SCOPE_IDENTITY() AS upload_id;
+            `);
+        
+        const uploadId = uploadResult.recordset[0].upload_id;
 
-        // Process each row and insert into the table
-        let insertedCount = 0;
+        // Validate data and count valid/invalid rows
+        let validCount = 0;
         let skippedCount = 0;
         let errorCount = 0;
         const errors = [];
@@ -199,24 +256,7 @@ const saveReferenceData = async (data: any[], tableName: string, originalFilenam
                     continue;
                 }
 
-                // Build dynamic SQL for insert
-                const columns = Object.keys(filteredRow).join(', ');
-                const paramNames = Object.keys(filteredRow).map(key => `@${key}`).join(', ');
-                
-                const request = pool.request();
-                
-                // Add parameters
-                for (const key in filteredRow) {
-                    request.input(key, filteredRow[key]);
-                }
-
-                // Execute insert
-                await request.query(`
-                    INSERT INTO dbo.${tableName} (${columns})
-                    VALUES (${paramNames})
-                `);
-
-                insertedCount++;
+                validCount++;
             } catch (error) {
                 errorCount++;
                 errors.push({
@@ -231,7 +271,8 @@ const saveReferenceData = async (data: any[], tableName: string, originalFilenam
 
         return {
             success: true,
-            insertedCount,
+            uploadId,
+            pendingCount: validCount,
             skippedCount,
             errorCount,
             errors: errors.length > 0 ? errors : undefined

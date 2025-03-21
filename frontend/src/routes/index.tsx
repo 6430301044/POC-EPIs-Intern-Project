@@ -8,7 +8,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Forgotpassword from "@/pages/Forgotpassword";
 import AdminLayout from "@/layouts/AdminLayout";
-import Admin from "@/pages/admin/Admin";
+import AdminHome from "@/pages/admin/AdminHome";
 import Team from "@/pages/admin/Team";
 import Projects from "@/pages/admin/Projects";
 import Calendar from "@/pages/admin/Calendar";
@@ -96,7 +96,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Admin />,
+        element: <AdminHome />,
       },
       {
         path: "/admin/team",

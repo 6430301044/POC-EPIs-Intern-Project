@@ -13,7 +13,7 @@ export default function Sidebar() {
   const { theme } = useTheme();
   
   // แยก Dashboard ออกมา
-  const admin = { name: 'Admin', path: '/admin', icon: HomeIcon }
+  const admin = { name: 'Home', path: '/admin', icon: HomeIcon }
   
   // เมนูหลัก
   const mainMenus = [
