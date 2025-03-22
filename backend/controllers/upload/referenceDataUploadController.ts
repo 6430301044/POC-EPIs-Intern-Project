@@ -204,12 +204,14 @@ const saveToPendingApproval = async (data: any[], tableName: string, originalFil
             .input("fileSize", fileSize)
             .input("mimeType", mimeType)
             .input("uploadedBy", userId)
+            .input("targetTable", tableName)
+            .input("parsedData", parsedData)
             .query(`
-                INSERT INTO dbo.UploadedFiles (
-                    filename, uploaded_by, upload_date, status
+                INSERT INTO dbo.ReferenceDataPendingApproval (
+                    filename, target_table, parsed_data, uploaded_by, upload_date, status, record_count
                 )
                 VALUES (
-                    @filename, @uploadedBy, GETDATE(), 'รอการอนุมัติ'
+                    @filename, @targetTable, @parsedData, @uploadedBy, GETDATE(), 'รอการอนุมัติ', ${data.length}
                 );
                 SELECT SCOPE_IDENTITY() AS upload_id;
             `);

@@ -18,27 +18,23 @@ export const getPendingApprovals = async (req: Request, res: Response) => {
                     CASE
                         WHEN s.semiannual = 1 THEN 'ม.ค. - มิ.ย.'
                         WHEN s.semiannual = 2 THEN 'ก.ค. - ธ.ค.'
-                        WHEN u.period_id IS NULL THEN 'ไม่ระบุ'
                         ELSE 'Unknown'
                     END as period_name,
-                    CASE
-                        WHEN d.startDate IS NOT NULL THEN YEAR(d.startDate)
-                        ELSE NULL
-                    END as year,
-                    ISNULL(m.mainName, 'ไม่ระบุ') as mainCategory,
-                    ISNULL(sb.subName, 'ไม่ระบุ') as subCategory,
-                    ISNULL(usr.User_name, 'ไม่ระบุ') as uploaded_by
+                    YEAR(d.startDate) as year,
+                    m.mainName as mainCategory,
+                    sb.subName as subCategory,
+                    usr.User_name as uploaded_by
                 FROM 
                     dbo.UploadedFiles u
-                LEFT JOIN 
+                JOIN 
                     dbo.Daysperiod d ON u.period_id = d.period_id
-                LEFT JOIN 
+                JOIN 
                     dbo.Semiannual s ON d.semiannual_id = s.semiannual_id
-                LEFT JOIN 
+                JOIN 
                     dbo.Mcategories m ON u.main_id = m.main_id
-                LEFT JOIN 
+                JOIN 
                     dbo.SbCategories sb ON u.sub_id = sb.sub_id
-                LEFT JOIN 
+                JOIN 
                     dbo.Users usr ON u.uploaded_by = usr.User_id
                 WHERE 
                     u.status = 'รอการอนุมัติ'
@@ -85,9 +81,9 @@ export const approveUpload = async (req: Request, res: Response) => {
                 .input("uploadId", uploadId)
                 .query(`
                     SELECT 
-                        upload_id, filename, system_filename, target_table, 
-                        parsed_data, column_mapping
-                    FROM dbo.ReferenceDataPendingApproval 
+                        upload_id, filename, period_id, main_id, sub_id, 
+                        parsed_data, target_table, column_mapping
+                    FROM dbo.UploadedFiles 
                     WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'
                 `);
             
@@ -107,71 +103,42 @@ export const approveUpload = async (req: Request, res: Response) => {
                 throw new Error("ข้อมูลไม่ครบถ้วนสำหรับการอนุมัติ");
             }
             
-            // Get table schema to determine valid columns
-            const schemaResult = await transaction.request()
-                .query(`
-                    SELECT COLUMN_NAME, DATA_TYPE 
-                    FROM INFORMATION_SCHEMA.COLUMNS 
-                    WHERE TABLE_NAME = '${targetTable}'
-                    AND COLUMN_NAME NOT LIKE '%_id' -- Exclude ID columns that are auto-generated
-                `);
-
-            const validColumns = schemaResult.recordset.map(col => col.COLUMN_NAME);
-            
-            // Insert the approved data into the target reference table
-            let insertedCount = 0;
-            let skippedCount = 0;
-            let errorCount = 0;
-            const errors = [];
-            
+            // Insert the approved data into the target table
             for (const record of parsedData) {
-                try {
-                    // Filter out invalid columns
-                    const filteredRow = {};
-                    for (const key in record) {
-                        if (validColumns.includes(key)) {
-                            filteredRow[key] = record[key];
-                        }
+                // Build dynamic query based on the record fields and column mapping
+                const columns: string[] = [];
+                const paramNames: string[] = [];
+                const request = transaction.request();
+
+                // Add period_id to all records
+                request.input("period_id", uploadData.period_id);
+                columns.push("period_id");
+                paramNames.push("@period_id");
+
+                // Map record fields to database columns
+                for (const [fieldName, columnName] of Object.entries(columnMapping)) {
+                    if (record[fieldName] !== undefined && record[fieldName] !== null && record[fieldName] !== '') {
+                        request.input(columnName as string, record[fieldName]);
+                        columns.push(columnName as string);
+                        paramNames.push(`@${columnName}`);
                     }
-
-                    // Skip if no valid columns
-                    if (Object.keys(filteredRow).length === 0) {
-                        skippedCount++;
-                        continue;
-                    }
-
-                    // Build dynamic SQL for insert
-                    const columns = Object.keys(filteredRow).join(', ');
-                    const paramNames = Object.keys(filteredRow).map(key => `@${key}`).join(', ');
-                    
-                    const request = transaction.request();
-                    
-                    // Add parameters
-                    for (const key in filteredRow) {
-                        request.input(key, filteredRow[key]);
-                    }
-
-                    // Execute insert
-                    await request.query(`
-                        INSERT INTO dbo.${targetTable} (${columns})
-                        VALUES (${paramNames})
-                    `);
-
-                    insertedCount++;
-                } catch (error) {
-                    errorCount++;
-                    errors.push({
-                        row: record,
-                        error: error.message
-                    });
                 }
+
+                // Skip if no valid fields found
+                if (columns.length <= 1) { // Only period_id
+                    console.warn("Skipping record with no valid fields");
+                    continue;
+                }
+
+                const query = `INSERT INTO ${targetTable} (${columns.join(', ')}) VALUES (${paramNames.join(', ')})`;
+                await request.query(query);
             }
             
             // Update the status to approved
             await transaction.request()
                 .input("uploadId", uploadId)
                 .query(`
-                    UPDATE dbo.ReferenceDataPendingApproval 
+                    UPDATE dbo.UploadedFiles 
                     SET status = 'อนุมัติแล้ว'
                     WHERE upload_id = @uploadId
                 `);
@@ -181,14 +148,11 @@ export const approveUpload = async (req: Request, res: Response) => {
             
             res.status(200).json({
                 success: true,
-                message: "อนุมัติข้อมูลอ้างอิงเรียบร้อยแล้ว",
+                message: "อนุมัติข้อมูลเรียบร้อยแล้ว",
                 data: {
                     uploadId,
                     filename: uploadData.filename,
-                    recordCount: parsedData.length,
-                    insertedCount,
-                    skippedCount,
-                    errorCount
+                    recordCount: parsedData.length
                 }
             });
             
@@ -199,10 +163,10 @@ export const approveUpload = async (req: Request, res: Response) => {
         }
         
     } catch (error) {
-        console.error("Error approving reference data upload:", error);
+        console.error("Error approving upload:", error);
         res.status(500).json({
             success: false,
-            message: "เกิดข้อผิดพลาดในการอนุมัติข้อมูลอ้างอิง",
+            message: "เกิดข้อผิดพลาดในการอนุมัติข้อมูล",
             error: error.message
         });
     }
@@ -378,7 +342,7 @@ export const getPendingReferenceApprovals = async (req: Request, res: Response) 
                     r.target_table as table_name,
                     r.uploaded_by_name as uploaded_by
                 FROM 
-                    dbo.ReferenceDataPendingApproval r
+                    dbo.ReferenceDataPendingApproval
                 WHERE 
                     r.status = 'รอการอนุมัติ'
                 ORDER BY 

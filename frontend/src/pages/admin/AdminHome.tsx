@@ -1,7 +1,7 @@
 import { Container } from '@/components/template/Container'
 import { SectionTitle } from '@/components/template/SectionTitle'
 
-export default function Admin() {
+export default function AdminHome() {
   return (
     <>
         <Container>

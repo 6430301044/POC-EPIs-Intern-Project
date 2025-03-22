@@ -23,7 +23,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
           c.companyName
         FROM 
           dbo.Users u
-        LEFT JOIN 
+        JOIN 
           dbo.Companies c ON u.Company_id = c.company_id
         ORDER BY 
           u.User_name

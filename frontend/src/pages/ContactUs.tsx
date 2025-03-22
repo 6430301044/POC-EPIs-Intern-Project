@@ -12,7 +12,7 @@ export default function ContactUs() {
       <div className="bg-white min-h-screen">
         {/* Breadcrumb Section with Background */}
         <section
-          className="relative w-full min-h-[460px] overflow-x-auto flex flex-col md:flex-row items-center justify-center px-4 md:px-[192px]"
+          className="relative w-full min-h-[760px] overflow-x-auto flex flex-col md:flex-row items-center justify-center px-4 md:px-[192px]"
           style={{
             backgroundImage: 'url("/images/PTT_Terminal.jpg")',
             backgroundSize: "cover",
@@ -60,7 +60,7 @@ export default function ContactUs() {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1440 320"
-            className="absolute bottom-0 left-0 w-full z-20"
+            className="absolute bottom-0 left-0 w-full z-20 pointer-events-none"
           >
             <path
               fill="#0099ff"
@@ -73,7 +73,7 @@ export default function ContactUs() {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1440 320"
-            className="absolute bottom-0 left-0 w-full z-20"
+            className="absolute bottom-0 left-0 w-full z-20 pointer-events-none"
           >
             <path
               fill="#0066a1"
@@ -86,7 +86,7 @@ export default function ContactUs() {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1440 320"
-            className="absolute bottom-0 left-0 w-full z-20"
+            className="absolute bottom-0 left-0 w-full z-20 pointer-events-nones"
           >
             <path
               fill="#ffffff"

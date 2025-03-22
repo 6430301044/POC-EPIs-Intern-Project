@@ -4,9 +4,10 @@ import { Container } from "@/components/template/Container";
 import { SectionTitle } from "@/components/template/SectionTitle";
 import ApproveUser from "./ApproveUser";
 import Approval from "./Approval";
+import ReferenceApproval from "./ReferenceApproval";
 
 export default function ApprovalCenter() {
-  const [activeTab, setActiveTab] = useState<"user" | "file">("user");
+  const [activeTab, setActiveTab] = useState<"user" | "file" | "reference">("user");
 
   return (
     <Container>
@@ -17,7 +18,7 @@ export default function ApprovalCenter() {
       />
 
       {/* Tab Navigation */}
-      <div className="flex justify-center space-x-6 mb-8">
+      <div className="flex justify-center space-x-4 mb-8">
         <button
           onClick={() => setActiveTab("user")}
           className={`px-6 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 ${
@@ -63,6 +64,29 @@ export default function ApprovalCenter() {
           </svg>
           <span>File Approvals</span>
         </button>
+        
+        <button
+          onClick={() => setActiveTab("reference")}
+          className={`px-6 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 ${
+            activeTab === "reference"
+              ? "bg-indigo-600 text-white shadow-lg scale-105"
+              : "bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 shadow"
+          }`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <span>Reference Approvals</span>
+        </button>
       </div>
 
       {/* Content Area with Animation */}
@@ -75,7 +99,9 @@ export default function ApprovalCenter() {
           transition={{ duration: 0.3 }}
           className="min-h-[400px]"
         >
-          {activeTab === "user" ? <ApproveUser /> : <Approval />}
+          {activeTab === "user" ? <ApproveUser /> : 
+           activeTab === "file" ? <Approval /> : 
+           <ReferenceApproval />}
         </motion.div>
       </div>
     </Container>

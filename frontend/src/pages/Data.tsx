@@ -57,7 +57,7 @@ export default function Data() {
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1440 320"
-          className="absolute bottom-0 left-0 w-full z-20"
+          className="absolute bottom-0 left-0 w-full z-20 pointer-events-none"
         >
           <path fill="#0099ff" fillOpacity="1" d="M0,700L1440,180L1440,320L0,320Z"></path>
         </svg>
@@ -66,7 +66,7 @@ export default function Data() {
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1440 320"
-          className="absolute bottom-0 left-0 w-full z-20"
+          className="absolute bottom-0 left-0 w-full z-20 pointer-events-none"
         >
           <path fill="#0066a1" fillOpacity="1" d="M0,500L1440,220L1440,320L0,320Z"></path>
         </svg>
@@ -75,7 +75,7 @@ export default function Data() {
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1440 320"
-          className="absolute bottom-0 left-0 w-full z-20"
+          className="absolute bottom-0 left-0 w-full z-20 pointer-events-none"
         >
           <path fill="#ffffff" fillOpacity="1" d="M0,200L1440,320L1440,320L0,320Z"></path>
         </svg>
