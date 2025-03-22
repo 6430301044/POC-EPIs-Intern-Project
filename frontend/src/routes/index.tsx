@@ -8,7 +8,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Forgotpassword from "@/pages/Forgotpassword";
 import AdminLayout from "@/layouts/AdminLayout";
-import Admin from "@/pages/admin/Admin";
+import AdminHome from "@/pages/admin/AdminHome";
 import Team from "@/pages/admin/Team";
 import Projects from "@/pages/admin/Projects";
 import News from "@/pages/admin/News";
@@ -25,6 +25,7 @@ import Visualization from "@/components/main/Visualization";
 // import Approval from "@/pages/admin/Approval";
 import ApproveMain from "@/pages/admin/ApproveMain";
 import NewsPage from "@/pages/NewsPage";
+import InfoTerminal from "@/pages/InfoTerminal";
 
 
 const router = createBrowserRouter([
@@ -54,7 +55,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/contact",
-        element: <Contact />
+        element: <Contact />,
       },
       {
         path: "/environment",
@@ -62,8 +63,12 @@ const router = createBrowserRouter([
       },
       {
         path: "/news",
-        element: <NewsPage />
+        element: <NewsPage />,
       },
+      {
+        path: "/terminalInfo",
+        element: <InfoTerminal />,
+      }
     ],
   },
   {
@@ -89,7 +94,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Admin />,
+        element: <AdminHome />,
       },
       {
         path: "/admin/team",

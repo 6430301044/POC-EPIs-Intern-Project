@@ -1,6 +1,9 @@
 import { Container } from "@/components/template/Container";
 import { SectionTitle } from "@/components/template/SectionTitle";
 import { useState, useEffect } from "react";
+import API_BASE_URL from "@/config/apiConfig";
+import BUDDHA_YRARS from "@/utils/buddhaYears";
+import DataPreviewModal from "@/components/admin/DataPreviewModal";
 
 interface PendingApproval {
   id: string;
@@ -19,6 +22,8 @@ export default function Approval() {
   const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [selectedUploadId, setSelectedUploadId] = useState<string | null>(null);
   const [toast, setToast] = useState<{
     show: boolean;
     title: string;
@@ -51,15 +56,15 @@ export default function Approval() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token"); // ดึง Token จาก Local Storage
-  
-      const response = await fetch("http://localhost:5000/api/upload/pending-approvals", {
+      
+      const response = await fetch(`${API_BASE_URL}/upload/pending-approvals`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}` // ส่ง Token ไปด้วย
         }
       });
-  
+      
       if (response.status === 401) {
         // Token หมดอายุ ให้ Redirect ไปหน้า Login หรือแจ้งเตือน
         showToast("Session Expired", "Please log in again.", "error");
@@ -67,21 +72,30 @@ export default function Approval() {
         window.location.href = "/login"; // Redirect ไปหน้า Login
         return;
       }
-  
+      
       if (!response.ok) {
         throw new Error("Failed to fetch pending approvals");
       }
-  
+      
       const data = await response.json();
       setPendingApprovals(data.data || []);
     } catch (error) {
-      showToast("Error", "Failed to load pending approvals", "error");
+      // แสดง toast เมื่อเกิดข้อผิดพลาดในการดึงข้อมูล
       console.error("Error fetching pending approvals:", error);
+      showToast(
+        "Error",
+        "ไม่สามารถดึงข้อมูลได้ กรุณาลองใหม่อีกครั้ง",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
   };
-  
+
+  // ดึงข้อมูลเมื่อโหลดคอมโพเนนต์
+  useEffect(() => {
+    fetchPendingApprovals();
+  }, []);
 
   // ฟังก์ชันสำหรับอนุมัติคำขอ
   const handleApprove = async (id: string) => {
@@ -89,13 +103,15 @@ export default function Approval() {
       setProcessingId(id);
       const token = localStorage.getItem("token");
   
-      const response = await fetch(`http://localhost:5000/api/upload/approve/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/upload/approve/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ userId: "admin" })
+        body: JSON.stringify({
+          userId: "admin" // ควรใช้ ID ของผู้ใช้ที่ login อยู่
+        })
       });
   
       if (response.status === 401) {
@@ -109,10 +125,20 @@ export default function Approval() {
         throw new Error("Failed to approve upload");
       }
   
-      showToast("Success", "Upload approved successfully", "success");
+      showToast(
+        "Success",
+        "Upload approved successfully",
+        "success"
+      );
+      
+      // รีเฟรชข้อมูลหลังจากอนุมัติ
       fetchPendingApprovals();
     } catch (error) {
-      showToast("Error", "Failed to approve upload", "error");
+      showToast(
+        "Error",
+        "Failed to approve upload",
+        "error"
+      );
       console.error("Error approving upload:", error);
     } finally {
       setProcessingId(null);
@@ -125,13 +151,16 @@ export default function Approval() {
       setProcessingId(id);
       const token = localStorage.getItem("token");
   
-      const response = await fetch(`http://localhost:5000/api/upload/reject/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/upload/reject/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ userId: "admin", rejectionReason: reason })
+        body: JSON.stringify({
+          userId: "admin", // ควรใช้ ID ของผู้ใช้ที่ login อยู่
+          rejectionReason: reason
+        })
       });
   
       if (response.status === 401) {
@@ -145,10 +174,20 @@ export default function Approval() {
         throw new Error("Failed to reject upload");
       }
   
-      showToast("Success", "Upload rejected successfully", "success");
+      showToast(
+        "Success",
+        "Upload rejected successfully",
+        "success"
+      );
+      
+      // รีเฟรชข้อมูลหลังจากปฏิเสธ
       fetchPendingApprovals();
     } catch (error) {
-      showToast("Error", "Failed to reject upload", "error");
+      showToast(
+        "Error",
+        "Failed to reject upload",
+        "error"
+      );
       console.error("Error rejecting upload:", error);
     } finally {
       setProcessingId(null);
@@ -164,18 +203,30 @@ export default function Approval() {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    });
+    }) + ` น.`;
+  };
+  
+  // ฟังก์ชันสำหรับเปิด modal แสดงตัวอย่างข้อมูล
+  const handlePreviewData = (id: string) => {
+    setSelectedUploadId(id);
+    setPreviewModalOpen(true);
+  };
+  
+  // ฟังก์ชันสำหรับปิด modal
+  const handleClosePreviewModal = () => {
+    setPreviewModalOpen(false);
+    setSelectedUploadId(null);
   };
 
   return (
     <>
       <Container>
-        <SectionTitle title="Approve File" align="center" />
+        <SectionTitle title="Approval" align="center" />
         <div className="p-8">
           <div className="flex flex-col space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">
-                Pending Approve
+                Pending Approvals
               </h2>
               <button 
                 onClick={() => fetchPendingApprovals()}
@@ -197,13 +248,14 @@ export default function Approval() {
               </div>
             ) : pendingApprovals.length === 0 ? (
               <div className="bg-gray-100 p-8 rounded text-center">
-                <p className="text-gray-500">No pending approvals found.</p>
+                <p className="text-gray-500">ไม่พบรายการที่รอการอนุมัติในขณะนี้</p>
+                <p className="text-gray-400 text-sm mt-2">หากคุณเพิ่งอัปโหลดไฟล์ กรุณาลองรีเฟรชหน้านี้</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full bg-white border border-gray-200">
                   <thead>
-                    <tr className="bg-gray-100">
+                    <tr className="bg-gray-100 text-black">
                       <th className="py-3 px-4 border-b text-left">File Name</th>
                       <th className="py-3 px-4 border-b text-left">Upload Date</th>
                       <th className="py-3 px-4 border-b text-left">Year</th>
@@ -216,10 +268,10 @@ export default function Approval() {
                   </thead>
                   <tbody>
                     {pendingApprovals.map((approval) => (
-                      <tr key={approval.id} className="hover:bg-gray-50">
+                      <tr key={approval.id} className="hover:bg-gray-50 text-black">
                         <td className="py-3 px-4 border-b">{approval.file_name}</td>
                         <td className="py-3 px-4 border-b">{formatDate(approval.upload_date)}</td>
-                        <td className="py-3 px-4 border-b">{approval.year}</td>
+                        <td className="py-3 px-4 border-b">{approval.year + BUDDHA_YRARS}</td>
                         <td className="py-3 px-4 border-b">
                           {approval.period_name}
                         </td>
@@ -228,6 +280,13 @@ export default function Approval() {
                         <td className="py-3 px-4 border-b">{approval.uploaded_by}</td>
                         <td className="py-3 px-4 border-b text-center">
                           <div className="flex justify-center space-x-2">
+                            <button
+                              onClick={() => handlePreviewData(approval.id)}
+                              disabled={processingId === approval.id}
+                              className="px-3 py-1 rounded text-white bg-blue-600 hover:bg-blue-700"
+                            >
+                              Preview
+                            </button>
                             <button
                               onClick={() => handleApprove(approval.id)}
                               disabled={processingId === approval.id}
@@ -263,6 +322,13 @@ export default function Approval() {
             <p>{toast.message}</p>
           </div>
         )}
+        
+        {/* Data Preview Modal */}
+        <DataPreviewModal 
+          uploadId={selectedUploadId}
+          isOpen={previewModalOpen}
+          onClose={handleClosePreviewModal}
+        />
       </Container>
     </>
   );

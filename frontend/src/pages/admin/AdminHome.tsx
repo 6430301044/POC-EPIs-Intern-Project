@@ -1,8 +1,7 @@
 import { Container } from '@/components/template/Container'
 import { SectionTitle } from '@/components/template/SectionTitle'
-import React from 'react'
 
-export default function Admin() {
+export default function AdminHome() {
   return (
     <>
         <Container>
@@ -10,8 +9,8 @@ export default function Admin() {
                 title='Admin'
                 align='center'
             />
-            <div className='text-9xl text-black'>
-                Hi there! I am the Admin.tsx page.
+            <div className='text-9xl text-black dark:text-white'>
+                Hi there! I am the AdminHome.tsx page.
             </div>
         </Container>
     </>

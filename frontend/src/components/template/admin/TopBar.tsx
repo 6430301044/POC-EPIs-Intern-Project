@@ -1,65 +1,88 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import DarkSwitch from '@/components/template/DarkSwitch'
-import { jwtDecode } from "jwt-decode";
+import { getDecodedToken } from '@/utils/authUtils'
+import API_BASE_URL from '@/config/apiConfig'
+
 // กำหนด interface สำหรับ SVG props
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string
 }
 
 export default function TopBar() {
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const [userName, setUserName] = useState("Guest");
-
-  const navigate = useNavigate();
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [userName, setUserName] = useState<string>('User')
+  const [userImage, setUserImage] = useState<string>('https://episstorageblob.blob.core.windows.net/profile/defaultProfileImage.jpg')
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  
+  // ฟังก์ชันสำหรับอัพเดทข้อมูลผู้ใช้จาก token
+  const updateUserFromToken = () => {
+    const decoded = getDecodedToken()
+    if (decoded) {
+      if (decoded.name) {
+        setUserName(decoded.name)
+      }
+      
+      // ดึงรูปภาพผู้ใช้จาก token แทนการเรียก API
+      if (decoded.imageUrl) {
+        setUserImage(decoded.imageUrl)
+      }
+    }
+  }
+  
+  // เรียกใช้เมื่อ component mount
+  useEffect(() => {
+    updateUserFromToken()
+    
+    // สร้าง event listener สำหรับการเปลี่ยนแปลง localStorage
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'token') {
+        updateUserFromToken()
+      }
+    }
+    
+    // เพิ่ม event listener
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Custom event สำหรับการอัพเดทภายในแอพเดียวกัน
+    const handleTokenRefresh = () => updateUserFromToken()
+    window.addEventListener('token-refreshed', handleTokenRefresh)
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('token-refreshed', handleTokenRefresh)
+    }
+  }, [])
 
   // Click outside handler
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsProfileOpen(false);
+        setIsProfileOpen(false)
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // ดึงข้อมูลชื่อผู้ใช้จาก token
-  useEffect(() => {
-    const token = localStorage.getItem("token"); // ดึง token จาก localStorage
-
-    if (token) {
-      try {
-        const decoded: any = jwtDecode(token); // decode JWT token
-        const { name } = decoded; // ดึงข้อมูลจาก decoded token
-
-        setUserName(name || "Guest"); // ตั้งค่าชื่อผู้ใช้จาก token หรือใช้ "Guest" ถ้าไม่มีข้อมูล
-      } catch (error) {
-        console.error("Error decoding token:", error);
-      }
-    }
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Close dropdown when clicking menu items
   const handleMenuClick = () => {
-    setIsProfileOpen(false);
-  };
-
+    setIsProfileOpen(false)
+  }
+  
+  // ฟังก์ชันสำหรับออกจากระบบ
   const handleSignOut = () => {
-    // ลบข้อมูลจาก localStorage
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-
-    // นำทางไปหน้า login
-    navigate('/login');
-  };
+    localStorage.removeItem('token')
+    window.location.href = '/login'
+  }
 
   return (
     <header className="flex-shrink-0 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-      <div className="flex items-center justify-between h-16 px-4">
+      <div className="flex items-center justify-end h-16 px-4">
         {/* Search */}
+        {/* Left side 
         <div className="flex-1 flex justify-start">
           <div className="w-full max-w-md">
             <div className="relative">
@@ -74,16 +97,18 @@ export default function TopBar() {
             </div>
           </div>
         </div>
-
+        */}
         {/* Right side */}
         <div className="flex items-center space-x-4">
-          <DarkSwitch />
+          <DarkSwitch variant="dark" />
           
           {/* Notifications */}
+          {/*
           <button className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
             <span className="sr-only">Notifications</span>
             <BellIcon className="w-6 h-6" />
           </button>
+          */}
 
           {/* Profile dropdown */}
           <div className="relative" ref={dropdownRef}>
@@ -92,12 +117,16 @@ export default function TopBar() {
               className="flex items-center space-x-2 mr-2"
             >
               <img
-                className="w-8 h-8 rounded-full"
-                src="/images/avatar.avif"
-                alt=""
+                className="w-8 h-8 rounded-full object-cover"
+                src={userImage}
+                alt="User profile"
+                onError={(e) => {
+                  // ถ้าโหลดรูปไม่สำเร็จ ให้ใช้รูป default
+                  e.currentTarget.src = 'https://episstorageblob.blob.core.windows.net/profile/defaultProfileImage.jpg'
+                }}
               />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {userName !== '' ? userName : 'Loading...'}
+                {userName}
               </span>
             </button>
 
@@ -110,17 +139,16 @@ export default function TopBar() {
                 >
                   Your Profile
                 </Link>
-                <Link
+                {/* <Link
                   to="/admin/settings"
                   onClick={handleMenuClick}
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   Settings
-                  </Link>
-                {/* Sign out button */}
+                </Link> */}
                 <button
                   onClick={handleSignOut}
-                  className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 w-full text-left"
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   Sign out
                 </button>
@@ -169,4 +197,4 @@ function BellIcon(props: IconProps) {
       />
     </svg>
   )
-} 
+}
