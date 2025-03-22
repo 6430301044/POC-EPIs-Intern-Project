@@ -208,6 +208,13 @@ export default function Team() {
         title='Team Management'
         align='center'
       />
+      {!canEdit && (
+        <Box sx={{ mt: 2, p: 2, bgcolor: '#fff9c4', borderRadius: 1, textAlign: 'center' }}>
+          <Typography variant="body2" color="warning.dark">
+            คุณกำลังดูข้อมูลในโหมดอ่านอย่างเดียว เนื่องจากคุณไม่มีสิทธิ์ในการแก้ไขข้อมูลผู้ใช้
+          </Typography>
+        </Box>
+      )}
       <Box
         m="40px 0 0 0"
         height="75vh"
@@ -262,6 +269,11 @@ export default function Team() {
               },
             }}
             pageSizeOptions={[5, 10, 25, 50]}
+            sx={{
+              '& .MuiDataGrid-row': {
+                cursor: canEdit ? 'pointer' : 'default',
+              },
+            }}
           />
         )}
       </Box>

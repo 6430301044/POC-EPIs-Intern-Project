@@ -23,9 +23,8 @@ export const uploadReferenceCSV = async (req: Request, res: Response) => {
         
         // Get the authenticated user's ID from the request object
         const userId = (req as any).user?.userId;
-        const userName = (req as any).user?.userName || "Unknown User";
 
-        const result = await parseCSV(req.file.path, tableName, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype, userId, userName);
+        const result = await parseCSV(req.file.path, tableName, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype, userId);
         res.status(200).json({ message: "อัปโหลดสำเร็จ รอการอนุมัติ", data: result });
 
     } catch (error) {
@@ -51,9 +50,8 @@ export const uploadReferenceExcel = async (req: Request, res: Response) => {
         }
 
         const userId = (req as any).user?.userId;
-        const userName = (req as any).user?.userName || "Unknown User";
         
-        const result = await parseExcel(req.file.path, tableName, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype, userId, userName);
+        const result = await parseExcel(req.file.path, tableName, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype, userId);
         res.status(200).json({ message: "อัปโหลดสำเร็จ รอการอนุมัติ", data: result });
 
     } catch (error) {
@@ -65,7 +63,7 @@ export const uploadReferenceExcel = async (req: Request, res: Response) => {
 /**
  * Parse CSV file for Reference Table data
  */
-const parseCSV = async (filePath: string, tableName: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number, userName: string) => {
+const parseCSV = async (filePath: string, tableName: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
     return new Promise((resolve, reject) => {
         const results: any[] = [];
 
@@ -77,7 +75,7 @@ const parseCSV = async (filePath: string, tableName: string, originalFilename: s
             .on("end", async () => {
                 try {
                     // Save data to pending approval table instead of directly to reference table
-                    const savedData = await saveToPendingApproval(results, tableName, originalFilename, systemFilename, fileSize, mimeType, userId, userName);
+                    const savedData = await saveToPendingApproval(results, tableName, originalFilename, systemFilename, fileSize, mimeType, userId);
                     
                     // We'll keep the file for approval process
                     // Move the file to a permanent location for later processing
@@ -108,7 +106,7 @@ const parseCSV = async (filePath: string, tableName: string, originalFilename: s
 /**
  * Parse Excel file for Reference Table data
  */
-const parseExcel = async (filePath: string, tableName: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number, userName: string) => {
+const parseExcel = async (filePath: string, tableName: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
     return new Promise((resolve, reject) => {
         try {
             // Read the Excel file
@@ -122,7 +120,7 @@ const parseExcel = async (filePath: string, tableName: string, originalFilename:
             const results = XLSX.utils.sheet_to_json(worksheet);
             
             // Save data to pending approval table instead of directly to reference table
-            saveToPendingApproval(results, tableName, originalFilename, systemFilename, fileSize, mimeType, userId, userName)
+            saveToPendingApproval(results, tableName, originalFilename, systemFilename, fileSize, mimeType, userId)
                 .then((savedData) => {
                     // We'll keep the file for approval process
                     // Move the file to a permanent location for later processing
@@ -165,7 +163,7 @@ const validateTableName = (tableName: string): boolean => {
 /**
  * Save data to pending approval table instead of directly to reference table
  */
-const saveToPendingApproval = async (data: any[], tableName: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number, userName: string) => {
+const saveToPendingApproval = async (data: any[], tableName: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
     if (!data || data.length === 0) {
         throw new Error("ไม่พบข้อมูลในไฟล์");
     }
@@ -194,15 +192,7 @@ const saveToPendingApproval = async (data: any[], tableName: string, originalFil
 
         const validColumns = schemaResult.recordset.map(col => col.COLUMN_NAME);
         
-        // Log upload activity
-        await pool.request()
-            .input("userId", userId)
-            .input("action", `Reference data upload to ${tableName} (pending approval)`)
-            .input("details", `Uploaded ${data.length} records from ${originalFilename} (pending approval)`)
-            .query(`
-                INSERT INTO dbo.UserActivity (user_id, action_type, action_details, action_timestamp)
-                VALUES (@userId, @action, @details, GETDATE())
-            `);
+        // UserActivity logging removed as the table does not exist
         
         // Save the parsed data as JSON string
         const parsedData = JSON.stringify(data);
@@ -214,25 +204,18 @@ const saveToPendingApproval = async (data: any[], tableName: string, originalFil
             .input("fileSize", fileSize)
             .input("mimeType", mimeType)
             .input("uploadedBy", userId)
-            .input("uploadedByName", userName)
-            .input("targetTable", tableName)
-            .input("parsedData", parsedData)
-            .input("columnMapping", JSON.stringify(validColumns.reduce((obj, col) => ({ ...obj, [col]: col }), {})))
             .query(`
-                INSERT INTO dbo.ReferenceDataPendingApproval (
-                    filename, system_filename, file_size, mime_type, 
-                    uploaded_by, uploaded_by_name, upload_date, status, 
-                    target_table, parsed_data, column_mapping
+                INSERT INTO dbo.UploadedFiles (
+                    filename, uploaded_by, upload_date, status
                 )
                 VALUES (
-                    @filename, @systemFilename, @fileSize, @mimeType,
-                    @uploadedBy, @uploadedByName, GETDATE(), 'รอการอนุมัติ',
-                    @targetTable, @parsedData, @columnMapping
+                    @filename, @uploadedBy, GETDATE(), 'รอการอนุมัติ'
                 );
                 SELECT SCOPE_IDENTITY() AS upload_id;
             `);
         
         const uploadId = uploadResult.recordset[0].upload_id;
+        console.log(`Created upload record with ID: ${uploadId}`);
 
         // Validate data and count valid/invalid rows
         let validCount = 0;

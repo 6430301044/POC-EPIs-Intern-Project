@@ -80,9 +80,13 @@ export default function Approval() {
       const data = await response.json();
       setPendingApprovals(data.data || []);
     } catch (error) {
-      // ปรับปรุงข้อความแจ้งเตือนให้เป็นมิตรกับผู้ใช้มากขึ้น
+      // แสดง toast เมื่อเกิดข้อผิดพลาดในการดึงข้อมูล
       console.error("Error fetching pending approvals:", error);
-      // ไม่แสดง toast เมื่อไม่มีข้อมูล เพราะจะแสดงข้อความในหน้าจออยู่แล้ว
+      showToast(
+        "Error",
+        "ไม่สามารถดึงข้อมูลได้ กรุณาลองใหม่อีกครั้ง",
+        "error"
+      );
     } finally {
       setLoading(false);
     }

@@ -63,7 +63,8 @@ const DataPreviewModal: React.FC<DataPreviewModalProps> = ({ uploadId, isOpen, o
         if (response.status === 401) {
           throw new Error('Session expired. Please log in again.');
         }
-        throw new Error('Failed to fetch preview data');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch preview data');
       }
 
       const data = await response.json();

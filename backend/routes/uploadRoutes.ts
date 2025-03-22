@@ -69,7 +69,7 @@ router.post("/upload-reference-excel", authenticateToken, authorizeRoles(['dev',
 // Reference data approval routes
 router.get("/pending-reference-approvals", authenticateToken, authorizeRoles(['dev', 'approver']), getPendingReferenceApprovals);
 router.get("/preview-reference/:uploadId", authenticateToken, authorizeRoles(['dev', 'approver']), getPreviewReferenceData);
-router.put("/reject-reference/:uploadId", authenticateToken, authorizeRoles(['approver']), rejectReferenceUpload);
-router.put("/approve-reference/:uploadId", authenticateToken, authorizeRoles(['approver']), approveReferenceUpload);
+router.put("/reject-reference/:uploadId", authenticateToken, authorizeRoles(['dev', 'approver']), rejectReferenceUpload);
+router.put("/approve-reference/:uploadId", authenticateToken, authorizeRoles(['dev', 'approver']), approveReferenceUpload);
 
 export default router;
