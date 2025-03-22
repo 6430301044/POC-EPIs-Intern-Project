@@ -2,7 +2,7 @@ import { Container } from "@/components/template/Container";
 import { SectionTitle } from "@/components/template/SectionTitle";
 import { useState, useEffect } from "react";
 import API_BASE_URL from "@/config/apiConfig";
-import DataPreviewModal from "@/components/admin/DataPreviewModal";
+import DataPreviewReference from "@/components/admin/DataPreviewReference";
 
 interface PendingReferenceApproval {
   id: string;
@@ -330,7 +330,7 @@ export default function ReferenceApproval() {
         )}
 
         {/* Data Preview Modal */}
-        <DataPreviewModal
+        <DataPreviewReference
           uploadId={selectedUploadId}
           isOpen={previewModalOpen}
           onClose={handleClosePreviewModal}

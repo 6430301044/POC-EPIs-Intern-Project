@@ -336,17 +336,17 @@ export const getPendingReferenceApprovals = async (req: Request, res: Response) 
         const result = await pool.request()
             .query(`
                 SELECT 
-                    r.upload_id as id,
-                    r.filename as file_name,
-                    r.upload_date,
-                    r.target_table as table_name,
-                    r.uploaded_by_name as uploaded_by
+                    upload_id as id,
+                    filename as file_name,
+                    upload_date,
+                    target_table as table_name,
+                    uploaded_by
                 FROM 
                     dbo.ReferenceDataPendingApproval
                 WHERE 
-                    r.status = 'รอการอนุมัติ'
+                    status = 'รอการอนุมัติ'
                 ORDER BY 
-                    r.upload_date DESC
+                    upload_date DESC
             `);
             
         res.status(200).json({
