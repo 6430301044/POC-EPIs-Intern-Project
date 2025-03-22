@@ -18,23 +18,27 @@ export const getPendingApprovals = async (req: Request, res: Response) => {
                     CASE
                         WHEN s.semiannual = 1 THEN 'ม.ค. - มิ.ย.'
                         WHEN s.semiannual = 2 THEN 'ก.ค. - ธ.ค.'
+                        WHEN u.period_id IS NULL THEN 'ไม่ระบุ'
                         ELSE 'Unknown'
                     END as period_name,
-                    YEAR(d.startDate) as year,
-                    m.mainName as mainCategory,
-                    sb.subName as subCategory,
-                    usr.User_name as uploaded_by
+                    CASE
+                        WHEN d.startDate IS NOT NULL THEN YEAR(d.startDate)
+                        ELSE NULL
+                    END as year,
+                    ISNULL(m.mainName, 'ไม่ระบุ') as mainCategory,
+                    ISNULL(sb.subName, 'ไม่ระบุ') as subCategory,
+                    ISNULL(usr.User_name, 'ไม่ระบุ') as uploaded_by
                 FROM 
                     dbo.UploadedFiles u
-                JOIN 
+                LEFT JOIN 
                     dbo.Daysperiod d ON u.period_id = d.period_id
-                JOIN 
+                LEFT JOIN 
                     dbo.Semiannual s ON d.semiannual_id = s.semiannual_id
-                JOIN 
+                LEFT JOIN 
                     dbo.Mcategories m ON u.main_id = m.main_id
-                JOIN 
+                LEFT JOIN 
                     dbo.SbCategories sb ON u.sub_id = sb.sub_id
-                JOIN 
+                LEFT JOIN 
                     dbo.Users usr ON u.uploaded_by = usr.User_id
                 WHERE 
                     u.status = 'รอการอนุมัติ'

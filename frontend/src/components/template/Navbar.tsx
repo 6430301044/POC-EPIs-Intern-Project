@@ -41,7 +41,7 @@ export default function Navbar() {
     { name: "เกี่ยวกับเรา", id: "#about" },
     { name: "ข้อมูลสิ่งแวดล้อม", id: "/environment" },
     { name: "ข่าวสารและกิจกรรม", id: "/news" },
-    { name: "ตารางข้อมูลสิ่งแวดล้อม", id: "/data" },
+    { name: "ตารางข้อมูลสิ่งแวดล้อม", id: "/environment-data" },
     { name: "ติดต่อเรา", id: "/contact" },
   ];
 

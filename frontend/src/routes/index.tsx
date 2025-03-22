@@ -32,6 +32,7 @@ import Contact from "@/pages/ContactUs";
 import ReferenceDataUpload from "@/pages/admin/ReferenceDataUpload";
 import UploadCenter from "@/pages/admin/UploadCenter";
 import BulkDataDeletion from "@/pages/admin/BulkDataDeletion";
+import NewsPage from "@/pages/NewsPage";
 
 
 const router = createBrowserRouter([
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
         element: <Legal />,
       },
       {
+        path: "/news",
+        element: <NewsPage />, 
+      },
+      {
         path: "/news/:id",
         element: <NewsDetail />,
       },
@@ -64,7 +69,7 @@ const router = createBrowserRouter([
         element: <TestAPICall />
       },
       {
-        path: "/data",
+        path: "/environment-data",
         element: <Data />,
       },
       {
