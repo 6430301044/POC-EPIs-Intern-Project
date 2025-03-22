@@ -46,12 +46,8 @@ export default function NewsPage() {
 
   return (
     <>
-<<<<<<< HEAD
-    <section className="relative w-full min-h-[760px] overflow-x-auto flex flex-col md:flex-row items-center justify-center px-4 md:px-[192px]"style={{
-=======
     {/* Breadcrumb Section */}
     <section className="relative w-full min-h-[670px] overflow-x-auto flex flex-col md:flex-row items-center justify-center px-4 md:px-[192px]"style={{
->>>>>>> parent of c1207f4 (ตกแต่งหน้าเมนูต่างๆ)
         backgroundImage: 'url("/images/PTT_Terminal.jpg")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
