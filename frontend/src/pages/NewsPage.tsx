@@ -46,7 +46,6 @@ export default function NewsPage() {
 
   return (
     <>
-    {/* Breadcrumb Section */}
     <section className="relative w-full min-h-[760px] overflow-x-auto flex flex-col md:flex-row items-center justify-center px-4 md:px-[192px]"style={{
         backgroundImage: 'url("/images/PTT_Terminal.jpg")',
         backgroundSize: 'cover',

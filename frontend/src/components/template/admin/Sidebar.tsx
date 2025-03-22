@@ -22,11 +22,11 @@ export default function Sidebar() {
     // { name: 'Calendar', path: '/admin/calendar', icon: CalendarIcon },
     // { name: 'Documents', path: '/admin/documents', icon: DocumentIcon },
     // { name: 'Reports', path: '/admin/reports', icon: ReportIcon },
-    { name: 'Upload Center', path: '/admin/upload-center', icon: UploadIcon },
-    { name: 'Approval Center', path: '/admin/approval-center', icon: ApprovalIcon },
-    { name: 'Data Management', path: '/admin/data-management', icon: DataIcon },
+    // { name: 'Upload Center', path: '/admin/upload-center', icon: UploadIcon },
+    // // { name: 'Approval Center', path: '/admin/approval-center', icon: ApprovalIcon },
+    // { name: 'Data Management', path: '/admin/data-management', icon: DataIcon },
     { name: 'Bulk Data Deletion', path: '/admin/bulk-data-deletion', icon: TrashIcon },
-    { name: 'News', path: '/admin/news', icon: ReportIcon },
+    // { name: 'News', path: '/admin/news', icon: ReportIcon },
   ]
 
   // const teams = [

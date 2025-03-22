@@ -25,7 +25,7 @@ import Visualization from "@/components/main/Visualization";
 // import Approval from "@/pages/admin/Approval";
 import ApproveMain from "@/pages/admin/ApproveMain";
 import NewsPage from "@/pages/NewsPage";
-import InfoTerminal from "@/pages/InfoTerminal";
+
 
 
 const router = createBrowserRouter([
@@ -65,10 +65,6 @@ const router = createBrowserRouter([
         path: "/news",
         element: <NewsPage />,
       },
-      {
-        path: "/terminalInfo",
-        element: <InfoTerminal />,
-      }
     ],
   },
   {
