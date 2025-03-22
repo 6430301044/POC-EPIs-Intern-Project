@@ -16,7 +16,7 @@ export const updateUser = async (req: Request, res: Response) => {
     // Check if user exists
     const userCheck = await pool.request()
       .input('userId', userId)
-      .query('SELECT User_id FROM dbo.Users WHERE User_id = @userId');
+      .query('SELECT User_id, User_email FROM dbo.Users WHERE User_id = @userId');
       
     if (userCheck.recordset.length === 0) {
       return res.status(404).json({
@@ -24,6 +24,9 @@ export const updateUser = async (req: Request, res: Response) => {
         message: 'User not found'
       });
     }
+    
+    // Get the user's email for later use with Register table
+    const userEmail = userCheck.recordset[0].User_email;
     
     // Build the update query dynamically based on provided fields
     let updateQuery = 'UPDATE dbo.Users SET ';
@@ -112,7 +115,7 @@ export const deleteUser = async (req: Request, res: Response) => {
     // Check if user exists
     const userCheck = await pool.request()
       .input('userId', userId)
-      .query('SELECT User_id FROM dbo.Users WHERE User_id = @userId');
+      .query('SELECT User_id, User_email FROM dbo.Users WHERE User_id = @userId');
       
     if (userCheck.recordset.length === 0) {
       return res.status(404).json({
@@ -120,6 +123,9 @@ export const deleteUser = async (req: Request, res: Response) => {
         message: 'User not found'
       });
     }
+    
+    // Get the user's email for later use with Register table
+    const userEmail = userCheck.recordset[0].User_email;
     
     // Begin transaction
     const transaction = pool.transaction();
@@ -144,6 +150,19 @@ export const deleteUser = async (req: Request, res: Response) => {
         // await transaction.request()
         //   .input('userId', userId)
         //   .query('DELETE FROM dbo.UploadedFiles WHERE uploaded_by = @userId');
+      }
+      
+      // Check if user exists in Register table
+      const registerCheck = await transaction.request()
+        .input('userEmail', userEmail)
+        .query('SELECT Register_id FROM dbo.Register WHERE User_email = @userEmail');
+      
+      // If user exists in Register table, delete the record
+      if (registerCheck.recordset.length > 0) {
+        const registerId = registerCheck.recordset[0].Register_id;
+        await transaction.request()
+          .input('registerId', registerId)
+          .query('DELETE FROM dbo.Register WHERE Register_id = @registerId');
       }
       
       // Now delete the user

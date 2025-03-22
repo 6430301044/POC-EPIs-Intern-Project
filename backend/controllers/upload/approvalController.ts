@@ -264,7 +264,7 @@ export const rejectReferenceUpload = async (req: Request, res: Response) => {
             // Check if the upload exists and is pending approval
             const checkResult = await transaction.request()
                 .input("uploadId", uploadId)
-                .query(`SELECT upload_id, filename, system_filename FROM dbo.ReferenceDataPendingApproval WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'`);
+                .query(`SELECT upload_id, filename FROM dbo.ReferenceDataPendingApproval WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'`);
                 
             if (checkResult.recordset.length === 0) {
                 return res.status(404).json({
@@ -291,16 +291,9 @@ export const rejectReferenceUpload = async (req: Request, res: Response) => {
             // Commit transaction
             await transaction.commit();
             
-            // Try to delete the uploaded file
-            try {
-                const filePath = path.join(__dirname, '../../../uploads/reference', fileInfo.system_filename);
-                if (fs.existsSync(filePath)) {
-                    fs.unlinkSync(filePath);
-                }
-            } catch (fileError) {
-                console.error("Error deleting rejected file:", fileError);
-                // Continue even if file deletion fails
-            }
+            // Note: We can't delete the file since system_filename doesn't exist in the database
+            // If file deletion is needed, we would need to add the system_filename column to the database
+            console.log("File rejection completed for upload ID:", uploadId);
             
             res.status(200).json({
                 success: true,
@@ -456,7 +449,7 @@ export const approveReferenceUpload = async (req: Request, res: Response) => {
                 .input("uploadId", uploadId)
                 .query(`
                     SELECT 
-                        upload_id, filename, system_filename, target_table, 
+                        upload_id, filename, target_table, 
                         parsed_data
                     FROM dbo.ReferenceDataPendingApproval 
                     WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'

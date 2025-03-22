@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "news_id": 2,
+    "image_url": "https://episstorageblob.blob.core.windows.net/newsimage/8c1aa0ef-324e-4af9-ba9d-815ebab08108.png",
+    "created_at": "2025-03-17T07:12:41.4"
+  },
+  {
+    "id": 2,
+    "news_id": 3,
+    "image_url": "https://episstorageblob.blob.core.windows.net/newsimage/3cd9d2af-2f77-4467-88d5-e19b81096178.png",
+    "created_at": "2025-03-17T07:45:56"
+  },
+  {
+    "id": 3,
+    "news_id": 3,
+    "image_url": "https://episstorageblob.blob.core.windows.net/newsimage/a9f7a092-1ab7-4e5a-a6c1-cccc1c4dbf69.png",
+    "created_at": "2025-03-17T07:45:56.073"
+  },
+  {
+    "id": 4,
+    "news_id": 4,
+    "image_url": "https://episstorageblob.blob.core.windows.net/newsimage/c845fc2e-bfe1-47d8-80f1-73c9e1efaf16.png",
+    "created_at": "2025-03-17T07:48:00.43"
+  },
+  {
+    "id": 5,
+    "news_id": 5,
+    "image_url": "https://episstorageblob.blob.core.windows.net/newsimage/3097006a-527e-43d9-8fda-ab7572a2ed92.png",
+    "created_at": "2025-03-17T07:59:00.34"
+  },
+  {
+    "id": 6,
+    "news_id": 5,
+    "image_url": "https://episstorageblob.blob.core.windows.net/newsimage/9a138064-173f-4b47-aef0-2056f1b4af0f.png",
+    "created_at": "2025-03-17T07:59:00.407"
+  },
+  {
+    "id": 7,
+    "news_id": 6,
+    "image_url": "https://episstorageblob.blob.core.windows.net/newsimage/c589b8ae-7562-42ff-b96f-9d92e4ee2c2e.png",
+    "created_at": "2025-03-17T08:00:10.623"
+  },
+  {
+    "id": 8,
+    "news_id": 7,
+    "image_url": "https://episstorageblob.blob.core.windows.net/newsimage/6f94f636-df8d-473c-aacf-ad78e41aa49b.png",
+    "created_at": "2025-03-17T08:05:59.683"
+  },
+  {
+    "id": 9,
+    "news_id": 7,
+    "image_url": "https://episstorageblob.blob.core.windows.net/newsimage/76a0cf52-5795-4d44-a110-5d73a0b5adda.png",
+    "created_at": "2025-03-17T08:05:59.757"
+  },
+  {
+    "id": 10,
+    "news_id": 8,
+    "image_url": "https://episstorageblob.blob.core.windows.net/newsimage/04f9ec0a-c3f8-4c57-99ec-a63e797f2ac7.png",
+    "created_at": "2025-03-17T09:40:54.057"
+  }
+]

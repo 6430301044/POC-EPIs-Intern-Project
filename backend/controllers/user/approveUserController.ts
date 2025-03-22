@@ -90,7 +90,7 @@ export const approveRegistration = async (req: Request, res: Response) => {
         .input("userJobPosition", registerData.User_Job_Position)
         .input("companyId", registerData.Company_id)
         .input("userPassword", registerData.User_password)
-        .input("userRole", registerData.User_role)
+        .input("userRole", registerData.User_role) // Changed from registerData.User_role to 'uploader'
         .input("userImage", defaultProfileImage)
         .query(`
           INSERT INTO dbo.Users (

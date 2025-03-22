@@ -1,5 +1,5 @@
-station_id,parameter,unit,day1st_result,day2nd_result,day3rd_result,std
-1,TSP,mg/m3,0.0140,0.0100,0.0120,0.3300
-1,PM-10,mg/m3,0.0110,0.0080,0.0080,0.1200
-1,SO2,ppm,0.0066,0.0066,0.0067,0.3000
-1,SO2,ppm,0.0078,0.0081,0.0082,0.1200
+station_id,parameter,unit,day1st_result,day2nd_result,day3rd_result,std,company_id,reportBy
+1,TSP,mg/m3,0.0140,0.0100,0.0120,0.3300,1,1
+1,PM-10,mg/m3,0.0110,0.0080,0.0080,0.1200,1,1
+1,SO2,ppm,0.0066,0.0066,0.0067,0.3000,1,1
+1,SO2,ppm,0.0078,0.0081,0.0082,0.1200,1,1

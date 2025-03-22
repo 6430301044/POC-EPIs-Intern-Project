@@ -181,33 +181,33 @@
     - company_id (int): รหัสบริษัทตรวจวัด
     - reportBy (int): รหัสบริษัททำรายงาน
 
- [dbo].[Enh_WDWS_Calm]
+ [dbo].[EnhanceWDWS]
     [station_id] INT            NULL,
     [indexName]  NVARCHAR (MAX) NULL,
     [calmValue]  DECIMAL (6, 4) NULL,
 
-[dbo].[Enh_SO2] 
+[dbo].[EnhanceSO2] 
     [station_id]      INT            NULL,
     [indexName] NVARCHAR (MAX) NULL,
     [day1st_result_ppm] DECIMAL (6, 4) NULL,
     [day2nd_result_ppm] DECIMAL (6, 4) NULL,
     [day3rd_result_ppm] DECIMAL (6, 4) NULL,
 
-[dbo].[Enh_NoiseLevelNormal] 
+[dbo].[EnhanceNoiseLevelNormal]
     [station_id]      INT            NULL,
     [indexName] NVARCHAR (MAX) NULL,
     [day1st_result]    DECIMAL (4, 1) NULL,
     [day2nd_result]    DECIMAL (4, 1) NULL,
     [day3rd_result]    DECIMAL (4, 1) NULL,
 
-[dbo].[Enh_NoiseLevel90_Average] 
+[dbo].[EnhanceNoiseLevel90] 
     [station_id]      INT            NULL,
     [indexName] NVARCHAR (MAX) NULL,
     [day1st_result]    DECIMAL (4, 1) NULL,
     [day2nd_result]    DECIMAL (4, 1) NULL,
     [day3rd_result]    DECIMAL (4, 1) NULL,
 
-[dbo].[Enh_Monitorresult] 
+[dbo].[EnhanceMonitorresult] 
     [station_id]      INT            NULL,
     [indexName] NVARCHAR (MAX) NULL,
     [day1st_Leq]       DECIMAL (4, 1) NULL,
@@ -217,27 +217,27 @@
     [day3rd_Leq]       DECIMAL (4, 1) NULL,
     [day3rd_L90]       DECIMAL (4, 1) NULL,
 
-[dbo].[Enh_PlanktonPhytos] 
+[dbo].[EnhancePlanktonPhytos] 
     [station_id]      INT            NULL,
     [indexName] NVARCHAR (MAX) NULL,
     [quantity_per_m3] FLOAT (53)     NULL,
 
-[dbo].[Enh_PlanktonZoos] 
+[dbo].[EnhancePlanktonZoos] 
     [station_id]      INT            NULL,
     [indexName] NVARCHAR (MAX) NULL,
     [quantity_per_m3] FLOAT (53)     NULL,
 
-[dbo].[Enh_Benthos] 
+[dbo].[EnhanceBenthos] 
     [station_id]      INT            NULL,
     [indexName] NVARCHAR (MAX) NULL,
     [quantity_per_m2] FLOAT (53)     NULL,
 
-[dbo].[Enh_FishLarvaeEggs] 
+[dbo].[EnhanceFishLarvaeEggs] 
     [station_id]      INT            NULL,
     [indexName] NVARCHAR (MAX) NULL,
     [quantity_per_1000m3] FLOAT (53)     NULL,
 
-[dbo].[Enh_JuvenileAquaticAnimals] 
+[dbo].[EnhanceJuvenileAquaticAnimals] 
     [station_id]      INT            NULL,
     [indexName] NVARCHAR (MAX) NULL,
     [quantity_per_1000m3] FLOAT (53)     NULL,
