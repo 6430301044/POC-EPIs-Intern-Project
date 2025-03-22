@@ -622,3 +622,16 @@ CREATE TABLE [dbo].[Enh_JuvenileAquaticAnimals] (
     CONSTRAINT [FK_Enh_JuvenileAquaticAnimals_Daysperiod] FOREIGN KEY ([period_id]) REFERENCES [dbo].[Daysperiod] ([period_id]),
     CONSTRAINT [FK_Enh_JuvenileAquaticAnimals_Monitoring_Station] FOREIGN KEY ([station_id]) REFERENCES [dbo].[Monitoring_Station] ([station_id])
 );
+
+CREATE TABLE [dbo].[ReferenceDataPendingApproval] (
+    [upload_id]    INT            IDENTITY (1, 1) NOT NULL,
+    [filename]     NVARCHAR (255) NOT NULL,
+    [target_table] NVARCHAR (255) NOT NULL,
+    [parsed_data]   NVARCHAR(MAX) NULL,
+    [upload_date]  DATETIME       DEFAULT (getdate()) NULL,
+    [uploaded_by]  INT            NOT NULL,
+    [status]       NVARCHAR (50)  DEFAULT ('รอการอนุมัติ') NULL,
+    [record_count] INT            DEFAULT ((0)) NULL,
+    CONSTRAINT [PK_ReferenceDataPendingApproval] PRIMARY KEY CLUSTERED ([upload_id] ASC),
+    CONSTRAINT [FK_ReferenceDataPendingApproval_Users] FOREIGN KEY ([uploaded_by]) REFERENCES [dbo].[Users] ([User_id])
+);
