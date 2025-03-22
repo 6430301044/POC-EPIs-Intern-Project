@@ -97,9 +97,8 @@ export const approveUpload = async (req: Request, res: Response) => {
             const uploadData = uploadResult.recordset[0];
             const parsedData = JSON.parse(uploadData.parsed_data || '[]');
             const targetTable = uploadData.target_table;
-            const columnMapping = JSON.parse(uploadData.column_mapping || '{}');
             
-            if (!parsedData.length || !targetTable || !columnMapping) {
+            if (!parsedData.length || !targetTable) {
                 throw new Error("ข้อมูลไม่ครบถ้วนสำหรับการอนุมัติ");
             }
             
@@ -383,7 +382,7 @@ export const getPreviewReferenceData = async (req: Request, res: Response) => {
             .query(`
                 SELECT 
                     upload_id, filename, target_table, 
-                    parsed_data, column_mapping
+                    parsed_data
                 FROM dbo.ReferenceDataPendingApproval 
                 WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'
             `);
@@ -458,7 +457,7 @@ export const approveReferenceUpload = async (req: Request, res: Response) => {
                 .query(`
                     SELECT 
                         upload_id, filename, system_filename, target_table, 
-                        parsed_data, column_mapping
+                        parsed_data
                     FROM dbo.ReferenceDataPendingApproval 
                     WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'
                 `);
@@ -473,9 +472,8 @@ export const approveReferenceUpload = async (req: Request, res: Response) => {
             const uploadData = uploadResult.recordset[0];
             const parsedData = JSON.parse(uploadData.parsed_data || '[]');
             const targetTable = uploadData.target_table;
-            const columnMapping = JSON.parse(uploadData.column_mapping || '{}');
             
-            if (!parsedData.length || !targetTable || !columnMapping) {
+            if (!parsedData.length || !targetTable) {
                 throw new Error("ข้อมูลไม่ครบถ้วนสำหรับการอนุมัติ");
             }
             
