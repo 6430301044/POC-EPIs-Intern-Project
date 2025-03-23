@@ -58,11 +58,12 @@ export default function DataManagement() {
   const fetchPeriods = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      
       const response = await fetch(`${API_BASE_URL}/upload/periods`,{
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include' // ส่ง cookies ไปด้วย
       });
       
       if (!response.ok) {
@@ -83,11 +84,11 @@ export default function DataManagement() {
   const fetchAvailableTables = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE_URL}/upload/available-tables`,{
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include' // ส่ง cookies ไปด้วย
       });
       
       if (!response.ok) {

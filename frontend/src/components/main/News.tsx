@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Container } from "@/components/template/Container"; // Component สำหรับ Layout
 import { SectionTitle } from "@/components/template/SectionTitle"; // Title Section
+import API_BASE_URL from "@/config/apiConfig";
 
 interface News {
   id: number;
@@ -21,7 +22,7 @@ export default function NewsPage() {
   const fetchNews = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/news"); // URL ของ API ที่ใช้ดึงข้อมูลข่าวสาร
+      const response = await fetch(`${API_BASE_URL}/news`); // URL ของ API ที่ใช้ดึงข้อมูลข่าวสาร
       const data = await response.json();
 
       // ตรวจสอบว่า data เป็นอาเรย์

@@ -6,6 +6,8 @@ import { registerUser } from "../controllers/user/registerController";
 import { getCompanies } from "../controllers/user/companyController";
 import { uploadUserImage, getUserImage } from "../controllers/user/userImageController";
 import { refreshToken } from "../controllers/user/tokenController";
+import { logoutUser } from "../controllers/user/logoutController";
+import { getCurrentUser } from "../controllers/user/userInfoController";
 import { getAllUsers } from "../controllers/user/userController";
 import { authenticateToken, authorizeApperover, authorizeRoles } from "../middleware/authMiddleware";
 import { updateUser, deleteUser } from "../controllers/user/userManagementController";
@@ -24,6 +26,7 @@ const upload = multer({
 router.post("/login", loginUser);
 router.post("/register", registerUser);
 router.get("/companies", getCompanies);
+router.post("/logout", logoutUser); // เพิ่ม route สำหรับ logout
 
 // User registration approval routes - ต้องการสิทธิ์ admin
 router.get("/register/pending", authenticateToken, authorizeApperover, getPendingRegistrations);
@@ -36,6 +39,7 @@ router.get("/image/:user_id", authenticateToken, getUserImage);
 
 // Token routes
 router.post("/token/refresh", authenticateToken, refreshToken);
+router.get("/me", authenticateToken, getCurrentUser);
 
 // User management routes
 router.get("/all", authenticateToken, authorizeRoles(['approver', 'dev']), getAllUsers);

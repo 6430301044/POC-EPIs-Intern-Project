@@ -615,6 +615,7 @@ export default function Upload() {
         headers: {
           'Authorization': `Bearer ${token}`
         },
+        credentials: 'include', // ส่ง cookies ไปด้วย
         body: formData,
       });
 

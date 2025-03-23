@@ -3,8 +3,14 @@ import jwt from 'jsonwebtoken';
 
 // ตรวจสอบ token ว่าถูกต้องหรือไม่
 export function authenticateToken(req: Request, res: Response, next: NextFunction) {
+    // ตรวจสอบ token จาก cookie ก่อน
+    const tokenFromCookie = req.cookies?.token;
+    
+    // ถ้าไม่มี token ใน cookie ให้ตรวจสอบจาก Authorization header (สำหรับการเปลี่ยนผ่าน)
     const authHeader = req.header('Authorization');
-    const token = authHeader && authHeader.split(' ')[1]; // รองรับรูปแบบ Bearer token
+    const tokenFromHeader = authHeader && authHeader.split(' ')[1]; // รองรับรูปแบบ Bearer token
+    
+    const token = tokenFromCookie || tokenFromHeader;
     
     if (!token) return res.status(401).json({ message: "Access Denied: No token provided" });
 

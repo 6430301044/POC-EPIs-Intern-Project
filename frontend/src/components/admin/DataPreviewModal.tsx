@@ -46,17 +46,12 @@ const DataPreviewModal: React.FC<DataPreviewModalProps> = ({ uploadId, isOpen, o
       setLoading(true);
       setError(null);
       
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found. Please log in again.');
-      }
-      
       const response = await fetch(`${API_BASE_URL}/upload/preview/${id}`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include' // ส่ง cookies ไปด้วย
       });
 
       if (!response.ok) {

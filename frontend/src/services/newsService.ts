@@ -74,18 +74,12 @@ export const fetchNewsById = async (id: number): Promise<NewsItem> => {
  */
 export const deleteNewsById = async (id: number): Promise<{success: boolean; message: string; data?: any}> => {
   try {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      throw new Error('Authentication token not found');
-    }
-    
     const response = await fetch(`${API_BASE_URL}/news/${id}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include' // ส่ง cookies ไปด้วย
     });
     
     if (!response.ok) {

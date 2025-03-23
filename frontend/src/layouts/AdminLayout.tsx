@@ -1,10 +1,13 @@
 import Sidebar from "@/components/template/admin/Sidebar";
 import TopBar from "@/components/template/admin/TopBar";
-import { Outlet, Navigate } from "react-router";
+import { Outlet, Navigate, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import { isAuthenticated, isTokenExpired, getUserRole } from "@/utils/authUtils";
+import { isAuthenticated, isTokenExpired } from "@/utils/authUtils";
+import { getUserRole } from "@/utils/authUtils";
+import API_BASE_URL from "@/config/apiConfig";
 
 export default function AdminLayout() {
+  const navigate = useNavigate();
   const [authStatus, setAuthStatus] = useState<{ isAuth: boolean; isLoading: boolean }>({ 
     isAuth: false, 
     isLoading: true 
@@ -12,14 +15,15 @@ export default function AdminLayout() {
 
   useEffect(() => {
     // ตรวจสอบ Token เมื่อโหลด component
-    const checkAuth = () => {
+    const checkAuth = async () => {
       // ตรวจสอบว่า token หมดอายุหรือไม่
-      if (isTokenExpired()) {
+      const expired = await isTokenExpired();
+      if (expired) {
         console.log("⏳ Token expired, clearing credentials...");
         localStorage.removeItem("token");
         setAuthStatus({ isAuth: false, isLoading: false });
       } else {
-        const auth = isAuthenticated();
+        const auth = await isAuthenticated();
         setAuthStatus({ isAuth: auth, isLoading: false });
       }
     };
@@ -43,6 +47,20 @@ export default function AdminLayout() {
       window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
+  
+  // ฟังก์ชันสำหรับตรวจสอบการหมดอายุของ Token
+  const checkTokenExpiration = async () => {
+    try {
+      const expired = await isTokenExpired();
+      if (expired) {
+        // ไม่ต้องลบ token จาก localStorage เพราะใช้ HttpOnly Cookie แล้ว
+        navigate("/login"); // Redirect ไปหน้า Login
+      }
+    } catch (error) {
+      console.error("Error checking token expiration:", error);
+      navigate("/login"); // Redirect ไปหน้า Login ในกรณีที่มี error
+    }
+  };
 
   // แสดง loading ระหว่างตรวจสอบ token
   if (authStatus.isLoading) {

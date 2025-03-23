@@ -5,7 +5,8 @@ import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router"
 import API_BASE_URL from '@/config/apiConfig';
 import { Eye, EyeOff } from "lucide-react";
-import { isAuthenticated, isTokenExpired, getDecodedToken } from "@/utils/authUtils";
+import { isAuthenticated, isTokenExpired } from "@/utils/authUtils";
+import { getDecodedToken } from "@/utils/authUtils";
 
 export default function Login() {
 
@@ -19,32 +20,29 @@ export default function Login() {
     document.title = "Login | WindReact"
 
     // ตรวจสอบ Token ว่าหมดอายุหรือยัง
-    const checkTokenExpiration = () => {
-      if (isTokenExpired()) {
-        console.log("⏳ Token expired, clearing credentials...");
-        localStorage.removeItem("token");
-        // ไม่ต้อง redirect เพราะอยู่ในหน้า Login อยู่แล้ว
-      } else if (isAuthenticated()) {
-        // ถ้า token ยังไม่หมดอายุและยังใช้งานได้ ให้ redirect ไปหน้า admin
-        navigate("/admin");
+    const checkTokenExpiration = async () => {
+      try {
+        // ตรวจสอบว่ามีการล็อกอินแล้วหรือไม่ก่อนที่จะเรียก API
+        const auth = await isAuthenticated();
+        
+        if (auth) {
+          // ถ้าผู้ใช้ล็อกอินแล้ว ให้ redirect ไปหน้า admin
+          navigate("/admin");
+        }
+        // ไม่ต้องเรียก isTokenExpired() เพราะถ้าไม่มีการล็อกอิน จะทำให้เกิด error 401 โดยไม่จำเป็น
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        // ไม่ต้องทำอะไรเพิ่มเติม เพราะอยู่ในหน้า Login อยู่แล้ว
       }
     }
 
     checkTokenExpiration(); // ตรวจสอบตอนเข้าเว็บ
     const interval = setInterval(checkTokenExpiration, 10 * 1000); // เช็คทุก 10 วินาที
 
-    // กำหนด listener สำหรับการเปลี่ยนแปลงใน localStorage
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === "token") {
-        checkTokenExpiration();
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
+    // เมื่อใช้ HttpOnly Cookie แล้ว ไม่จำเป็นต้องมี listener สำหรับการเปลี่ยนแปลงใน localStorage อีกต่อไป
 
     return () => {
       clearInterval(interval); // ล้าง interval ตอนออกจากหน้า
-      window.removeEventListener("storage", handleStorageChange); // ลบ event listener
     };
   }, [navigate])
 
@@ -58,13 +56,14 @@ export default function Login() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include', // เพิ่ม credentials เพื่อให้ browser ส่ง cookies ไปกับ request
         body: JSON.stringify({ User_email: email, User_password: password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("token", data.token); // เก็บ Token เพียงอย่างเดียว โดยข้อมูล role จะอยู่ใน token
+        // ไม่ต้องเก็บ token ใน localStorage อีกต่อไป เพราะใช้ HttpOnly Cookie แล้ว
         alert("Login successful!");
         navigate("/admin"); // ไปหน้า Dashboard
       } else {

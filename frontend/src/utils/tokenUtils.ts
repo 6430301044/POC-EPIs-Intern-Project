@@ -1,5 +1,6 @@
 import { jwtDecode } from 'jwt-decode';
 import API_BASE_URL from '@/config/apiConfig';
+import { getDecodedToken } from './authUtils';
 
 interface DecodedToken {
   userId: string;
@@ -21,40 +22,30 @@ interface DecodedToken {
  */
 export const refreshTokenWithNewImage = async (imageUrl: string): Promise<boolean> => {
   try {
-    const token = localStorage.getItem('token');
-    if (!token) return false;
-    
-    const decoded = jwtDecode<DecodedToken>(token);
-    if (!decoded || !decoded.userId) return false;
+    // ดึงข้อมูลผู้ใช้ปัจจุบัน
+    const userData = await getDecodedToken();
+    if (!userData || !userData.userId) return false;
     
     // Create a new token with the updated image URL
     const response = await fetch(`${API_BASE_URL}/user/token/refresh`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
+      credentials: 'include', // ส่ง cookies ไปด้วย
       body: JSON.stringify({
-        userId: decoded.userId,
+        userId: userData.userId,
         imageUrl: imageUrl
       })
     });
     
     if (!response.ok) return false;
     
-    const data = await response.json();
-    if (data.token) {
-      localStorage.setItem('token', data.token);
-      
-      // Dispatch a custom event to notify components that the token has been refreshed
-      // This is needed because the 'storage' event only fires for changes from other tabs
-      const tokenRefreshedEvent = new Event('token-refreshed');
-      window.dispatchEvent(tokenRefreshedEvent);
-      
-      return true;
-    }
+    // Dispatch a custom event to notify components that the token has been refreshed
+    const tokenRefreshedEvent = new Event('token-refreshed');
+    window.dispatchEvent(tokenRefreshedEvent);
     
-    return false;
+    return true;
   } catch (error) {
     console.error('Error refreshing token:', error);
     return false;

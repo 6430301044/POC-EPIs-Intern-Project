@@ -40,12 +40,13 @@ export default function ApproveUser() {
   const fetchPendingApprovals = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
       
       const response = await fetch(`${API_BASE_URL}/user/register/pending`, {
+        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include' // ส่ง cookies ไปด้วย
       });
       const data = await response.json();
 
@@ -68,14 +69,13 @@ export default function ApproveUser() {
 
     setProcessingId(Register_id);
     try {
-      const token = localStorage.getItem('token');
       
       const response = await fetch(`${API_BASE_URL}/user/register/approve/${Register_id}`, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
+          "Content-Type": "application/json"
+        },
+        credentials: 'include' // ส่ง cookies ไปด้วย
       });
 
       if (!response.ok) throw new Error("Failed to approve user");
@@ -98,14 +98,13 @@ export default function ApproveUser() {
 
     setProcessingId(Register_id);
     try {
-      const token = localStorage.getItem('token');
       
       const response = await fetch(`${API_BASE_URL}/user/register/reject/${Register_id}`, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
+          "Content-Type": "application/json"
+        },
+        credentials: 'include' // ส่ง cookies ไปด้วย
       });
 
       if (!response.ok) throw new Error("Failed to reject user");

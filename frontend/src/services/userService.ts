@@ -6,15 +6,12 @@ import API_BASE_URL from '@/config/apiConfig';
  */
 export const getAllUsers = async () => {
   try {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('No authentication token found');
-    
     const response = await fetch(`${API_BASE_URL}/user/all`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include' // ส่ง cookies ไปด้วย
     });
     
     if (!response.ok) {
@@ -37,15 +34,12 @@ export const getAllUsers = async () => {
  */
 export const updateUser = async (userId: string, userData: any) => {
   try {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('No authentication token found');
-    
     const response = await fetch(`${API_BASE_URL}/user/${userId}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
+      credentials: 'include', // ส่ง cookies ไปด้วย
       body: JSON.stringify(userData)
     });
     
@@ -68,15 +62,12 @@ export const updateUser = async (userId: string, userData: any) => {
  */
 export const deleteUser = async (userId: string) => {
   try {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('No authentication token found');
-    
     const response = await fetch(`${API_BASE_URL}/user/${userId}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include' // ส่ง cookies ไปด้วย
     });
     
     if (!response.ok) {

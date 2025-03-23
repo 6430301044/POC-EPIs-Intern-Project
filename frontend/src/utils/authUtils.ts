@@ -1,4 +1,5 @@
 import { jwtDecode } from 'jwt-decode';
+import API_BASE_URL from '@/config/apiConfig'
 
 interface DecodedToken {
   userId: string;
@@ -17,15 +18,21 @@ interface DecodedToken {
  * Decodes the JWT token and returns the decoded data
  * @returns The decoded token or null if token is invalid
  */
-export const getDecodedToken = (): DecodedToken | null => {
+export const getDecodedToken = async (): Promise<DecodedToken | null> => {
   try {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
+    // ส่ง request ไปยัง endpoint ที่จะส่งข้อมูลผู้ใช้กลับมา
+    // เนื่องจาก token อยู่ใน HttpOnly Cookie แล้ว เราไม่สามารถอ่านมันได้โดยตรง
+    const response = await fetch(`${API_BASE_URL}/user/me`, {
+      method: 'GET',
+      credentials: 'include' // ส่ง cookies ไปด้วย
+    });
     
-    const decoded = jwtDecode<DecodedToken>(token);
-    return decoded;
+    if (!response.ok) return null;
+    
+    const data = await response.json();
+    return data.user;
   } catch (error) {
-    console.error('Error decoding token:', error);
+    console.error('Error getting user data:', error);
     return null;
   }
 };
@@ -34,8 +41,8 @@ export const getDecodedToken = (): DecodedToken | null => {
  * Gets the user role from the decoded token
  * @returns The user role or null if not available
  */
-export const getUserRole = (): string | null => {
-  const decoded = getDecodedToken();
+export const getUserRole = async (): Promise<string | null> => {
+  const decoded = await getDecodedToken();
   return decoded?.role || null;
 };
 
@@ -44,8 +51,8 @@ export const getUserRole = (): string | null => {
  * @param role The role to check
  * @returns True if user has the role, false otherwise
  */
-export const hasRole = (role: string | string[]): boolean => {
-  const userRole = getUserRole();
+export const hasRole = async (role: string | string[]): Promise<boolean> => {
+  const userRole = await getUserRole();
   if (!userRole) return false;
   
   if (Array.isArray(role)) {
@@ -59,42 +66,61 @@ export const hasRole = (role: string | string[]): boolean => {
  * Checks if the user has edit permission
  * @returns True if user has edit permission
  */
-export const hasEditPermission = (): boolean => {
-  return hasRole(['dev']);
+export const hasEditPermission = async (): Promise<boolean> => {
+  return await hasRole(['dev']);
 };
 
 /**
  * Checks if the user has approve permission
  * @returns True if user has approve permission
  */
-export const hasApprovePermission = (): boolean => {
-  return hasRole(['approver', 'dev']);
+export const hasApprovePermission = async (): Promise<boolean> => {
+  return await hasRole(['approver', 'dev']);
 };
 
 /**
  * Checks if the user has add permission
  * @returns True if user has add permission
  */
-export const hasAddPermission = (): boolean => {
-  return hasRole(['uploader', 'approver', 'dev']);
+export const hasAddPermission = async (): Promise<boolean> => {
+  return await hasRole(['uploader', 'approver', 'dev']);
 };
 
 /**
  * Checks if the token is expired
  * @returns True if token is expired or invalid
  */
-export const isTokenExpired = (): boolean => {
-  const decoded = getDecodedToken();
-  if (!decoded) return true;
-  
-  const currentTime = Date.now() / 1000;
-  return decoded.exp < currentTime;
+export const isTokenExpired = async (): Promise<boolean> => {
+  try {
+    // ส่ง request ไปยัง endpoint เพื่อตรวจสอบว่า token ยังใช้งานได้หรือไม่
+    const response = await fetch(`${API_BASE_URL}/user/me`, {
+      method: 'GET',
+      credentials: 'include' // ส่ง cookies ไปด้วย
+    });
+    
+    // ถ้า response ไม่ ok แสดงว่า token หมดอายุหรือไม่ถูกต้อง
+    return !response.ok;
+  } catch (error) {
+    console.error('Error checking token expiration:', error);
+    return true; // ถือว่าหมดอายุถ้ามี error
+  }
 };
 
 /**
  * Checks if the user is authenticated
  * @returns True if user is authenticated
  */
-export const isAuthenticated = (): boolean => {
-  return !!getDecodedToken() && !isTokenExpired();
+export const isAuthenticated = async (): Promise<boolean> => {
+  try {
+    // ส่ง request ไปยัง endpoint เพื่อตรวจสอบว่า user ยังล็อกอินอยู่หรือไม่
+    const response = await fetch(`${API_BASE_URL}/user/me`, {
+      method: 'GET',
+      credentials: 'include' // ส่ง cookies ไปด้วย
+    });
+    
+    return response.ok;
+  } catch (error) {
+    console.error('Error checking authentication:', error);
+    return false;
+  }
 };

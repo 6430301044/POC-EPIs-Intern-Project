@@ -119,22 +119,20 @@ export default function EnhanceTableUpload() {
       setIsLoadingEnhanceTables(true);
       const token = localStorage.getItem('token');
       
-      // ใช้ข้อมูลจากไฟล์ JSON ที่มีอยู่แล้วในตัวอย่าง
-      // ในการใช้งานจริง ควรมีการเรียก API เพื่อดึงข้อมูล
-      const mockData: EnhanceTable[] = [
-        { enhance_id: 1, enhanceName: "EnhanceWDWS", valueName: "Calm", sub_id: 1 },
-        { enhance_id: 2, enhanceName: "EnhanceSO2", valueName: "ค่าเฉลี่ย 24 ชั่วโมง, ค่าเฉลี่ย 1 ชั่วโมงสูงสุด, ค่าเฉลี่ย 1 ชั่วโมงต่ำสุด", sub_id: 3 },
-        { enhance_id: 3, enhanceName: "EnhanceNoiseLevelNormal", valueName: "Leq(24), Ldn, Lmax", sub_id: 6 },
-        { enhance_id: 4, enhanceName: "EnhanceNoiseLevel90", valueName: "Average", sub_id: 7 },
-        { enhance_id: 5, enhanceName: "EnhanceMonitorresult", valueName: "ค่าต่ำสุด, ค่าสูงสุด", sub_id: 8 },
-        { enhance_id: 6, enhanceName: "EnhancePlanktonPhytos", valueName: "ชนิดของแพลงก์ตอนพืช, ปริมาณแพลงก์ตอนพืช, ดัชนีความหลากหลายแพลงก์ตอนพืช, ดัชนีความสม่ำเสมอแพลงก์ตอนพืช", sub_id: 11 },
-        { enhance_id: 7, enhanceName: "EnhancePlanktonZoo", valueName: "ชนิดของแพลงก์ตอนสัตว์, ปริมาณแพลงก์ตอนสัตว์, ดัชนีความหลากหลายแพลงก์ตอนสัตว์, ดัชนีความสม่ำเสมอแพลงก์ตอนสัตว์", sub_id: 12 },
-        { enhance_id: 8, enhanceName: "EnhanceBenthos", valueName: "ชนิดของสัตว์หน้าดิน, ปริมาณสัตว์หน้าดิน, ค่าดัชนีความหลากหลายสัตว์หน้าดิน", sub_id: 13 },
-        { enhance_id: 9, enhanceName: "EnhanceFishLarvaeEggs", valueName: "กลุ่มของลูกปลา, ปริมาณของลูกปลา, ค่าดัชนีความหลากหลายของลูกปลา, ปริมาณไข่ปลา", sub_id: 14 },
-        { enhance_id: 10, enhanceName: "EnhanceJuvenileAquaticAnimals", valueName: "จำนวนกลุ่มของสัตว์น้ำวัยอ่อนทั้งหมด, ปริมาณของสัตว์น้ำวัยอ่อนทั้งหมด, ค่าดัชนีความหลากหลายของสัตว์น้ำวัยอ่อน", sub_id: 15 }
-      ];
+      const response = await fetch(`${API_BASE_URL}/enhance-table/structure`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
-      setEnhanceTables(mockData);
+      if (!response.ok) {
+        throw new Error("Failed to fetch enhance tables");
+      }
+      
+      const responseData = await response.json();
+      setEnhanceTables(responseData.data || []);
     } catch (error) {
       showToast(
         "Error",
@@ -374,6 +372,7 @@ export default function EnhanceTableUpload() {
         headers: {
           'Authorization': `Bearer ${token}`
         },
+        credentials: 'include', // ส่ง cookies ไปด้วย
         body: formData,
       });
 

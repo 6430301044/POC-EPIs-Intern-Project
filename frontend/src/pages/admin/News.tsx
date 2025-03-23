@@ -66,25 +66,12 @@ export default function NewsUpload() {
       formData.append("content", content);
       formData.append("category", category);
   
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const decodedToken = jwtDecode(token);
-          const userId = decodedToken.userId;
-          formData.append("Create_by", userId.toString());
-        } catch (error) {
-          console.error("Error decoding token:", error);
-          showToast("ล้มเหลว!", "❌ เกิดข้อผิดพลาดในการตรวจสอบข้อมูลผู้ใช้!", 'error');
-          setLoading(false);
-          return;
-        }
-      }
-  
       images.forEach((image: File) => formData.append("file", image));
   
-      const response = await fetch("http://localhost:5000/upload/news", {
+      const response = await fetch(`${API_BASE_URL}/upload/news`, {
         method: "POST",
         body: formData,
+        credentials: 'include' // ส่ง cookies ไปด้วย
       });
   
       if (!response.ok) {

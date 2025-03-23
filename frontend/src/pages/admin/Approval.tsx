@@ -55,20 +55,18 @@ export default function Approval() {
   const fetchPendingApprovals = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token"); // ดึง Token จาก Local Storage
       
       const response = await fetch(`${API_BASE_URL}/upload/pending-approvals`, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` // ส่ง Token ไปด้วย
-        }
+          "Content-Type": "application/json"
+        },
+        credentials: 'include' // ส่ง cookies ไปด้วย
       });
       
       if (response.status === 401) {
         // Token หมดอายุ ให้ Redirect ไปหน้า Login หรือแจ้งเตือน
         showToast("Session Expired", "Please log in again.", "error");
-        localStorage.removeItem("token"); // ลบ Token ที่หมดอายุออก
         window.location.href = "/login"; // Redirect ไปหน้า Login
         return;
       }
@@ -101,14 +99,13 @@ export default function Approval() {
   const handleApprove = async (id: string) => {
     try {
       setProcessingId(id);
-      const token = localStorage.getItem("token");
   
       const response = await fetch(`${API_BASE_URL}/upload/approve/${id}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Content-Type": "application/json"
         },
+        credentials: 'include', // ส่ง cookies ไปด้วย
         body: JSON.stringify({
           userId: "admin" // ควรใช้ ID ของผู้ใช้ที่ login อยู่
         })
@@ -116,7 +113,6 @@ export default function Approval() {
   
       if (response.status === 401) {
         showToast("Session Expired", "Please log in again.", "error");
-        localStorage.removeItem("token");
         window.location.href = "/login";
         return;
       }
@@ -149,14 +145,13 @@ export default function Approval() {
   const handleReject = async (id: string, reason: string = "") => {
     try {
       setProcessingId(id);
-      const token = localStorage.getItem("token");
   
       const response = await fetch(`${API_BASE_URL}/upload/reject/${id}`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Content-Type": "application/json"
         },
+        credentials: 'include', // ส่ง cookies ไปด้วย
         body: JSON.stringify({
           userId: "admin", // ควรใช้ ID ของผู้ใช้ที่ login อยู่
           rejectionReason: reason
@@ -165,7 +160,6 @@ export default function Approval() {
   
       if (response.status === 401) {
         showToast("Session Expired", "Please log in again.", "error");
-        localStorage.removeItem("token");
         window.location.href = "/login";
         return;
       }

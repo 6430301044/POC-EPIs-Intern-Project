@@ -48,12 +48,20 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
         imageUrl: userImageUrl
       },
       process.env.JWT_SECRET || 'your_jwt_secret_key',
-      { expiresIn: '1h' }
+      { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
     );
 
+    // ตั้งค่า cookie แบบ HttpOnly
+    res.cookie('token', token, {
+      httpOnly: true, // ป้องกัน JavaScript เข้าถึง cookie
+      secure: true, // ใช้เฉพาะ HTTPS (จำเป็นเมื่อใช้ sameSite: 'none')
+      sameSite: 'none', // เปลี่ยนเป็น none เพื่อให้ส่ง cookie ข้าม domain ได้ดีขึ้น
+      maxAge: 3600000, // 1 ชั่วโมง (1h) ตรงกับ expiresIn ของ token
+      path: '/', // ใช้ได้ทั้งเว็บไซต์
+    });
+
     res.status(200).json({
-      message: "Token refreshed successfully",
-      token
+      message: "Token refreshed successfully"
     });
 
   } catch (error) {

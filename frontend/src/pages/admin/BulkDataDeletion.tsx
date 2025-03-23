@@ -158,9 +158,9 @@ export default function BulkDataDeletion() {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include', // ส่ง cookies ไปด้วย
         body: JSON.stringify(requestBody)
       });
 

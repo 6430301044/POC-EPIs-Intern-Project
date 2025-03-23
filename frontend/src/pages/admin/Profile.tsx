@@ -30,14 +30,22 @@ export default function Profile() {
     const fetchUserProfile = async () => {
       try {
         setLoading(true)
-        const token = localStorage.getItem('token')
-        if (!token) {
-          setError('ไม่พบข้อมูลการเข้าสู่ระบบ')
+        
+        const response = await fetch(`${API_BASE_URL}/user/me`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include' // ส่ง cookies ไปด้วย
+        });
+        
+        if (!response.ok) {
+          setError('ไม่สามารถดึงข้อมูลผู้ใช้ได้')
           setLoading(false)
           return
         }
-
-        const decoded = getDecodedToken()
+        
+        const decoded = await getDecodedToken()
         if (!decoded) {
           setError('ไม่สามารถอ่านข้อมูลผู้ใช้ได้')
           setLoading(false)
@@ -110,22 +118,13 @@ export default function Profile() {
       setError('')
       setSuccess('')
 
-      const token = localStorage.getItem('token')
-      if (!token) {
-        setError('ไม่พบข้อมูลการเข้าสู่ระบบ')
-        setUploading(false)
-        return
-      }
-
       const formData = new FormData()
       formData.append('file', selectedFile)
       formData.append('User_id', profile.userId)
 
       const response = await fetch(`${API_BASE_URL}/user/image/upload`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
+        credentials: 'include', // ส่ง cookies ไปด้วย
         body: formData
       })
 

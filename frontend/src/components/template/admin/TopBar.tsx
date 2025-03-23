@@ -5,9 +5,9 @@ import { getDecodedToken } from '@/utils/authUtils'
 import API_BASE_URL from '@/config/apiConfig'
 
 // กำหนด interface สำหรับ SVG props
-interface IconProps extends React.SVGProps<SVGSVGElement> {
-  className?: string
-}
+// interface IconProps extends React.SVGProps<SVGSVGElement> {
+//   className?: string
+// }
 
 export default function TopBar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
@@ -16,8 +16,8 @@ export default function TopBar() {
   const dropdownRef = useRef<HTMLDivElement>(null)
   
   // ฟังก์ชันสำหรับอัพเดทข้อมูลผู้ใช้จาก token
-  const updateUserFromToken = () => {
-    const decoded = getDecodedToken()
+  const updateUserFromToken = async () => {
+    const decoded = await getDecodedToken()
     if (decoded) {
       if (decoded.name) {
         setUserName(decoded.name)
@@ -32,12 +32,17 @@ export default function TopBar() {
   
   // เรียกใช้เมื่อ component mount
   useEffect(() => {
-    updateUserFromToken()
+    // เรียกใช้ฟังก์ชัน async ใน useEffect
+    const fetchUserData = async () => {
+      await updateUserFromToken()
+    }
+    
+    fetchUserData()
     
     // สร้าง event listener สำหรับการเปลี่ยนแปลง localStorage
-    const handleStorageChange = (e: StorageEvent) => {
+    const handleStorageChange = async (e: StorageEvent) => {
       if (e.key === 'token') {
-        updateUserFromToken()
+        await updateUserFromToken()
       }
     }
     
@@ -45,7 +50,7 @@ export default function TopBar() {
     window.addEventListener('storage', handleStorageChange)
     
     // Custom event สำหรับการอัพเดทภายในแอพเดียวกัน
-    const handleTokenRefresh = () => updateUserFromToken()
+    const handleTokenRefresh = async () => await updateUserFromToken()
     window.addEventListener('token-refreshed', handleTokenRefresh)
     
     // Cleanup
@@ -73,9 +78,23 @@ export default function TopBar() {
   }
   
   // ฟังก์ชันสำหรับออกจากระบบ
-  const handleSignOut = () => {
-    localStorage.removeItem('token')
-    window.location.href = '/login'
+  const handleSignOut = async () => {
+    try {
+      // เรียก API logout เพื่อลบ cookie ที่ server
+      const response = await fetch(`${API_BASE_URL}/user/logout`, {
+        method: 'POST',
+        credentials: 'include' // ส่ง cookies ไปด้วย
+      });
+      
+      if (response.ok) {
+        // ไม่ต้องลบ token จาก localStorage เพราะใช้ HttpOnly Cookie แล้ว
+        window.location.href = '/login';
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   }
 
   return (
@@ -161,40 +180,40 @@ export default function TopBar() {
   )
 }
 
-function SearchIcon(props: IconProps) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-      />
-    </svg>
-  )
-}
+// function SearchIcon(props: IconProps) {
+//   return (
+//     <svg
+//       {...props}
+//       xmlns="http://www.w3.org/2000/svg"
+//       fill="none"
+//       viewBox="0 0 24 24"
+//       stroke="currentColor"
+//     >
+//       <path
+//         strokeLinecap="round"
+//         strokeLinejoin="round"
+//         strokeWidth={2}
+//         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+//       />
+//     </svg>
+//   )
+// }
 
-function BellIcon(props: IconProps) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-      />
-    </svg>
-  )
-}
+// function BellIcon(props: IconProps) {
+//   return (
+//     <svg
+//       {...props}
+//       xmlns="http://www.w3.org/2000/svg"
+//       fill="none"
+//       viewBox="0 0 24 24"
+//       stroke="currentColor"
+//     >
+//       <path
+//         strokeLinecap="round"
+//         strokeLinejoin="round"
+//         strokeWidth={2}
+//         d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+//       />
+//     </svg>
+//   )
+// }

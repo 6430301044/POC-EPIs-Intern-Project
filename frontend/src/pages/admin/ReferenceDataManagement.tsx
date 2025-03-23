@@ -127,14 +127,14 @@ const ReferenceDataManagement: React.FC = () => {
     
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('token');
       
       const response = await fetch(
         `${API_BASE_URL}/upload/reference/${selectedTable}?offset=${page * rowsPerPage}&pageSize=${rowsPerPage}`,
         {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include' // ส่ง cookies ไปด้วย
         }
       );
       
@@ -242,14 +242,13 @@ const ReferenceDataManagement: React.FC = () => {
   // Add new record
   const handleAddRecord = async () => {
     try {
-      const token = localStorage.getItem('token');
       
       const response = await fetch(`${API_BASE_URL}/upload/reference/${selectedTable}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include', // ส่ง cookies ไปด้วย
         body: JSON.stringify(formData)
       });
       
@@ -300,13 +299,13 @@ const ReferenceDataManagement: React.FC = () => {
   // Delete record
   const handleDeleteRecord = async () => {
     try {
-      const token = localStorage.getItem('token');
       
       const response = await fetch(`${API_BASE_URL}/upload/reference/${selectedTable}/${selectedId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include' // ส่ง cookies ไปด้วย
       });
       
       const result = await response.json();
