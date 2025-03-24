@@ -46,14 +46,15 @@ export const approveRegistration = async (req: Request, res: Response) => {
     const { registerId } = req.params;
     
     if (!registerId) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Registration ID is required"
       });
+      return;
     }
     
     const pool = await connectToDB();
-    let transaction = null;
+    let transaction: any = null;
     
     try {
       // Begin transaction
@@ -73,10 +74,11 @@ export const approveRegistration = async (req: Request, res: Response) => {
       
       if (registerResult.recordset.length === 0) {
         await transaction.rollback();
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           message: "Registration not found or already processed"
         });
+        return;
       }
       
       const registerData = registerResult.recordset[0];
@@ -118,9 +120,14 @@ export const approveRegistration = async (req: Request, res: Response) => {
         success: true,
         message: "User registration approved successfully"
       });
+      return;
+
     } catch (error) {
       // Rollback transaction on error
-      if (transaction) await transaction.rollback();
+      if (transaction) {
+        console.error("Transaction rollback:", error);
+        await transaction.rollback();
+      }
       throw error;
     }
   } catch (error) {
@@ -139,10 +146,11 @@ export const rejectRegistration = async (req: Request, res: Response) => {
     const { registerId } = req.params;
     
     if (!registerId) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Registration ID is required"
       });
+      return;
     }
     
     const pool = await connectToDB();
@@ -157,10 +165,11 @@ export const rejectRegistration = async (req: Request, res: Response) => {
       `);
     
     if (result.rowsAffected[0] === 0) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: "Registration not found or already processed"
       });
+      return;
     }
     
     res.status(200).json({

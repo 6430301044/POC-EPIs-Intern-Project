@@ -9,7 +9,7 @@ import { refreshToken } from "../controllers/user/tokenController";
 import { logoutUser } from "../controllers/user/logoutController";
 import { getCurrentUser } from "../controllers/user/userInfoController";
 import { getAllUsers } from "../controllers/user/userController";
-import { authenticateToken, authorizeApperover, authorizeRoles } from "../middleware/authMiddleware";
+import { authenticateToken, authorizeApprover, authorizeRoles } from "../middleware/authMiddleware";
 import { updateUser, deleteUser } from "../controllers/user/userManagementController";
 
 const router = express.Router();
@@ -29,9 +29,9 @@ router.get("/companies", getCompanies);
 router.post("/logout", logoutUser); // เพิ่ม route สำหรับ logout
 
 // User registration approval routes - ต้องการสิทธิ์ admin
-router.get("/register/pending", authenticateToken, authorizeApperover, getPendingRegistrations);
-router.post("/register/approve/:registerId", authenticateToken, authorizeApperover, approveRegistration);
-router.post("/register/reject/:registerId", authenticateToken, authorizeApperover, rejectRegistration);
+router.get("/register/pending", authenticateToken, authorizeApprover, getPendingRegistrations);
+router.post("/register/approve/:registerId", authenticateToken, authorizeApprover, approveRegistration);
+router.post("/register/reject/:registerId", authenticateToken, authorizeApprover, rejectRegistration);
 
 // User image routes
 router.post("/image/upload", authenticateToken, upload.single("file"), uploadUserImage);

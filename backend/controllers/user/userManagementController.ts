@@ -19,10 +19,11 @@ export const updateUser = async (req: Request, res: Response) => {
       .query('SELECT User_id, User_email FROM dbo.Users WHERE User_id = @userId');
       
     if (userCheck.recordset.length === 0) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: 'User not found'
       });
+      return;
     }
     
     // Get the user's email for later use with Register table
@@ -30,7 +31,7 @@ export const updateUser = async (req: Request, res: Response) => {
     
     // Build the update query dynamically based on provided fields
     let updateQuery = 'UPDATE dbo.Users SET ';
-    const queryParams = [];
+    const queryParams: string[] = [];
     
     if (updateData.User_name) {
       queryParams.push('User_name = @userName');
@@ -53,10 +54,11 @@ export const updateUser = async (req: Request, res: Response) => {
     }
     
     if (queryParams.length === 0) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'No valid fields provided for update'
       });
+      return;
     }
     
     updateQuery += queryParams.join(', ');
@@ -91,6 +93,8 @@ export const updateUser = async (req: Request, res: Response) => {
       success: true,
       message: 'User updated successfully'
     });
+    return;
+
   } catch (error) {
     console.error('Error updating user:', error);
     res.status(500).json({
@@ -118,10 +122,11 @@ export const deleteUser = async (req: Request, res: Response) => {
       .query('SELECT User_id, User_email FROM dbo.Users WHERE User_id = @userId');
       
     if (userCheck.recordset.length === 0) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: 'User not found'
       });
+      return;
     }
     
     // Get the user's email for later use with Register table
@@ -177,6 +182,8 @@ export const deleteUser = async (req: Request, res: Response) => {
         success: true,
         message: 'User deleted successfully'
       });
+      return;
+      
     } catch (error) {
       // Rollback the transaction in case of error
       await transaction.rollback();

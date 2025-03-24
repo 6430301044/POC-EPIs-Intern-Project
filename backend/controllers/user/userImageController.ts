@@ -29,7 +29,7 @@ async function ensureContainerExists() {
 
 // สร้าง interface ที่ขยาย Request และเพิ่ม property file
 interface MulterRequest extends Request {
-  file: Express.Multer.File;
+  file?: Express.Multer.File;
 }
 
 // ฟังก์ชันลบไฟล์จาก Azure Blob Storage
@@ -63,7 +63,8 @@ async function deleteOldProfileImage(imageUrl: string) {
 export const uploadUserImage = async (req: MulterRequest, res: Response) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
+      res.status(400).json({ message: "No file uploaded" });
+      return;
     }
 
     await ensureContainerExists(); // ตรวจสอบและสร้างคอนเทนเนอร์ถ้ายังไม่มี
@@ -121,6 +122,8 @@ export const uploadUserImage = async (req: MulterRequest, res: Response) => {
       User_image: User_image,
       fileName: blobName
     });
+    return;
+    
   } catch (error) {
     console.error("Upload error:", error);
     res.status(500).json({ message: "Error uploading file", error: error.message });
@@ -133,13 +136,15 @@ export const getUserImage = async (req: Request, res: Response) => {
     const { User_id } = req.params;
     
     if (!User_id) {
-      return res.status(400).json({ message: "User ID is required" });
+      res.status(400).json({ message: "User ID is required" });
+      return;
     }
     
     // แปลง Userid เป็นตัวเลขและตรวจสอบความถูกต้อง
     const Userid = parseInt(User_id);
     if (isNaN(Userid)) {
-      return res.status(400).json({ message: "Invalid user ID format" });
+      res.status(400).json({ message: "Invalid user ID format" });
+      return;
     }
     
     const pool = await connectToDB();
@@ -150,11 +155,12 @@ export const getUserImage = async (req: Request, res: Response) => {
     
     if (result.recordset.length === 0) {
       // ไม่พบรูปภาพ ส่งค่า default
-      return res.status(200).json({
+      res.status(200).json({
         success: true,
         User_image: null, // ให้ frontend ใช้รูป default
         isDefault: true
       });
+      return;
     }
     
     res.status(200).json({
@@ -162,6 +168,8 @@ export const getUserImage = async (req: Request, res: Response) => {
       User_image: result.recordset[0].User_image,
       isDefault: false
     });
+    return;
+
   } catch (error) {
     console.error("Error fetching user image:", error);
     res.status(500).json({ message: "Server error", error: error.message });
