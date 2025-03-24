@@ -33,6 +33,7 @@ import ReferenceDataUpload from "@/pages/admin/ReferenceDataUpload";
 import UploadCenter from "@/pages/admin/UploadCenter";
 import BulkDataDeletion from "@/pages/admin/BulkDataDeletion";
 import NewsPage from "@/pages/NewsPage";
+import About from "@/pages/About";
 
 
 const router = createBrowserRouter([
@@ -66,7 +67,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/about",
-        element: <TestAPICall />
+        element: <About />
       },
       {
         path: "/environment-data",

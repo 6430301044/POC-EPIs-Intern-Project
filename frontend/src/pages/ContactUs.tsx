@@ -28,7 +28,7 @@ export default function ContactUs() {
               <h2 className="text-3xl font-semibold">{"ติดต่อเรา"}</h2>
             </div>
 
-            <div className="text-lg mt-2 flex items-center space-x-2 relative z-30">
+            <div className="text-lg mt-2 flex items-center justify-center space-x-2 relative z-30">
           <a
             href="/"
             className="text-white hover:text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105"
@@ -86,7 +86,7 @@ export default function ContactUs() {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1440 320"
-            className="absolute bottom-0 left-0 w-full z-20 pointer-events-nones"
+            className="absolute bottom-0 left-0 w-full z-20 pointer-events-none"
           >
             <path
               fill="#ffffff"

@@ -20,11 +20,11 @@ export default function NewPage() {
         
         <div className="text-center text-white z-10">
           <div className="mb-4">
-            <span className="text-4xl">{'📊'}</span>
-            <h2 className="text-3xl font-semibold">{'ข้อมูลสิ่งแวดล้อม'}</h2>
+            <span className="text-4xl">{'📰'}</span>
+            <h2 className="text-3xl font-semibold">{'ข่าวสารและกิจกรรม'}</h2>
           </div>
   
-          <div className="text-lg mt-2 flex items-center space-x-2 relative z-30">
+          <div className="text-lg mt-2 flex items-center justify-center space-x-2 relative z-30">
           <a
             href="/"
             className="text-white hover:text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105"
