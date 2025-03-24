@@ -1,10 +1,12 @@
 import { Container } from "@/components/template/Container"
 import DarkSwitch from "@/components/template/DarkSwitch"
 import { SectionTitle } from "@/components/template/SectionTitle"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Link, useNavigate } from "react-router"
 import API_BASE_URL from '@/config/apiConfig';
 import { Eye, EyeOff, CheckCircle, XCircle, Circle } from "lucide-react";
+import { AxiosError } from 'axios';
+import { FetchError } from 'node-fetch';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -25,6 +27,18 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
+  // สร้าง union type สำหรับข้อผิดพลาดจาก API
+  type ApiError = AxiosError | FetchError;
+  
+  // สร้าง type guard function เพื่อตรวจสอบว่า error เป็น ApiError หรือไม่
+  function isApiError(error: unknown): error is ApiError {
+    return (
+      error instanceof Error && 
+      ('isAxiosError' in error || 'type' in error)
+    );
+  }
   
   // Fetch companies for dropdown
   useEffect(() => {
@@ -133,11 +147,36 @@ export default function Register() {
       alert("Registration successful!");
       navigate("/login"); // ไปหน้า Login หลังสมัครเสร็จ
   
-    } catch (error: any) {
-      console.error("Error:", error.message);
-      alert("Something went wrong: " + error.message);
+    } catch (error: unknown) {
+      if (isApiError(error)) {
+        console.error("Error:", error.message);
+        alert("Something went wrong: " + error.message);
+      } else {
+        console.error("Unknown error:", error);
+        alert("Something went wrong. Please try again.");
+      }
     }
   };
+
+  const validateForm = useCallback(() => {
+    const isValid =
+    firstName.trim() !== "" &&
+    lastName.trim() !== "" &&
+    email.trim() !== "" &&
+    phone.trim() !== "" &&
+    companyId !== null &&
+    jobPosition.trim() !== "" &&
+    password.trim() !== "" &&
+    confirmPassword.trim() !== "" &&
+    password === confirmPassword &&
+    !passwordError &&
+    termsAccepted;
+    setIsFormValid(isValid);
+    }, [firstName, lastName, email, phone, companyId, jobPosition, password, confirmPassword, passwordError, termsAccepted]);
+    
+    useEffect(() => {
+    validateForm();
+    }, [validateForm]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -342,6 +381,8 @@ export default function Register() {
                   id="terms"
                   name="terms"
                   type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
                   required
                   className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
@@ -352,8 +393,9 @@ export default function Register() {
 
               <div>
                 <button
+                  disabled={!isFormValid} 
                   type="submit"
-                  className="group relative flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className={`group relative flex w-full justify-center rounded-lg ${isFormValid ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-400 cursor-not-allowed"} px-4 py-2 text-sm font-medium text-white  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2`}
                 >
                   Create Account
                 </button>
