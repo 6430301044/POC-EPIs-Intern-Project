@@ -6,7 +6,9 @@ import { scrollToSection } from "@/utils/scrollHelper";
 
 export default function Navbar() {
   const [isOpened, setIsOpened] = useState(false);
-  const [language, setLanguage] = useState("ไทย");
+  
+  const [activeMenu, setActiveMenu] = useState(location.pathname);
+
 
   const { theme } = useTheme();
 
@@ -21,6 +23,8 @@ export default function Navbar() {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
 
+      setActiveMenu(location.pathname);
+
       // ไม่ปิดเมนูถ้าคลิกที่ปุ่ม
       if (menuButtonRef.current?.contains(target)) {
         return;
@@ -34,7 +38,11 @@ export default function Navbar() {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [location.pathname]);
+
+  const handleMenuClick = (id: string) => {
+    setActiveMenu(id);
+  };
 
   const navigation = [
     { name: "หน้าหลัก", id: "/" },
@@ -209,15 +217,16 @@ export default function Navbar() {
                     <li key={item.id}>
                       <Link
                         to={item.id}
+                        onClick={() => handleMenuClick(item.id)}
                         className={`relative block px-4 py-2 text-lg font-normal rounded-md cursor-pointer 
-                                  hover:text-[#00AEEF] transition-all ease-in-out 
-                                  before:transition-[width] before:ease-in-out before:duration-700 
-                                  before:absolute before:h-[3px] before:w-0 before:bottom-0 before:left-0 
-                                  before:bg-[linear-gradient(to_right,#06b6d4,#3b82f6)] hover:before:w-full
-                                  ${location.pathname === item.id ? "text-[#00AEEF] before:w-full" : "text-white"}`}
+                                    hover:text-[#00AEEF] transition-all ease-in-out 
+                                    before:transition-[width] before:ease-in-out before:duration-700 
+                                    before:absolute before:h-[3px] before:w-0 before:bottom-0 before:left-0 
+                                    before:bg-[linear-gradient(to_right,#06b6d4,#3b82f6)] hover:before:w-full
+                                    ${activeMenu === item.id ? "text-[#00AEEF] before:w-full" : "text-white"}`}
                       >
                         {item.name}
-                      </Link>
+                      </Link> 
                     </li>
                   ))}
                 </ul>
