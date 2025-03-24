@@ -27,7 +27,8 @@ const upload = multer({
   storage: multer.memoryStorage(),
   fileFilter: (req, file, cb) => {
     if (file.mimetype !== 'image/jpeg' && file.mimetype !== 'image/png') {
-      return cb(new Error('Only JPEG and PNG files are allowed'), false);
+      cb(null, false);
+      return;
     }
     cb(null, true);
   }
@@ -45,13 +46,15 @@ async function ensureContainerExists() {
 // API สำหรับอัปโหลดข่าวพร้อมรูปภาพ
 router.post("/", upload.array("file", 10), async (req: Request, res: Response) => {
   if (!req.files || (req.files as Express.Multer.File[]).length === 0) {
-    return res.status(400).json({ message: "No files uploaded" });
+    res.status(400).json({ message: "No files uploaded" });
+    return;
   }
 
   const { title, content, category, Create_by } = req.body;
 
   if (!title || !content || !category || !Create_by) {
-    return res.status(400).json({ message: "Missing required fields" });
+    res.status(400).json({ message: "Missing required fields" });
+    return;
   }
 
   try {
@@ -76,7 +79,7 @@ router.post("/", upload.array("file", 10), async (req: Request, res: Response) =
     const newsId = result.recordset[0].news_id; // ดึง id ของข่าวที่เพิ่งเพิ่ม
 
     // 2️⃣ อัปโหลดรูปภาพไปยัง Azure Blob Storage
-    const uploadedFiles = [];
+    const uploadedFiles: string[] = [];
     for (const file of (req.files as Express.Multer.File[])) {
       const fileExtension = file.originalname.split(".").pop();
       const blobName = `${uuidv4()}.${fileExtension}`;
@@ -100,15 +103,17 @@ router.post("/", upload.array("file", 10), async (req: Request, res: Response) =
         `);
     }
 
-    return res.status(200).json({
+    res.status(200).json({
       message: "ข่าวและรูปภาพถูกอัปโหลดเรียบร้อย",
       news_id: newsId,
       image_urls: uploadedFiles
     });
+    return;
 
   } catch (error) {
     console.error("Error in file upload:", error);
-    return res.status(500).json({ message: "Error uploading files", error: error.message });
+    res.status(500).json({ message: "Error uploading files", error: error.message });
+    return;
   }
 });
 

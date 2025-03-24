@@ -29,20 +29,22 @@ async function ensureContainerExists() {
 
 // สร้าง interface ที่ขยาย Request และเพิ่ม property files
 interface MulterRequest extends Request {
-  files: Express.Multer.File[];
+  files?: Express.Multer.File[] | { [fieldname: string]: Express.Multer.File[]; };
 }
 
 // ฟังก์ชันอัปโหลดข่าวพร้อมรูปภาพ
 export const uploadNews = async (req: MulterRequest, res: Response) => {
   try {
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: "No files uploaded" });
+      res.status(400).json({ message: "No files uploaded" });
+      return;
     }
 
     const { title, content, category, Create_by } = req.body;
 
     if (!title || !content || !category) {
-      return res.status(400).json({ message: "Missing required fields" });
+      res.status(400).json({ message: "Missing required fields" });
+      return;
     }
 
     await ensureContainerExists(); // ตรวจสอบและสร้างคอนเทนเนอร์ถ้ายังไม่มี
@@ -65,8 +67,8 @@ export const uploadNews = async (req: MulterRequest, res: Response) => {
     const newsId = result.recordset[0].news_id; // ดึง id ของข่าวที่เพิ่งเพิ่ม
 
     // 2️⃣ อัปโหลดรูปภาพไปยัง Azure Blob Storage
-    const uploadedFiles = [];
-    for (const file of req.files) {
+    const uploadedFiles = [] as string[];
+    for (const file of req.files as Express.Multer.File[]) {
       const fileExtension = file.originalname.split(".").pop(); // ดึงนามสกุลไฟล์
       const blobName = `${uuidv4()}.${fileExtension}`; // ใช้ UUID ป้องกันไฟล์ซ้ำ
       const blockBlobClient = containerClient.getBlockBlobClient(blobName);
@@ -98,9 +100,12 @@ export const uploadNews = async (req: MulterRequest, res: Response) => {
       news_id: newsId,
       image_urls: uploadedFiles
     });
+    return;
+
   } catch (error) {
     console.error("Upload error:", error);
     res.status(500).json({ message: "Error uploading news and images", error: error.message });
+    return;
   }
 };
 
@@ -120,9 +125,12 @@ export const getAllNews = async (req: Request, res: Response) => {
       success: true,
       data: result.recordset
     });
+    return;
+
   } catch (error) {
     console.error("Error fetching news:", error);
     res.status(500).json({ message: "Error fetching news", error: error.message });
+    return;
   }
 };
 
@@ -138,7 +146,8 @@ export const getNewsById = async (req: Request, res: Response) => {
       .query(`SELECT * FROM News WHERE id = @id`);
     
     if (newsResult.recordset.length === 0) {
-      return res.status(404).json({ message: "News not found" });
+      res.status(404).json({ message: "News not found" });
+      return;
     }
     
     // ดึงรูปภาพที่เกี่ยวข้อง
@@ -153,9 +162,12 @@ export const getNewsById = async (req: Request, res: Response) => {
       success: true,
       data: news
     });
+    return;
+
   } catch (error) {
     console.error("Error fetching news by id:", error);
     res.status(500).json({ message: "Error fetching news", error: error.message });
+    return;
   }
 };
 
@@ -164,7 +176,7 @@ export const deleteNewsById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const pool = await connectToDB();
-    let transaction = null;
+    let transaction: any = null;
     
     try {
       // เริ่ม transaction
@@ -184,10 +196,11 @@ export const deleteNewsById = async (req: Request, res: Response) => {
       const recordCount = checkResult.recordset[0].count;
       
       if (recordCount === 0) {
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           message: "ไม่พบข้อมูลข่าวที่ต้องการลบ"
         });
+        return;
       }
       
       // ลบข้อมูลจากตาราง News
@@ -210,10 +223,14 @@ export const deleteNewsById = async (req: Request, res: Response) => {
           id: id
         }
       });
-      
+      return;
+
     } catch (error) {
       // ถ้ามีข้อผิดพลาด ให้ rollback transaction
-      if (transaction) await transaction.rollback();
+      if (transaction) {
+        console.error("Transaction rollback due to error:", error);
+        await transaction.rollback();
+      }
       throw error;
     }
     
@@ -224,5 +241,6 @@ export const deleteNewsById = async (req: Request, res: Response) => {
       message: "เกิดข้อผิดพลาดในการลบข้อมูลข่าว",
       error: error.message
     });
+    return;
   }
 };

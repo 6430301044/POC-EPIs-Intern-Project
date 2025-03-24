@@ -11,14 +11,15 @@ export const deleteNewsByCondition = async (req: Request, res: Response) => {
         const { startDate, endDate, status, category } = req.body;
         
         if (!startDate && !endDate && !status && !category) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "กรุณาระบุเงื่อนไขในการลบข้อมูลอย่างน้อย 1 เงื่อนไข (วันที่เริ่มต้น, วันที่สิ้นสุด, สถานะ, หรือหมวดหมู่)"
             });
+            return;
         }
         
         const pool = await connectToDB();
-        let transaction = null;
+        let transaction: any = null;
         
         try {
             // Begin transaction
@@ -26,7 +27,7 @@ export const deleteNewsByCondition = async (req: Request, res: Response) => {
             await transaction.begin();
             
             // Build WHERE clause based on provided conditions
-            let whereConditions = [];
+            let whereConditions: string[] = [];
             let queryParams: any = {};
             
             if (startDate) {
@@ -68,10 +69,11 @@ export const deleteNewsByCondition = async (req: Request, res: Response) => {
             const recordCount = countResult.recordset[0].count;
             
             if (recordCount === 0) {
-                return res.status(404).json({
+                res.status(404).json({
                     success: false,
                     message: "ไม่พบข้อมูลตามเงื่อนไขที่ระบุ"
                 });
+                return;
             }
             
             // Delete data from the News table
@@ -104,10 +106,14 @@ export const deleteNewsByCondition = async (req: Request, res: Response) => {
                     recordCount
                 }
             });
+            return;
             
         } catch (error) {
             // If there's an error, roll back the transaction
-            if (transaction) await transaction.rollback();
+            if (transaction) {
+                console.error("Error deleting uploaded files data:", error);
+                await transaction.rollback();
+            }
             throw error;
         }
         
@@ -118,6 +124,7 @@ export const deleteNewsByCondition = async (req: Request, res: Response) => {
             message: "เกิดข้อผิดพลาดในการลบข้อมูลข่าว",
             error: error.message
         });
+        return;
     }
 };
 
@@ -127,14 +134,15 @@ export const deleteUploadedFilesByCondition = async (req: Request, res: Response
         const { startDate, endDate, status, uploadedBy, periodId } = req.body;
         
         if (!startDate && !endDate && !status && !uploadedBy && !periodId) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "กรุณาระบุเงื่อนไขในการลบข้อมูลอย่างน้อย 1 เงื่อนไข (วันที่เริ่มต้น, วันที่สิ้นสุด, สถานะ, ผู้อัปโหลด หรือรหัสช่วงเวลา)"
             });
+            return;
         }
         
         const pool = await connectToDB();
-        let transaction = null;
+        let transaction: any = null;
         
         try {
             // Begin transaction
@@ -142,7 +150,7 @@ export const deleteUploadedFilesByCondition = async (req: Request, res: Response
             await transaction.begin();
             
             // Build WHERE clause based on provided conditions
-            let whereConditions = [];
+            let whereConditions: string[] = [];
             let queryParams: any = {};
             
             if (startDate) {
@@ -189,10 +197,11 @@ export const deleteUploadedFilesByCondition = async (req: Request, res: Response
             const recordCount = countResult.recordset[0].count;
             
             if (recordCount === 0) {
-                return res.status(404).json({
+                res.status(404).json({
                     success: false,
                     message: "ไม่พบข้อมูลตามเงื่อนไขที่ระบุ"
                 });
+                return;
             }
             
             // Delete data from the UploadedFiles table
@@ -225,10 +234,14 @@ export const deleteUploadedFilesByCondition = async (req: Request, res: Response
                     recordCount
                 }
             });
+            return;
             
         } catch (error) {
             // If there's an error, roll back the transaction
-            if (transaction) await transaction.rollback();
+            if (transaction) {
+                console.error("Error deleting uploaded files data:", error);
+                await transaction.rollback();
+            }
             throw error;
         }
         
@@ -239,5 +252,6 @@ export const deleteUploadedFilesByCondition = async (req: Request, res: Response
             message: "เกิดข้อผิดพลาดในการลบข้อมูลไฟล์อัปโหลด",
             error: error.message
         });
+        return;
     }
 };
