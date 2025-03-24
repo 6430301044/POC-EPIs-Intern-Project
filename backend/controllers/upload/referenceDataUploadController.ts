@@ -11,14 +11,16 @@ import path from "path";
 export const uploadReferenceCSV = async (req: Request, res: Response) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ message: "กรุณาอัปโหลดไฟล์ CSV" });
+            res.status(400).json({ message: "กรุณาอัปโหลดไฟล์ CSV" });
+            return
         }
 
         // Get parameters from the request
         const { tableName } = req.body;
 
         if (!tableName) {
-            return res.status(400).json({ message: "กรุณาระบุชื่อตารางอ้างอิง" });
+            res.status(400).json({ message: "กรุณาระบุชื่อตารางอ้างอิง" });
+            return
         }
         
         // Get the authenticated user's ID from the request object
@@ -39,14 +41,16 @@ export const uploadReferenceCSV = async (req: Request, res: Response) => {
 export const uploadReferenceExcel = async (req: Request, res: Response) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ message: "กรุณาอัปโหลดไฟล์ Excel" });
+            res.status(400).json({ message: "กรุณาอัปโหลดไฟล์ Excel" });
+            return;
         }
 
         // Get parameters from the request
         const { tableName } = req.body;
 
         if (!tableName) {
-            return res.status(400).json({ message: "กรุณาระบุชื่อตารางอ้างอิง" });
+            res.status(400).json({ message: "กรุณาระบุชื่อตารางอ้างอิง" });
+            return;
         }
 
         const userId = (req as any).user?.userId;
@@ -174,7 +178,7 @@ const saveToPendingApproval = async (data: any[], tableName: string, originalFil
     }
 
     const pool = await connectToDB();
-    let transaction = null;
+    let transaction:any = null;
 
     try {
         // Begin transaction
@@ -223,7 +227,7 @@ const saveToPendingApproval = async (data: any[], tableName: string, originalFil
         let validCount = 0;
         let skippedCount = 0;
         let errorCount = 0;
-        const errors = [];
+        const errors: Array<{ row: any; error: any}> = [];
 
         for (const row of data) {
             try {
@@ -266,6 +270,7 @@ const saveToPendingApproval = async (data: any[], tableName: string, originalFil
     } catch (error) {
         // Rollback transaction on error
         if (transaction) {
+            console.error("Transaction rollback due to error:", error);
             await transaction.rollback();
         }
         throw error;

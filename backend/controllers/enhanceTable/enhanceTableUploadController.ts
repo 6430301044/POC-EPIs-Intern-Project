@@ -10,14 +10,16 @@ import { connectToDB } from "../../db/dbConfig";
 export const uploadEnhanceCSV = async (req: Request, res: Response) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ message: "กรุณาอัปโหลดไฟล์ CSV" });
+            res.status(400).json({ message: "กรุณาอัปโหลดไฟล์ CSV" });
+            return;
         }
 
         // Get parameters from the request
         const { periodId, enhanceTableId } = req.body;
 
         if (!periodId || !enhanceTableId) {
-            return res.status(400).json({ message: "กรุณาระบุ periodId และ enhanceTableId" });
+            res.status(400).json({ message: "กรุณาระบุ periodId และ enhanceTableId" });
+            return;
         }
         // Get the authenticated user's ID from the request object
         const userId = (req as any).user?.userId; // Use authenticated user ID or fallback to admin (1)
@@ -37,17 +39,22 @@ export const uploadEnhanceCSV = async (req: Request, res: Response) => {
 export const uploadEnhanceExcel = async (req: Request, res: Response) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ message: "กรุณาอัปโหลดไฟล์ Excel" });
+            res.status(400).json({ message: "กรุณาอัปโหลดไฟล์ Excel" });
+            return;
         }
 
         // Get parameters from the request
         const { periodId, enhanceTableId } = req.body;
 
         if (!periodId || !enhanceTableId) {
-            return res.status(400).json({ message: "กรุณาระบุ periodId และ enhanceTableId" });
+            res.status(400).json({ message: "กรุณาระบุ periodId และ enhanceTableId" });
+            return;
         }
 
-        const result = await parseExcel(req.file.path, enhanceTableId, periodId, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype);
+        // Get the authenticated user's ID from the request object
+        const userId = (req as any).user?.userId; // Use authenticated user ID or fallback to admin (1)
+
+        const result = await parseExcel(req.file.path, enhanceTableId, periodId, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype, userId);
         res.status(200).json({ message: "อัปโหลดสำเร็จ", data: result });
 
     } catch (error) {
@@ -206,7 +213,7 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
     }
 
     const pool = await connectToDB();
-    let transaction = null;
+    let transaction: any = null;
 
     try {
         // Get enhance table information
@@ -333,6 +340,7 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
     } catch (error) {
         // Rollback the transaction if there's an error
         if (transaction) {
+            console.error("Transaction rollback:", error);
             await transaction.rollback();
         }
         throw error;

@@ -17,10 +17,11 @@ export const getReferenceData = async (req: Request, res: Response) => {
         ];
         
         if (!validTables.includes(table)) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: `ไม่พบตาราง ${table} หรือไม่ได้รับอนุญาตให้เข้าถึง`
             });
+            return;
         }
         
         const pool = await connectToDB();
@@ -83,10 +84,11 @@ export const addReferenceData = async (req: Request, res: Response) => {
         ];
         
         if (!validTables.includes(table)) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: `ไม่พบตาราง ${table} หรือไม่ได้รับอนุญาตให้เข้าถึง`
             });
+            return;
         }
         
         const pool = await connectToDB();
@@ -111,10 +113,11 @@ export const addReferenceData = async (req: Request, res: Response) => {
         }
         
         if (Object.keys(filteredData).length === 0) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: `ไม่มีข้อมูลที่ถูกต้องสำหรับการเพิ่มในตาราง ${table}`
             });
+            return;
         }
         
         // Build the SQL query
@@ -205,10 +208,11 @@ export const updateReferenceData = async (req: Request, res: Response) => {
         ];
         
         if (!validTables.includes(table)) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: `ไม่พบตาราง ${table} หรือไม่ได้รับอนุญาตให้เข้าถึง`
             });
+            return;
         }
         
         const pool = await connectToDB();
@@ -246,10 +250,11 @@ export const updateReferenceData = async (req: Request, res: Response) => {
         }
         
         if (Object.keys(filteredData).length === 0) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: `ไม่มีข้อมูลที่ถูกต้องสำหรับการอัปเดตในตาราง ${table}`
             });
+            return;
         }
         
         // Build the SQL query
@@ -274,10 +279,11 @@ export const updateReferenceData = async (req: Request, res: Response) => {
         `);
         
         if (result.rowsAffected[0] === 0) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: `ไม่พบข้อมูลที่ต้องการอัปเดตในตาราง ${table}`
             });
+            return
         }
         
         // Special handling for Daysperiod table to ensure year_id is set
@@ -346,10 +352,11 @@ export const deleteReferenceData = async (req: Request, res: Response) => {
         ];
         
         if (!validTables.includes(table)) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: `ไม่พบตาราง ${table} หรือไม่ได้รับอนุญาตให้เข้าถึง`
             });
+            return;
         }
         
         const pool = await connectToDB();
@@ -402,11 +409,12 @@ export const deleteReferenceData = async (req: Request, res: Response) => {
                     `);
                 
                 if (refCheck.recordset[0].count > 0) {
-                    return res.status(400).json({
+                    res.status(400).json({
                         success: false,
                         message: `ไม่สามารถลบข้อมูลได้เนื่องจากมีการอ้างอิงในตาราง ${referencingTable}`,
                         constraint: constraintName
                     });
+                    return;
                 }
             }
         }
@@ -421,10 +429,11 @@ export const deleteReferenceData = async (req: Request, res: Response) => {
         `);
         
         if (result.rowsAffected[0] === 0) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: `ไม่พบข้อมูลที่ต้องการลบในตาราง ${table}`
             });
+            return;
         }
         
         res.status(200).json({

@@ -10,10 +10,11 @@ export const getPreviewData = async (req: Request, res: Response) => {
         const { uploadId } = req.params;
         
         if (!uploadId) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "กรุณาระบุไอดีของไฟล์ที่ต้องการดูตัวอย่างข้อมูล"
             });
+            return
         }
         
         const pool = await connectToDB();
@@ -30,10 +31,11 @@ export const getPreviewData = async (req: Request, res: Response) => {
             `);
         
         if (uploadResult.recordset.length === 0) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: "ไม่พบข้อมูลสำหรับไฟล์ที่อัปโหลด"
             });
+            return;
         }
         
         const uploadData = uploadResult.recordset[0];

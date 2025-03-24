@@ -6,14 +6,16 @@ import { connectToDB } from "../../db/dbConfig";
 export const uploadCSV = async (req: Request, res: Response) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ message: "กรุณาอัปโหลดไฟล์ CSV" });
+            res.status(400).json({ message: "กรุณาอัปโหลดไฟล์ CSV" });
+            return;
         }
 
         // Get parameters from the request
         const { periodId, mainCategory, subCategory } = req.body;
 
         if (!periodId || !mainCategory || !subCategory) {
-            return res.status(400).json({ message: "กรุณาระบุ periodId, mainCategory และ subCategory" });
+            res.status(400).json({ message: "กรุณาระบุ periodId, mainCategory และ subCategory" });
+            return;
         }
 
         // Get the authenticated user's ID from the request object
@@ -63,7 +65,7 @@ const saveForApproval = async (data: any[], mainCategory: string, subCategory: s
     }
 
     const pool = await connectToDB();
-    let transaction = null;
+    let transaction: any = null;
 
     try {
         // Begin transaction
@@ -141,7 +143,10 @@ const saveForApproval = async (data: any[], mainCategory: string, subCategory: s
         return { success: true, count: data.length, uploadId };
     } catch (error) {
         // If there's an error, roll back the transaction
-        if (transaction) await transaction.rollback();
+        if (transaction) {
+            console.error("Transaction rollback:", error);
+            await transaction.rollback();
+        }
         throw error;
     }
 };

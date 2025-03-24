@@ -6,20 +6,22 @@ import { connectToDB } from "../../db/dbConfig";
 export const uploadExcel = async (req: Request, res: Response) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ message: "กรุณาอัปโหลดไฟล์ Excel" });
+            res.status(400).json({ message: "กรุณาอัปโหลดไฟล์ Excel" });
+            return;
         }
 
         // Get parameters from the request
         const { periodId, mainCategory, subCategory } = req.body;
 
         if (!periodId || !mainCategory || !subCategory) {
-            return res.status(400).json({ message: "กรุณาระบุ periodId, mainCategory และ subCategory" });
+            res.status(400).json({ message: "กรุณาระบุ periodId, mainCategory และ subCategory" });
+            return;
         }
 
         // Get the authenticated user's ID from the request object
         const userId = (req as any).user?.userId; // Use authenticated user ID or fallback to admin (1)
 
-        const result = await parseExcel(req.file.path, mainCategory, subCategory, periodId, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype);
+        const result = await parseExcel(req.file.path, mainCategory, subCategory, periodId, req.file.originalname, req.file.filename, req.file.size, req.file.mimetype, userId);
         res.status(200).json({ message: "อัปโหลดสำเร็จ", data: result });
 
     } catch (error) {
@@ -65,7 +67,7 @@ const saveForApproval = async (data: any[], mainCategory: string, subCategory: s
     }
 
     const pool = await connectToDB();
-    let transaction = null;
+    let transaction: any = null;
 
     try {
         // Begin transaction
@@ -143,7 +145,10 @@ const saveForApproval = async (data: any[], mainCategory: string, subCategory: s
         return { success: true, count: data.length, uploadId };
     } catch (error) {
         // If there's an error, roll back the transaction
-        if (transaction) await transaction.rollback();
+        if (transaction){
+            console.error("Transaction rollback:", error);
+            await transaction.rollback();
+        } 
         throw error;
     }
 };

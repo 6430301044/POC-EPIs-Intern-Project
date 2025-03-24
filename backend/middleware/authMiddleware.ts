@@ -12,7 +12,10 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
     
     const token = tokenFromCookie || tokenFromHeader;
     
-    if (!token) return res.status(401).json({ message: "Access Denied: No token provided" });
+    if (!token) {
+        res.status(401).json({ message: "Access Denied: No token provided" });
+        return;
+    }
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
@@ -20,22 +23,25 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
         // ตรวจสอบการหมดอายุของ token
         const currentTime = Date.now() / 1000; // เวลาปัจจุบัน (วินาที)
         if ((decoded as any).exp < currentTime) {
-            return res.status(401).json({ message: "Token has expired", expired: true });
+            res.status(401).json({ message: "Token has expired", expired: true });
+            return;
         }
         
         (req as any).user = decoded;
         next();
     } catch (error) {
         if ((error as any).name === 'TokenExpiredError') {
-            return res.status(401).json({ message: "Token has expired", expired: true });
+            res.status(401).json({ message: "Token has expired", expired: true });
+            return;
         }
-        return res.status(403).json({ message: "Invalid token" });
+        res.status(403).json({ message: "Invalid token" });
+        return;
     }
 }
 
-// ตรวจสอบว่าผู้ใช้มีสิทธิ์ apperover หรือไม่
-export function authorizeApperover(req: Request, res: Response, next: NextFunction) {
-    if ((req as any).user && ((req as any).user.role === 'approver' || (req as any).user.role === 'dev')) {
+// ตรวจสอบว่าผู้ใช้มีสิทธิ์ approver หรือไม่
+export function authorizeApprover(req: Request, res: Response, next: NextFunction) {
+    if ((req as any).user && ((req as any).user.role === 'approver')) {
         next();
     } else {
         res.status(403).json({ message: "Access Denied: Approver privileges required" });
@@ -46,32 +52,25 @@ export function authorizeApperover(req: Request, res: Response, next: NextFuncti
 export function authorizeRoles(roles: string[]) {
     return (req: Request, res: Response, next: NextFunction) => {
         if (!(req as any).user) {
-            return res.status(401).json({ message: "Access Denied: Authentication required" });
+            res.status(401).json({ message: "Access Denied: Authentication required" });
+            return;
         }
         
         if (roles.includes((req as any).user.role)) {
             next();
         } else {
             res.status(403).json({ message: "Access Denied: Insufficient privileges" });
+            return;
         }
     };
 }
 
-// ตรวจสอบว่าผู้ใช้มีสิทธิ์ admin หรือไม่
-export function authorizeAdmin(req: Request, res: Response, next: NextFunction) {
-    if ((req as any).user && (req as any).user.role === 'admin') {
-        next();
-    } else {
-        res.status(403).json({ message: "Access Denied: Admin privileges required" });
-    }
-}
-
 // ตรวจสอบว่าผู้ใช้มีสิทธิ์ member หรือไม่
-export function authorizeMember(req: Request, res: Response, next: NextFunction) {
+export function authorizeUploader(req: Request, res: Response, next: NextFunction) {
     if ((req as any).user && (req as any).user.role === 'member') {
         next();
     } else {
-        res.status(403).json({ message: "Access Denied: Member privileges required" });
+        res.status(403).json({ message: "Access Denied: Uploader privileges required" });
     }
 }
 
@@ -86,7 +85,7 @@ export function authorizeDev(req: Request, res: Response, next: NextFunction) {
 
 // ตรวจสอบว่าผู้ใช้มีสิทธิ์ในการจัดการข้อมูล (admin, approver, dev)
 export function authorizeDataManager(req: Request, res: Response, next: NextFunction) {
-    if ((req as any).user && ['admin', 'approver', 'dev'].includes((req as any).user.role)) {
+    if ((req as any).user && ['approver', 'dev'].includes((req as any).user.role)) {
         next();
     } else {
         res.status(403).json({ message: "Access Denied: Data management privileges required" });

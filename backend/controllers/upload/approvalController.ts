@@ -56,20 +56,211 @@ export const getPendingApprovals = async (req: Request, res: Response) => {
     }
 };
 
+// Function to get column mapping based on subcategory
+const getColumnMapping = (subCategory: string): { [key: string]: string } => {
+    // Define column mappings for each subcategory
+    const mappings: { [key: string]: { [key: string]: string } } = {
+        "ผลการตรวจวัดทิศทางและความเร็วลมเฉลี่ยรายชั่วโมง": { //WDWS
+            "windDirection": "windDirection",
+            "ws_05_1": "ws_05_1",
+            "ws_1_2": "ws_1_2",
+            "ws_2_3": "ws_2_3",
+            "ws_3_4": "ws_3_4",
+            "ws_4_6": "ws_4_6",
+            "ws_more_that_6": "ws_more_that_6",
+            "station_id": "station_id",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการตรวจวัดคุณภาพอากาศในบรรยากาศ": { 
+            "station_id": "station_id",
+            "parameter": "parameter",
+            "unit": "unit",
+            "day1st_result": "day1st_result",
+            "day2nd_result": "day2nd_result",
+            "day3rd_result": "day3rd_result",
+            "std": "std",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการตรวจวัดค่าความเข้มข้นของก๊าซซัลเฟอร์ไดออกไซด์ในบรรยากาศ": { //SO2
+            "station_id": "station_id",
+            "timePeriod": "timePeriod",
+            "day1st_result_ppm": "day1st_result_ppm",
+            "day2nd_result_ppm": "day2nd_result_ppm",
+            "day3rd_result_ppm": "day3rd_result_ppm",
+            "certifiedDate": "certifiedDate",
+            "expireDate": "expireDate",
+            "concentrationPPB": "concentrationPPB",
+            "gasCylinder": "gasCylinder",
+            "toolAnalyst": "toolAnalyst",
+            "toolCalibration": "toolCalibration",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการตรวจวัดสารอินทรีย์ระเหยง่ายในบรรยากาศ": {
+            "station_id": "station_id",
+            "index_name": "index_name",
+            "day1st_result_ug_per_m3": "day1st_result_ug_per_m3",
+            "day2nd_result_ug_per_m3": "day2nd_result_ug_per_m3",
+            "day3rd_result_ug_per_m3": "day3rd_result_ug_per_m3",
+            "std_lower": "std_lower",
+            "std_higher": "std_higher",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการตรวจวัดคุณภาพอากาศภายในสถานประกอบการ": {
+            "station_id": "station_id",
+            "index_name": "index_name",
+            "unit": "unit",
+            "result": "result",
+            "std": "std",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการตรวจวัดระดับเสียงโดยทั่วไป": {
+            "station_id": "station_id",
+            "timePeriod": "timePeriod",
+            "day1st_result": "day1st_result",
+            "day2nd_result": "day2nd_result",
+            "day3rd_result": "day3rd_result",
+            "certifiedDate": "certifiedDate",
+            "calibrationRefdB": "calibrationRefdB",
+            "slmRead":"slmRead",
+            "slmAdjust":"slmAdjust",
+            "calSheetNo":"calSheetNo",
+            "toolAnalyst":"toolAnalyst",
+            "toolCalibration":"toolCalibration",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการตรวจวัดคุณภาพเสียง 90": {
+            "station_id": "station_id",
+            "timePeriod": "timePeriod",
+            "day1st_result": "day1st_result",
+            "day2nd_result": "day2nd_result",
+            "day3rd_result": "day3rd_result",
+            "certifiedDate": "certifiedDate",
+            "calibrationRefdB": "calibrationRefdB",
+            "slmRead": "slmRead",
+            "slmAdjust": "slmAdjust",
+            "calSheetNo": "calSheetNo",
+            "toolAnalyst":"toolAnalyst",
+            "toolCalibration":"toolCalibration",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการติดตามตรวจสอบ": {
+            "station_id": "station_id",
+            "timePeriod": "timePeriod",
+            "day1st_Leq": "day1st_Leq",
+            "day1st_L90": "day1st_L90",
+            "day2nd_Leq": "day2nd_Leq",
+            "day2nd_L90": "day2nd_L90",
+            "day3rd_Leq": "day3rd_Leq",
+            "day3rd_L90": "day3rd_L90",
+            "calibrationRefdB": "calibrationRefdB",
+            "slmRead": "slmRead",
+            "slmAdjust": "slmAdjust",
+            "certifiedDate": "certifiedDate",
+            "calSheetNo": "calSheetNo",
+            "toolAnalyst":"toolAnalyst",
+            "toolCalibration":"toolCalibration",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการตรวจวัดคุณภาพน้ำทะเล": {
+            "station_id": "station_id",
+            "parameter": "parameter",
+            "result": "result",
+            "unit": "unit",
+            "std_lower": "std_lower",
+            "std_higher": "std_higher",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการตรวจวัดคุณภาพน้ำทิ้ง": {
+            "station_id": "station_id",
+            "index_name": "index_name",
+            "result": "result",
+            "unit": "unit",
+            "std_lower": "std_lower",
+            "std_higher": "std_higher",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนพืช": {
+            "station_id": "station_id",
+            "division": "division",
+            "class": "class",
+            "order": "order",
+            "family": "family",
+            "genu": "genu",
+            "quantity_per_m3": "quantity_per_m3",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนสัตว์": {
+            "station_id": "station_id",
+            "phylum": "phylum",
+            "class": "class",
+            "order": "order",
+            "family": "family",
+            "genu": "genu",
+            "quantity_per_m3": "quantity_per_m3",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์หน้าดิน": {
+            "station_id": "station_id",
+            "phylum": "phylum",
+            "class": "class",
+            "order": "order",
+            "family": "family",
+            "genu": "genu",
+            "quantity_per_m2": "quantity_per_m2",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของลูกปลาและไข่ปลา": {
+            "station_id": "station_id",
+            "phylum": "phylum",
+            "class": "class",
+            "order": "order",
+            "family": "family",
+            "genu": "genu",
+            "quantity_per_1000m3": "quantity_per_1000m3",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        },
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์น้ำวัยอ่อน": {
+            "station_id": "station_id",
+            "phylum": "phylum",
+            "group_name": "group_name",
+            "quantity_per_1000m3": "quantity_per_1000m3",
+            "company_id": "company_id",
+            "reportBy": "reportBy"
+        }
+    };
+
+    return mappings[subCategory] || {};
+};
+
 // Function to approve an uploaded file
 export const approveUpload = async (req: Request, res: Response) => {
     try {
         const { uploadId } = req.params;
         
         if (!uploadId) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "กรุณาระบุไอดีของไฟล์ที่ต้องการอนุมัติ"
             });
+            return;
         }
         
         const pool = await connectToDB();
-        let transaction = null;
+        let transaction: any = null;
         
         try {
             // Begin transaction
@@ -88,10 +279,11 @@ export const approveUpload = async (req: Request, res: Response) => {
                 `);
             
             if (uploadResult.recordset.length === 0) {
-                return res.status(404).json({
+                res.status(404).json({
                     success: false,
                     message: "ไม่พบข้อมูลที่รอการอนุมัติตาม ID ที่ระบุ"
                 });
+                return;
             }
             
             const uploadData = uploadResult.recordset[0];
@@ -101,6 +293,14 @@ export const approveUpload = async (req: Request, res: Response) => {
             if (!parsedData.length || !targetTable) {
                 throw new Error("ข้อมูลไม่ครบถ้วนสำหรับการอนุมัติ");
             }
+            
+            // Get subcategory name to determine column mapping
+            const subCategoryResult = await transaction.request()
+                .input("subId", uploadData.sub_id)
+                .query(`SELECT subName FROM dbo.SbCategories WHERE sub_id = @subId`);
+            
+            const subCategory = subCategoryResult.recordset[0]?.subName || '';
+            const columnMapping = getColumnMapping(subCategory);
             
             // Insert the approved data into the target table
             for (const record of parsedData) {
@@ -154,10 +354,14 @@ export const approveUpload = async (req: Request, res: Response) => {
                     recordCount: parsedData.length
                 }
             });
+            return;
             
         } catch (error) {
             // If there's an error, roll back the transaction
-            if (transaction) await transaction.rollback();
+            if (transaction) {
+                console.error("Rolling back transaction:", error);
+                await transaction.rollback();
+            }
             throw error;
         }
         
@@ -178,14 +382,15 @@ export const rejectUpload = async (req: Request, res: Response) => {
         const { rejectionReason } = req.body;
         
         if (!uploadId) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "กรุณาระบุไอดีของไฟล์ที่ต้องการปฏิเสธ"
             });
+            return;
         }
         
         const pool = await connectToDB();
-        let transaction = null;
+        let transaction:any = null;
         
         try {
             // Begin transaction
@@ -198,10 +403,11 @@ export const rejectUpload = async (req: Request, res: Response) => {
                 .query(`SELECT upload_id, filename FROM dbo.UploadedFiles WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'`);
                 
             if (checkResult.recordset.length === 0) {
-                return res.status(404).json({
+                res.status(404).json({
                     success: false,
                     message: "ไม่พบข้อมูลที่รอการอนุมัติตาม ID ที่ระบุ"
                 });
+                return;
             }
             
             // Update the status to rejected
@@ -224,9 +430,14 @@ export const rejectUpload = async (req: Request, res: Response) => {
                     filename: checkResult.recordset[0].filename
                 }
             });
+            return;
+
         } catch (error) {
             // If there's an error, roll back the transaction
-            if (transaction) await transaction.rollback();
+            if (transaction) {
+                console.error("Rolling back transaction:", error);
+                await transaction.rollback();
+            }
             throw error;
         }
         
@@ -247,14 +458,15 @@ export const rejectReferenceUpload = async (req: Request, res: Response) => {
         const { rejectionReason } = req.body;
         
         if (!uploadId) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "กรุณาระบุไอดีของไฟล์ที่ต้องการปฏิเสธ"
             });
+            return;
         }
         
         const pool = await connectToDB();
-        let transaction = null;
+        let transaction: any = null;
         
         try {
             // Begin transaction
@@ -267,10 +479,11 @@ export const rejectReferenceUpload = async (req: Request, res: Response) => {
                 .query(`SELECT upload_id, filename FROM dbo.ReferenceDataPendingApproval WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'`);
                 
             if (checkResult.recordset.length === 0) {
-                return res.status(404).json({
+                res.status(404).json({
                     success: false,
                     message: "ไม่พบข้อมูลที่รอการอนุมัติตาม ID ที่ระบุ"
                 });
+                return;
             }
             
             const fileInfo = checkResult.recordset[0];
@@ -303,10 +516,14 @@ export const rejectReferenceUpload = async (req: Request, res: Response) => {
                     filename: fileInfo.filename
                 }
             });
+            return;
             
         } catch (error) {
             // If there's an error, roll back the transaction
-            if (transaction) await transaction.rollback();
+            if (transaction) {
+                console.error("Rolling back transaction:", error);
+                await transaction.rollback();
+            }
             throw error;
         }
         
@@ -345,6 +562,8 @@ export const getPendingReferenceApprovals = async (req: Request, res: Response) 
             success: true,
             data: result.recordset
         });
+        return;
+
     } catch (error) {
         console.error("Error fetching pending reference data approvals:", error);
         res.status(500).json({
@@ -361,10 +580,11 @@ export const getPreviewReferenceData = async (req: Request, res: Response) => {
         const { uploadId } = req.params;
         
         if (!uploadId) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "กรุณาระบุไอดีของไฟล์ที่ต้องการดูตัวอย่าง"
             });
+            return;
         }
         
         const pool = await connectToDB();
@@ -381,10 +601,11 @@ export const getPreviewReferenceData = async (req: Request, res: Response) => {
             `);
         
         if (uploadResult.recordset.length === 0) {
-            return res.status(404).json({
+            res.status(404).json({
                 success: false,
                 message: "ไม่พบข้อมูลที่รอการอนุมัติตาม ID ที่ระบุ"
             });
+            return;
         }
         
         const uploadData = uploadResult.recordset[0];
@@ -413,6 +634,7 @@ export const getPreviewReferenceData = async (req: Request, res: Response) => {
                 }
             }
         });
+        return;
         
     } catch (error) {
         console.error("Error fetching reference data preview:", error);
@@ -430,14 +652,15 @@ export const approveReferenceUpload = async (req: Request, res: Response) => {
         const { uploadId } = req.params;
         
         if (!uploadId) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "กรุณาระบุไอดีของไฟล์ที่ต้องการอนุมัติ"
             });
+            return;
         }
         
         const pool = await connectToDB();
-        let transaction = null;
+        let transaction:any = null;
         
         try {
             // Begin transaction
@@ -456,10 +679,11 @@ export const approveReferenceUpload = async (req: Request, res: Response) => {
                 `);
             
             if (uploadResult.recordset.length === 0) {
-                return res.status(404).json({
+                res.status(404).json({
                     success: false,
                     message: "ไม่พบข้อมูลที่รอการอนุมัติตาม ID ที่ระบุ"
                 });
+                return;
             }
             
             const uploadData = uploadResult.recordset[0];
@@ -485,7 +709,7 @@ export const approveReferenceUpload = async (req: Request, res: Response) => {
             let insertedCount = 0;
             let skippedCount = 0;
             let errorCount = 0;
-            const errors = [];
+            const errors: Array<{ row: any; error: any }> = [];
             
             for (const record of parsedData) {
                 try {
@@ -554,10 +778,14 @@ export const approveReferenceUpload = async (req: Request, res: Response) => {
                     errorCount
                 }
             });
+            return;
             
         } catch (error) {
             // If there's an error, roll back the transaction
-            if (transaction) await transaction.rollback();
+            if (transaction) {
+                console.error("Rolling back transaction:", error);
+                await transaction.rollback();
+            }
             throw error;
         }
         

@@ -11,14 +11,15 @@ export const deleteDataByPeriod = async (req: Request, res: Response) => {
         const { periodId, targetTable } = req.body;
         
         if (!periodId || !targetTable) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "กรุณาระบุ periodId และ targetTable"
             });
+            return;
         }
         
         const pool = await connectToDB();
-        let transaction = null;
+        let transaction: any = null;
         
         try {
             // Begin transaction
@@ -46,10 +47,11 @@ export const deleteDataByPeriod = async (req: Request, res: Response) => {
                 `);
                 
             if (periodResult.recordset.length === 0) {
-                return res.status(404).json({
+                res.status(404).json({
                     success: false,
                     message: "ไม่พบข้อมูลช่วงเวลาตาม ID ที่ระบุ"
                 });
+                return;
             }
             
             const periodInfo = periodResult.recordset[0];
@@ -83,7 +85,10 @@ export const deleteDataByPeriod = async (req: Request, res: Response) => {
             
         } catch (error) {
             // If there's an error, roll back the transaction
-            if (transaction) await transaction.rollback();
+            if (transaction) {
+                console.error("Error deleting data:", error);
+                await transaction.rollback();
+            }
             throw error;
         }
         
@@ -103,14 +108,15 @@ export const updateDataByPeriod = async (req: Request, res: Response) => {
         const { periodId, targetTable, updateFields } = req.body;
         
         if (!periodId || !targetTable || !updateFields || Object.keys(updateFields).length === 0) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "กรุณาระบุ periodId, targetTable และข้อมูลที่ต้องการอัพเดท"
             });
+            return;
         }
         
         const pool = await connectToDB();
-        let transaction = null;
+        let transaction: any = null;
         
         try {
             // Begin transaction
@@ -138,10 +144,11 @@ export const updateDataByPeriod = async (req: Request, res: Response) => {
                 `);
                 
             if (periodResult.recordset.length === 0) {
-                return res.status(404).json({
+                res.status(404).json({
                     success: false,
                     message: "ไม่พบข้อมูลช่วงเวลาตาม ID ที่ระบุ"
                 });
+                return;
             }
             
             const periodInfo = periodResult.recordset[0];
@@ -154,10 +161,11 @@ export const updateDataByPeriod = async (req: Request, res: Response) => {
             const recordCount = countResult.recordset[0].count;
             
             if (recordCount === 0) {
-                return res.status(404).json({
+                res.status(404).json({
                     success: false,
                     message: "ไม่พบข้อมูลในช่วงเวลาที่ระบุ"
                 });
+                return;
             }
             
             // Build SET clause for UPDATE statement
@@ -199,7 +207,10 @@ export const updateDataByPeriod = async (req: Request, res: Response) => {
             
         } catch (error) {
             // If there's an error, roll back the transaction
-            if (transaction) await transaction.rollback();
+            if (transaction) {
+                console.error("Error updating data:", error);
+                await transaction.rollback();
+            }
             throw error;
         }
         

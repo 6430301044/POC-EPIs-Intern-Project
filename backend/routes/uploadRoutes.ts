@@ -20,7 +20,8 @@ router.post("/upload-enhance-excel", authenticateToken, authorizeRoles(['dev', '
 // General upload endpoint that routes to the appropriate controller based on file type
 router.post("/", authenticateToken, authorizeRoles(['dev', 'uploader', 'approver']), upload.single("file"), (req, res) => {
     if (!req.file) {
-        return res.status(400).json({ message: "กรุณาอัปโหลดไฟล์" });
+        res.status(400).json({ message: "กรุณาอัปโหลดไฟล์" });
+        return;
     }
     
     // Route to the appropriate controller based on file type
@@ -36,7 +37,8 @@ router.post("/", authenticateToken, authorizeRoles(['dev', 'uploader', 'approver
             if (err) console.error("Error deleting unsupported file:", err);
         });
         
-        return res.status(400).json({ message: "ไม่รองรับประเภทไฟล์นี้ กรุณาอัปโหลดไฟล์ CSV หรือ Excel เท่านั้น" });
+        res.status(400).json({ message: "ไม่รองรับประเภทไฟล์นี้ กรุณาอัปโหลดไฟล์ CSV หรือ Excel เท่านั้น" });
+        return;
     }
 });
 
