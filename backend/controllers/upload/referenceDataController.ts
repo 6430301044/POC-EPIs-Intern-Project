@@ -221,10 +221,16 @@ export const updateReferenceData = async (req: Request, res: Response) => {
         let primaryKeyColumn;
         
         // Handle special cases for primary key column names
-        if (table === 'Daysperiod') {
+        if (table === 'Mcategories') {
+            primaryKeyColumn = 'main_id';
+        } else if (table === 'SbCategories') {
+            primaryKeyColumn = 'sub_id';
+        } else if (table === 'Daysperiod') {
             primaryKeyColumn = 'period_id';
         } else if (table === 'Monitoring_Station') {
             primaryKeyColumn = 'station_id';
+        } else if (table === 'Companies') {
+            primaryKeyColumn = 'company_id';    
         } else {
             // Default pattern for other tables
             primaryKeyColumn = `${table.toLowerCase().replace(/s$/, '')}_id`;

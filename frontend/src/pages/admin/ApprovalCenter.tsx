@@ -13,7 +13,7 @@ export default function ApprovalCenter() {
     <Container>
       <SectionTitle
         title="Approval Center"
-        subtitle="Manage user and file approvals in one place"
+        preTitle="Manage user and file approvals in one place"
         align="center"
       />
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '@/contexts/ThemeContext';
 import {
   Box,
   Button,
@@ -53,6 +54,8 @@ interface ReferenceDataResponse {
 }
 
 const ReferenceDataManagement: React.FC = () => {
+  // Import useTheme hook
+  const { theme } = useTheme();
   // State for table selection and data
   const [selectedTable, setSelectedTable] = useState<string>('');
   const [tableData, setTableData] = useState<ReferenceData[]>([]);
@@ -270,14 +273,13 @@ const ReferenceDataManagement: React.FC = () => {
   // Update record
   const handleUpdateRecord = async () => {
     try {
-      const token = localStorage.getItem('token');
       
       const response = await fetch(`${API_BASE_URL}/upload/reference/${selectedTable}/${selectedId}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include', // ส่ง cookies ไปด้วย
         body: JSON.stringify(formData)
       });
       
@@ -350,6 +352,24 @@ const ReferenceDataManagement: React.FC = () => {
             type={inputType}
             margin="normal"
             required={column.COLUMN_NAME !== 'year_id' && column.COLUMN_NAME !== 'semiannual_id'} // Make year_id and semiannual_id optional
+            sx={{ 
+              '& .MuiInputLabel-root': {
+                color: theme === 'dark' ? 'grey.300' : 'inherit'
+              },
+              '& .MuiOutlinedInput-root': {
+                bgcolor: theme === 'dark' ? 'rgba(54, 65, 83, 1)' : 'background.paper',
+                color: theme === 'dark' ? 'grey.100' : 'text.primary',
+                '& fieldset': {
+                  borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+                },
+                '&:hover fieldset': {
+                  borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)'
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: 'primary.main'
+                }
+              }
+            }}
           />
         </Grid>
       );
@@ -405,19 +425,49 @@ const ReferenceDataManagement: React.FC = () => {
   return (
     <>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+        <Paper sx={{ 
+          p: 2, 
+          display: 'flex', 
+          flexDirection: 'column',
+          bgcolor: theme === 'dark' ? 'rgba(30, 41, 56, 1)' : 'background.paper',
+          color: theme === 'dark' ? 'grey.100' : 'text.primary',
+          boxShadow: theme === 'dark' ? '0px 3px 5px rgba(0, 0, 0, 0.2)' : 1,
+          border: theme === 'dark' ? '1px solid rgba(30, 41, 56, 1)' : 'none'
+        }}>
           <Typography component="h1" variant="h5" gutterBottom>
             จัดการข้อมูลอ้างอิง
           </Typography>
           
+          
           <Box sx={{ mb: 3 }}>
             <FormControl fullWidth>
-              <InputLabel id="table-select-label">เลือกตารางข้อมูลอ้างอิง</InputLabel>
+              <InputLabel id="table-select-label" sx={{ color: theme === 'dark' ? 'grey.300' : 'inherit' }}>เลือกตารางข้อมูลอ้างอิง</InputLabel>
               <Select
                 labelId="table-select-label"
                 value={selectedTable}
                 label="เลือกตารางข้อมูลอ้างอิง"
                 onChange={handleTableChange}
+                sx={{ 
+                  bgcolor: theme === 'dark' ? 'rgba(54, 65, 83, 1)' : 'background.paper',
+                  color: theme === 'dark' ? 'grey.100' : 'text.primary',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'primary.main',
+                  }
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      bgcolor: theme === 'dark' ? 'rgba(54, 65, 83, 1)' : 'background.paper',
+                      color: theme === 'dark' ? 'grey.100' : 'text.primary',
+                    }
+                  }
+                }}
               >
                 {referenceTables.map(table => (
                   <MenuItem key={table.id} value={table.id}>{table.name}</MenuItem>
@@ -445,10 +495,23 @@ const ReferenceDataManagement: React.FC = () => {
             </Box>
           ) : selectedTable ? (
             <>
-              <TableContainer>
-                <Table>
+              <TableContainer sx={{ 
+                bgcolor: theme === 'dark' ? 'rgba(30, 41, 56, 1)' : 'background.paper',
+              }}>
+                <Table sx={{ 
+                  '& .MuiTableCell-root': {
+                    color: theme === 'dark' ? 'grey.300' : 'inherit',
+                    borderBottomColor: theme === 'dark' ? 'rgba(81, 81, 81, 1)' : 'inherit'
+                  }
+                }}>
                   <TableHead>
-                    <TableRow>
+                    <TableRow sx={{ 
+                      bgcolor: theme === 'dark' ? 'rgba(45, 55, 72, 1)' : 'inherit',
+                      '& .MuiTableCell-root': {
+                        color: theme === 'dark' ? 'grey.100' : 'inherit',
+                        fontWeight: 'bold'
+                      }
+                    }}>
                       {renderTableColumns()}
                       <TableCell>จัดการ</TableCell>
                     </TableRow>
@@ -468,11 +531,23 @@ const ReferenceDataManagement: React.FC = () => {
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 labelRowsPerPage="แถวต่อหน้า"
+                sx={{
+                  color: theme === 'dark' ? '#fff' : 'inherit',
+                  '.MuiTablePagination-selectLabel, .MuiTablePagination-select, .MuiTablePagination-selectIcon, .MuiTablePagination-input': {
+                    color: theme === 'dark' ? '#fff' : 'inherit'
+                  },
+                  '.MuiTablePagination-actions': {
+                    color: theme === 'dark' ? '#fff' : 'inherit',
+                    '& .MuiIconButton-root': {
+                      color: theme === 'dark' ? '#fff' : 'inherit'
+                    }
+                  }
+                }}
               />
             </>
           ) : (
             <Box sx={{ p: 3, textAlign: 'center' }}>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body1" color={theme === 'dark' ? 'grey.400' : 'text.secondary'}>
                 กรุณาเลือกตารางข้อมูลอ้างอิงที่ต้องการจัดการ
               </Typography>
             </Box>
@@ -481,8 +556,19 @@ const ReferenceDataManagement: React.FC = () => {
       </Container>
       
       {/* Add Dialog */}
-      <Dialog open={openAddDialog} onClose={handleCloseDialogs} maxWidth="md" fullWidth>
-        <DialogTitle>เพิ่มข้อมูลใหม่</DialogTitle>
+      <Dialog 
+        open={openAddDialog} 
+        onClose={handleCloseDialogs} 
+        maxWidth="md" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: theme === 'dark' ? 'rgba(30, 41, 56, 1)' : 'background.paper',
+            color: theme === 'dark' ? 'grey.100' : 'text.primary',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: theme === 'dark' ? 'grey.100' : 'inherit' }}>เพิ่มข้อมูลใหม่</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
             {renderFormFields()}
@@ -495,8 +581,19 @@ const ReferenceDataManagement: React.FC = () => {
       </Dialog>
       
       {/* Edit Dialog */}
-      <Dialog open={openEditDialog} onClose={handleCloseDialogs} maxWidth="md" fullWidth>
-        <DialogTitle>แก้ไขข้อมูล</DialogTitle>
+      <Dialog 
+        open={openEditDialog} 
+        onClose={handleCloseDialogs} 
+        maxWidth="md" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: theme === 'dark' ? 'rgba(30, 41, 56, 1)' : 'background.paper',
+            color: theme === 'dark' ? 'grey.100' : 'text.primary',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: theme === 'dark' ? 'grey.100' : 'inherit' }}>แก้ไขข้อมูล</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
             {renderFormFields()}
@@ -509,10 +606,19 @@ const ReferenceDataManagement: React.FC = () => {
       </Dialog>
       
       {/* Delete Confirmation Dialog */}
-      <Dialog open={openDeleteDialog} onClose={handleCloseDialogs}>
-        <DialogTitle>ยืนยันการลบข้อมูล</DialogTitle>
+      <Dialog 
+        open={openDeleteDialog} 
+        onClose={handleCloseDialogs}
+        PaperProps={{
+          sx: {
+            bgcolor: theme === 'dark' ? 'rgba(30, 41, 56, 1)' : 'background.paper',
+            color: theme === 'dark' ? 'grey.100' : 'text.primary',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: theme === 'dark' ? 'grey.100' : 'inherit' }}>ยืนยันการลบข้อมูล</DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <DialogContentText sx={{ color: theme === 'dark' ? 'grey.400' : 'text.secondary' }}>
             คุณต้องการลบข้อมูลนี้ใช่หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้
           </DialogContentText>
         </DialogContent>

@@ -12,21 +12,21 @@ export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme } = useTheme();
   
-  // แยก Dashboard ออกมา
-  const admin = { name: 'Home', path: '/admin', icon: HomeIcon }
+  // แยก Home ออกมา
+  const admin = { name: 'หน้าหลัก', path: '/admin', icon: HomeIcon } //Eng name Home
   
   // เมนูหลัก
   const mainMenus = [
-    { name: 'Team', path: '/admin/team', icon: TeamIcon },
+    { name: 'จัดการดูแลข้อมูลผู้ใช้ในระบบ', path: '/admin/team', icon: TeamIcon }, //Eng name Team Management
     // { name: 'Projects', path: '/admin/projects', icon: ProjectIcon },
     // { name: 'Calendar', path: '/admin/calendar', icon: CalendarIcon },
     // { name: 'Documents', path: '/admin/documents', icon: DocumentIcon },
     // { name: 'Reports', path: '/admin/reports', icon: ReportIcon },
-    { name: 'Upload Center', path: '/admin/upload-center', icon: UploadIcon },
-    { name: 'Approval Center', path: '/admin/approval-center', icon: ApprovalIcon },
-    { name: 'Data Management', path: '/admin/data-management', icon: DataIcon },
+    { name: 'ศูนย์รวมการอัปโหลดข้อมูล', path: '/admin/upload-center', icon: UploadIcon }, //Eng name Upload Center
+    { name: 'ศูนย์รวมการอนุมัติข้อมูล', path: '/admin/approval-center', icon: ApprovalIcon }, //Eng name Approval Center
+    { name: 'ศูนย์รวมการจัดการข้อมูล', path: '/admin/data-management', icon: DataIcon }, //Eng name Verification Center
     { name: 'Bulk Data Deletion', path: '/admin/bulk-data-deletion', icon: TrashIcon },
-    { name: 'News', path: '/admin/news', icon: ReportIcon },
+    { name: 'ข่าวสารประชาสัมพันธ์', path: '/admin/news', icon: ReportIcon }, //Eng name News
   ]
 
   // const teams = [
