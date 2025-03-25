@@ -46,7 +46,7 @@ const DataPreviewReference: React.FC<DataPreviewReferenceProps> = ({ uploadId, i
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_BASE_URL}/upload/reference-preview/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/upload/preview-reference/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'

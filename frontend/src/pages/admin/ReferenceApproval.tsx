@@ -236,15 +236,15 @@ export default function ReferenceApproval() {
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
               </div>
             ) : pendingApprovals.length === 0 ? (
-              <div className="bg-gray-100 p-8 rounded text-center">
+              <div className="bg-gray-100 dark:bg-gray-700 p-8 rounded text-center">
                 <p className="text-gray-500">ไม่พบรายการข้อมูลอ้างอิงที่รอการอนุมัติในขณะนี้</p>
                 <p className="text-gray-400 text-sm mt-2">หากคุณเพิ่งอัปโหลดไฟล์ กรุณาลองรีเฟรชหน้านี้</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200">
+                <table className="min-w-full bg-white border border-gray-200 dark:bg-gray-700">
                   <thead>
-                    <tr className="bg-gray-100 text-black">
+                    <tr className="bg-gray-100 dark:bg-gray-700 text-black dark:text-gray-300">
                       <th className="py-3 px-4 border-b text-left">File Name</th>
                       <th className="py-3 px-4 border-b text-left">Upload Date</th>
                       <th className="py-3 px-4 border-b text-left">Target Table</th>
@@ -254,7 +254,7 @@ export default function ReferenceApproval() {
                   </thead>
                   <tbody>
                     {pendingApprovals.map((approval) => (
-                      <tr key={approval.id} className="hover:bg-gray-50 text-black">
+                      <tr key={approval.id} className="hover:bg-gray-50 text-black dark:text-gray-300 dark:hover:bg-gray-800">
                         <td className="py-3 px-4 border-b">{approval.file_name}</td>
                         <td className="py-3 px-4 border-b">{formatDate(approval.upload_date)}</td>
                         <td className="py-3 px-4 border-b">{approval.table_name}</td>
