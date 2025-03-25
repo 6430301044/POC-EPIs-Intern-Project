@@ -1,9 +1,8 @@
 import Visualization from "@/components/main/Visualization";
-import Table from "@/components/main/TableNC";
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
-import { Link, useLocation } from "react-router";
+import { useLocation } from "react-router";
 
 export default function Data() {
   const location = useLocation();
@@ -25,7 +24,7 @@ export default function Data() {
             <h2 className="text-3xl font-semibold">{'ข้อมูลสิ่งแวดล้อม'}</h2>
           </div>
   
-          <div className="text-lg mt-2 flex items-center space-x-2 relative z-30">
+          <div className="text-lg mt-2 flex items-center justify-center space-x-2 relative z-30">
           <a
             href="/"
             className="text-white hover:text-blue-500 transition-all duration-300 ease-in-out transform hover:scale-105"
@@ -81,11 +80,8 @@ export default function Data() {
         </svg>
       </section>
       
-      <div id="visualization" className="py-25">
+      <div id="visualization" className="py-0">
         <Visualization />
-      </div>
-      <div id="table">
-        <Table />
       </div>
     </div>
   );

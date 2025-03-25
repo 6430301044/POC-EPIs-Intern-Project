@@ -23,7 +23,6 @@ import DataManagement from "@/pages/admin/DataManagement";
 import ReferenceDataManagement from "@/pages/admin/ReferenceDataManagement";
 import News from "@/pages/admin/News";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
-import TestAPICall from "@/components/TestAPICall";
 import ApproveUser from "@/pages/admin/ApproveUser";
 import ApprovalCenter from "@/pages/admin/ApprovalCenter";
 import NewsDetail from "@/pages/NewsDetail";
@@ -34,7 +33,7 @@ import UploadCenter from "@/pages/admin/UploadCenter";
 import BulkDataDeletion from "@/pages/admin/BulkDataDeletion";
 import NewsPage from "@/pages/NewsPage";
 import About from "@/pages/About";
-
+import Results from "@/pages/results";
 
 const router = createBrowserRouter([
   {
@@ -72,6 +71,10 @@ const router = createBrowserRouter([
       {
         path: "/environment-data",
         element: <Data />,
+      },
+      {
+        path: "/environment-measurement",
+        element: <Results />,
       },
       {
         path: "/contact",

@@ -48,7 +48,7 @@ export default function Contact() {
           align="center"
         ></SectionTitle>
         <div
-          className="flex w-full justify-center items-center h-full py-16"
+          className="flex w-full justify-center items-center h-full py-5"
           id="contact"
         >
           <div className="flex flex-col justify-center items-center w-150 h-auto bg-amber-300 p-8 rounded">

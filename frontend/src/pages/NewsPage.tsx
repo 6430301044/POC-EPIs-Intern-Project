@@ -7,6 +7,7 @@ import { Link, useLocation } from "react-router";
 export default function NewPage() {
   const location = useLocation();
   const pathnames = location.pathname.split('/').filter(Boolean);
+
   return (
     <div className="bg-white min-h-screen">
       {/* Breadcrumb Section with Background */}
@@ -80,7 +81,7 @@ export default function NewPage() {
         </svg>
       </section>
       
-      <div id="news" className="py-25">
+      <div id="news" className="py-0">
         <News />
       </div>
     </div>

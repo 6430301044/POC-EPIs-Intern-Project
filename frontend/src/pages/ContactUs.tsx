@@ -2,7 +2,7 @@ import Contact from "@/components/main/Contact";
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome } from "@fortawesome/free-solid-svg-icons";
-import { Link, useLocation } from "react-router";
+import { useLocation } from "react-router";
 
 export default function ContactUs() {
   const location = useLocation();
@@ -12,7 +12,7 @@ export default function ContactUs() {
       <div className="bg-white min-h-screen">
         {/* Breadcrumb Section with Background */}
         <section
-          className="relative w-full min-h-[760px] overflow-x-auto flex flex-col md:flex-row items-center justify-center px-4 md:px-[192px]"
+          className="relative w-full min-h-[760px] overflow-x-auto flex flex-col md:flex-row items-center justify-center"
           style={{
             backgroundImage: 'url("/images/PTT_Terminal.jpg")',
             backgroundSize: "cover",
@@ -96,7 +96,7 @@ export default function ContactUs() {
           </svg>
         </section>
 
-        <div id="contact" className="py-25">
+        <div id="contact" className="py-0">
           <Contact />
         </div>
       </div>

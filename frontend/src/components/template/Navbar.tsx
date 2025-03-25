@@ -43,13 +43,13 @@ export default function Navbar() {
   const handleMenuClick = (id: string) => {
     setActiveMenu(id);
   };
-
+  ///Hello
   const navigation = [
     { name: "หน้าหลัก", id: "/" },
     { name: "เกี่ยวกับเรา", id: "/about" },  
     { name: "ข้อมูลสิ่งแวดล้อม", id: "/environment-data" },
+    { name: "ตารางข้อมูลสิ่งแวดล้อม", id: "/environment-measurement" },
     { name: "ข่าวสารและกิจกรรม", id: "/news" },
-    // { name: "ตารางข้อมูลสิ่งแวดล้อม", id: "/environment-data" },
     { name: "ติดต่อเรา", id: "/contact" },
   ];
 
@@ -91,28 +91,9 @@ export default function Navbar() {
               <div className="flex items-center justify-end space-x-2 md:w-1/3">
                 {/* Desktop links - show only on desktop */}
                 <div className="hidden lg:flex items-center space-x-4">
-                  {/* <a href="#" className="hover:underline">
-                    ศูนย์ข้อมูลข่าวสาร
-                  </a> */}
-                  {/* <a href="#" className="hover:underline">
-                    1365 Contact Center
-                  </a> */}
                   <a href="/login" className="hover:underline">
                     สำหรับเจ้าหน้าที่
                   </a>
-                  {/* ปุ่มเปลี่ยนภาษา */}
-                  {/* <button
-                    onClick={() => setLanguage(language === "ไทย" ? "En" : "ไทย")}
-                    className="hover:underline"
-                  > */}
-                    {/* {language} */}
-                  {/* </button>
-
-                  <Link to="/login">
-                    <button className="relative z-0 h-12 rounded-full bg-blue-500 px-6 text-neutral-50 after:absolute after:left-0 after:top-0 after:-z-10 after:h-full after:w-full after:rounded-full after:bg-blue-500 hover:after:scale-x-125 hover:after:scale-y-150 hover:after:opacity-0 hover:after:transition hover:after:duration-500">
-                      Login
-                    </button>
-                  </Link> */}
                 </div>
                 
                 {/* Dark mode switch - show only on mobile/tablet */}
