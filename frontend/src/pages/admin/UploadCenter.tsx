@@ -13,7 +13,7 @@ export default function UploadCenter() {
   return (
     <Container>
       <SectionTitle
-        title="Upload Center"
+        title="ศูนย์รวมการอัปโหลดข้อมูล"
         subtitle="จัดการการอัปโหลดข้อมูลทั้งหมดในที่เดียว"
         align="center"
       />

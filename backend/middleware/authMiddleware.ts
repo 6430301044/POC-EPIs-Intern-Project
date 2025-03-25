@@ -39,15 +39,6 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
     }
 }
 
-// ตรวจสอบว่าผู้ใช้มีสิทธิ์ approver หรือไม่
-export function authorizeApprover(req: Request, res: Response, next: NextFunction) {
-    if ((req as any).user && ((req as any).user.role === 'approver')) {
-        next();
-    } else {
-        res.status(403).json({ message: "Access Denied: Approver privileges required" });
-    }
-}
-
 // ตรวจสอบว่าผู้ใช้มีสิทธิ์ตามที่กำหนดหรือไม่
 export function authorizeRoles(roles: string[]) {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -65,9 +56,18 @@ export function authorizeRoles(roles: string[]) {
     };
 }
 
+// ตรวจสอบว่าผู้ใช้มีสิทธิ์ approver หรือไม่
+export function authorizeApprover(req: Request, res: Response, next: NextFunction) {
+    if ((req as any).user && ((req as any).user.role === 'approver' || (req as any).user.role === 'dev')) {
+        next();
+    } else {
+        res.status(403).json({ message: "Access Denied: Approver privileges required" });
+    }
+}
+
 // ตรวจสอบว่าผู้ใช้มีสิทธิ์ member หรือไม่
 export function authorizeUploader(req: Request, res: Response, next: NextFunction) {
-    if ((req as any).user && (req as any).user.role === 'member') {
+    if ((req as any).user && (req as any).user.role === 'uploader' || (req as any).user.role === 'approver' || (req as any).user.role === 'dev') {
         next();
     } else {
         res.status(403).json({ message: "Access Denied: Uploader privileges required" });

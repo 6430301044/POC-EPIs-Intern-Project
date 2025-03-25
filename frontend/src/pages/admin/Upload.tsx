@@ -274,12 +274,12 @@ export default function Upload() {
   const fetchPeriods = async () => {
     try {
       setIsLoadingPeriods(true);
-      const token = localStorage.getItem('token');
       
       const response = await fetch(`${API_BASE_URL}/upload/periods`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include' // ส่ง cookies ไปด้วย
       });
       
       if (!response.ok) {
@@ -608,12 +608,11 @@ export default function Upload() {
     try {
       // ใช้ API_BASE_URL เพื่อให้ตรงกับ endpoint จริง
       // ตรวจสอบประเภทไฟล์และเลือก endpoint ที่เหมาะสม
-      const token = localStorage.getItem('token');
       const endpoint = selectedFile.type === "text/csv" ? "upload-csv" : "upload-excel";
       const response = await fetch(`${API_BASE_URL}/upload/${endpoint}`, {
         method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         credentials: 'include', // ส่ง cookies ไปด้วย
         body: formData,
