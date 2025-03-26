@@ -33,9 +33,9 @@ export const fetchNews = async (sortOrder: string = 'desc', category?: string): 
     const data = await response.json();
     const newsItems = Array.isArray(data.data) ? data.data : [];
     
-    // If category filtering is requested but not supported by backend,
-    // filter on the client side
-    if (category && !url.includes('&category=')) {
+    // If category filtering is requested, filter on the client side
+    // regardless of whether the backend supports it or not
+    if (category) {
       return newsItems.filter(item => item.News_category === category);
     }
     

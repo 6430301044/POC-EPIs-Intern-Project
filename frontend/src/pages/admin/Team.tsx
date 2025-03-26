@@ -216,7 +216,7 @@ export default function Team() {
         <Box sx={{ 
           mt: 2, 
           p: 2, 
-          bgcolor: theme === 'dark' ? 'rgba(255, 249, 196, 0.15)' : '#fff9c4', 
+          bgcolor: theme === 'dark' ? 'gray.700' : '#fff9c4', 
           borderRadius: 1, 
           textAlign: 'center' 
         }}>
