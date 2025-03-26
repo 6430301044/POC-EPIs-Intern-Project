@@ -175,14 +175,15 @@ export default function ApproveUser() {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
           ) : pendingApprovals.length === 0 ? (
-            <div className="bg-gray-100 p-8 rounded text-center">
-              <p className="text-gray-500">No pending approvals found.</p>
+            <div className="bg-gray-100 dark:bg-gray-700 p-8 rounded text-center">
+              <p className="text-gray-800 dark:text-gray-300">ไม่พบรายการข้อมูลผู้ใช้ที่รอการอนุมัติในขณะนี้</p> {/* Eng name: No pending approvals found. */}
+              <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">หากคุณเพิ่งลงทะเบียนผู้ใช้ กรุณาลองรีเฟรชหน้านี้</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border border-gray-200">
+              <table className="min-w-full bg-white border border-gray-200 dark:bg-gray-700">
                 <thead>
-                  <tr className="bg-gray-100 text-black">
+                  <tr className="bg-gray-100 dark:bg-gray-700 text-black dark:text-gray-300">
                     <th className="py-3 px-4 border-b text-left">User Name</th>
                     <th className="py-3 px-4 border-b text-left">Job Position</th>
                     <th className="py-3 px-4 border-b text-left">Company</th>
@@ -194,7 +195,7 @@ export default function ApproveUser() {
                 </thead>
                 <tbody>
                   {pendingApprovals.map((approval) => (
-                    <tr key={approval.Register_id} className="hover:bg-gray-50 text-black">
+                    <tr key={approval.Register_id} className="hover:bg-gray-50 text-black dark:text-gray-300 dark:hover:bg-gray-800">
                       <td className="py-3 px-4 border-b">{approval.User_name}</td>
                       <td className="py-3 px-4 border-b">{approval.User_Job_Position}</td>
                       <td className="py-3 px-4 border-b">{approval.companyName}</td>

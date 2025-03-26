@@ -25,7 +25,7 @@ export const getPreviewData = async (req: Request, res: Response) => {
             .query(`
                 SELECT 
                     upload_id, filename, period_id, 
-                    parsed_data, target_table, column_mapping
+                    parsed_data, target_table, column_mapping, upload_date
                 FROM dbo.UploadedFiles 
                 WHERE upload_id = @uploadId
             `);

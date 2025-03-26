@@ -8,7 +8,7 @@ export default function Results() {
     const location = useLocation();
     const pathnames = location.pathname.split('/').filter(Boolean);
     return (
-        <div className="bg-white min-h-screen">
+        <div className="bg-white dark:bg-gray-700 min-h-screen">
           {/* Breadcrumb Section with Background */}
           <section className="relative w-full min-h-[760px] overflow-x-auto flex flex-col md:flex-row items-center justify-center px-4 md:px-[192px]" style={{
             backgroundImage: 'url("/images/PTT_Terminal_2.jpg")',

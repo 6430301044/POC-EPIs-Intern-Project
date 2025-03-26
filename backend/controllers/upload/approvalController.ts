@@ -545,17 +545,20 @@ export const getPendingReferenceApprovals = async (req: Request, res: Response) 
         const result = await pool.request()
             .query(`
                 SELECT 
-                    upload_id as id,
-                    filename as file_name,
-                    upload_date,
-                    target_table as table_name,
-                    uploaded_by
+                    r.upload_id as id,
+                    r.filename as file_name,
+                    r.upload_date,
+                    r.target_table as table_name,
+                    r.uploaded_by,
+                    u.User_name as uploaded_by_name
                 FROM 
-                    dbo.ReferenceDataPendingApproval
+                    dbo.ReferenceDataPendingApproval r
+                LEFT JOIN
+                    dbo.Users u ON r.uploaded_by = u.User_id
                 WHERE 
-                    status = 'รอการอนุมัติ'
+                    r.status = 'รอการอนุมัติ'
                 ORDER BY 
-                    upload_date DESC
+                    r.upload_date DESC
             `);
             
         res.status(200).json({
@@ -578,6 +581,11 @@ export const getPendingReferenceApprovals = async (req: Request, res: Response) 
 export const getPreviewReferenceData = async (req: Request, res: Response) => {
     try {
         const { uploadId } = req.params;
+        const { page = 1, pageSize = 10 } = req.query;
+        
+        // Convert to numbers and validate
+        const pageNum = parseInt(page as string) || 1;
+        const pageSizeNum = parseInt(pageSize as string) || 10;
         
         if (!uploadId) {
             res.status(400).json({
@@ -595,7 +603,7 @@ export const getPreviewReferenceData = async (req: Request, res: Response) => {
             .query(`
                 SELECT 
                     upload_id, filename, target_table, 
-                    parsed_data
+                    parsed_data, upload_date
                 FROM dbo.ReferenceDataPendingApproval 
                 WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'
             `);
@@ -620,13 +628,21 @@ export const getPreviewReferenceData = async (req: Request, res: Response) => {
                 WHERE TABLE_NAME = '${targetTable}'
             `);
         
-        // Return preview data
+        // Calculate pagination
+        const startIndex = (pageNum - 1) * pageSizeNum;
+        const endIndex = startIndex + pageSizeNum;
+        const paginatedData = parsedData.slice(startIndex, endIndex);
+        
+        // Return preview data with pagination
         res.status(200).json({
             success: true,
             data: {
                 columns: schemaResult.recordset,
-                rows: parsedData.slice(0, 10), // Return first 10 rows for preview
+                rows: paginatedData,
                 totalRows: parsedData.length,
+                currentPage: pageNum,
+                pageSize: pageSizeNum,
+                totalPages: Math.ceil(parsedData.length / pageSizeNum),
                 fileInfo: {
                     filename: uploadData.filename,
                     upload_date: uploadData.upload_date,

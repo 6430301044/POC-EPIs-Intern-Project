@@ -127,7 +127,7 @@ const ReferenceDataFieldStructures: { [key: string]: FieldStructure[] } = {
     { name: "mainName", type: "string", description: "ชื่อหมวดหมู่หลัก", required: true }
   ],
   "หมวดหมู่ย่อย": [
-    { name: "subName", type: "int", description: "ชื่อหมวดหมู่ย่อย", required: true },
+    { name: "subName", type: "string", description: "ชื่อหมวดหมู่ย่อย", required: true },
     { name: "main_id", type: "string", description: "รหัสหมวดหมู่หลัก", required: true }
   ],
   "บริษัท": [
@@ -135,7 +135,7 @@ const ReferenceDataFieldStructures: { [key: string]: FieldStructure[] } = {
     { name: "companyPhone", type: "string", description: "เบอร์โทรบริษัท" }
   ],
   "สถานีตรวจวัด": [
-    { name: "stationName", type: "int", description: "ชื่อสถานีตรวจวัด", required: true },
+    { name: "stationName", type: "string", description: "ชื่อสถานีตรวจวัด", required: true },
     { name: "lat", type: "decimal", description: "ละติจูด" },
     { name: "long", type: "decimal", description: "ลองจิจูด" }
   ],

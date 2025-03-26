@@ -17,7 +17,7 @@ export function SectionTitle(props: Readonly<SectionTitleProps>) {
       }`}
     >
       {props.preTitle && (
-        <div className="text-sm font-bold tracking-wider text-indigo-600 uppercase">
+        <div className="text-sm font-bold tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
           {props.preTitle}
         </div>
       )}
