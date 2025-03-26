@@ -33,7 +33,9 @@ import UploadCenter from "@/pages/admin/UploadCenter";
 import BulkDataDeletion from "@/pages/admin/BulkDataDeletion";
 import NewsPage from "@/pages/NewsPage";
 import About from "@/pages/About";
-import Results from "@/pages/results";
+import Results from "@/pages/Results";
+import SrirachaOil from "@/pages/SrirachaOil";
+import KhaoBoYa from "@/pages/KhaoBoYa";
 
 const router = createBrowserRouter([
   {
@@ -79,7 +81,15 @@ const router = createBrowserRouter([
       {
         path: "/contact",
         element: <Contact />,
-      }
+      },
+      {
+        path: "/sriracha-oil",
+        element: <SrirachaOil />,
+      },
+      {
+        path: "/khaoboya-terminal",
+        element: <KhaoBoYa />,
+      },
     ],
   },
   {
