@@ -36,6 +36,7 @@ import About from "@/pages/About";
 import Results from "@/pages/Results";
 import SrirachaOil from "@/pages/SrirachaOil";
 import KhaoBoYa from "@/pages/KhaoBoYa";
+import OtpPage from "@/pages/Otppage";
 
 const router = createBrowserRouter([
   {
@@ -101,6 +102,10 @@ const router = createBrowserRouter([
     // Without Layout
     path: "/register",
     element: <Register />,
+  },
+  {
+    path: "/otp",
+    element: <OtpPage />,
   },
   {
     // Without Layout

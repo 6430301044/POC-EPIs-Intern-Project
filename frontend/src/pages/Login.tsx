@@ -47,25 +47,23 @@ export default function Login() {
   }, [navigate])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log("Form submitted")
-    // to login
+    e.preventDefault();
+    console.log("Form submitted");
     try {
       const response = await fetch(`${API_BASE_URL}/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: 'include', // เพิ่ม credentials เพื่อให้ browser ส่ง cookies ไปกับ request
+        credentials: 'include', // Send cookies with the request
         body: JSON.stringify({ User_email: email, User_password: password }),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
-        // ไม่ต้องเก็บ token ใน localStorage อีกต่อไป เพราะใช้ HttpOnly Cookie แล้ว
-        alert("Login successful!");
-        navigate("/admin"); // ไปหน้า Dashboard
+        alert("Login successful! Please enter OTP to proceed.");
+        navigate("/otp", { state: { email } }); // Redirect to OTP input page, passing email
       } else {
         alert(data.message || "Login failed");
       }
