@@ -545,17 +545,20 @@ export const getPendingReferenceApprovals = async (req: Request, res: Response) 
         const result = await pool.request()
             .query(`
                 SELECT 
-                    upload_id as id,
-                    filename as file_name,
-                    upload_date,
-                    target_table as table_name,
-                    uploaded_by
+                    r.upload_id as id,
+                    r.filename as file_name,
+                    r.upload_date,
+                    r.target_table as table_name,
+                    r.uploaded_by,
+                    u.User_name as uploaded_by_name
                 FROM 
-                    dbo.ReferenceDataPendingApproval
+                    dbo.ReferenceDataPendingApproval r
+                LEFT JOIN
+                    dbo.Users u ON r.uploaded_by = u.User_id
                 WHERE 
-                    status = 'รอการอนุมัติ'
+                    r.status = 'รอการอนุมัติ'
                 ORDER BY 
-                    upload_date DESC
+                    r.upload_date DESC
             `);
             
         res.status(200).json({
@@ -595,7 +598,7 @@ export const getPreviewReferenceData = async (req: Request, res: Response) => {
             .query(`
                 SELECT 
                     upload_id, filename, target_table, 
-                    parsed_data
+                    parsed_data, upload_date
                 FROM dbo.ReferenceDataPendingApproval 
                 WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'
             `);

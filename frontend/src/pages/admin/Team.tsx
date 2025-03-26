@@ -13,6 +13,7 @@ import { hasEditPermission } from '@/utils/authUtils';
 import { UploadFile } from '@mui/icons-material';
 import EditUserModal from '@/components/admin/EditUserModal';
 import DeleteUserModal from '@/components/admin/DeleteUserModal';
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface User {
   User_id: string;
@@ -33,6 +34,7 @@ export default function Team() {
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const canEdit = hasEditPermission();
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -137,10 +139,12 @@ export default function Team() {
             justifyContent="center"
             backgroundColor={
               role === 'admin'
-                ? '#3da58a'
+                ? theme === 'dark' ? '#1e5245' : '#3da58a'
                 : role === 'approver'
-                ? '#4cceac'
-                : '#4cceac'
+                ? theme === 'dark' ? '#2e7c67' : '#4cceac'
+                : role === 'uploader'
+                ? theme === 'dark' ? '#3da58a' : '#4cceac'
+                : theme === 'dark' ? '#4cceac' : '#4cceac'
             }
             borderRadius="4px"
           >
@@ -209,8 +213,14 @@ export default function Team() {
         align='center'
       />
       {!canEdit && (
-        <Box sx={{ mt: 2, p: 2, bgcolor: '#fff9c4', borderRadius: 1, textAlign: 'center' }}>
-          <Typography variant="body2" color="warning.dark">
+        <Box sx={{ 
+          mt: 2, 
+          p: 2, 
+          bgcolor: theme === 'dark' ? 'rgba(255, 249, 196, 0.15)' : '#fff9c4', 
+          borderRadius: 1, 
+          textAlign: 'center' 
+        }}>
+          <Typography variant="body2" color={theme === 'dark' ? 'warning.light' : 'warning.dark'}>
             คุณกำลังดูข้อมูลในโหมดอ่านอย่างเดียว เนื่องจากคุณไม่มีสิทธิ์ในการแก้ไขข้อมูลผู้ใช้
           </Typography>
         </Box>
@@ -224,28 +234,29 @@ export default function Team() {
           },
           '& .MuiDataGrid-cell': {
             borderBottom: 'none',
+            color: theme === 'dark'? '#ffffff' : '#2e7c67',
           },
           '& .name-column--cell': {
-            color: '#2e7c67',
+            color: theme === 'dark' ? '#4cceac' : '#2e7c67',
           },
           '& .MuiDataGrid-columnHeaders': {
-            backgroundColor: '#3da58a',
+            backgroundColor: theme === 'dark' ? '#1e5245' : '#3da58a',
             borderBottom: 'none',
-            color: '#000000',
+            color:'#000000',
           },
           '& .MuiDataGrid-virtualScroller': {
-            backgroundColor: '#f2f0f0',
+            backgroundColor: theme === 'dark' ? '#1f2a40' : '#f2f0f0',
           },
           '& .MuiDataGrid-footerContainer': {
             borderTop: 'none',
-            backgroundColor: '#3da58a',
+            backgroundColor: theme === 'dark' ? '#1e5245' : '#3da58a',
             color: '#ffffff',
           },
           '& .MuiCheckbox-root': {
-            color: '#1e5245',
+            color: theme === 'dark' ? '#4cceac' : '#1e5245',
           },
           '& .MuiDataGrid-toolbarContainer .MuiButton-text': {
-            color: '#1e5245',
+            color: theme === 'dark' ? '#4cceac' : '#1e5245',
           },
         }}
       >
@@ -272,7 +283,16 @@ export default function Team() {
             sx={{
               '& .MuiDataGrid-row': {
                 cursor: canEdit ? 'pointer' : 'default',
+              },color: theme === 'dark' ? '#fff' : 'inherit',
+              '.MuiTablePagination-selectLabel, .MuiTablePagination-select, .MuiTablePagination-selectIcon, .MuiTablePagination-input': {
+                color: theme === 'dark' ? '#fff' : 'inherit'
               },
+              '.MuiTablePagination-actions': {
+                color: theme === 'dark' ? '#fff' : 'inherit',
+                '& .MuiIconButton-root': {
+                  color: theme === 'dark' ? '#fff' : 'inherit'
+                }
+              }
             }}
           />
         )}

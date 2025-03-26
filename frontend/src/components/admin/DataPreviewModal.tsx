@@ -15,13 +15,12 @@ interface Column {
 interface FileInfo {
   filename: string;
   upload_date: string;
-  period_id: string;
   total_rows: number;
 }
 
 interface PreviewData {
   columns: Column[];
-  rows: any[];
+  rows: number[];
   totalRows: number;
   fileInfo: FileInfo;
 }

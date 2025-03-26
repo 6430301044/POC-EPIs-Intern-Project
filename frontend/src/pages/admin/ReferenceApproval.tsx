@@ -10,6 +10,7 @@ interface PendingReferenceApproval {
   upload_date: string;
   table_name: string;
   uploaded_by: string;
+  uploaded_by_name: string;
 }
 
 export default function ReferenceApproval() {
@@ -237,8 +238,8 @@ export default function ReferenceApproval() {
               </div>
             ) : pendingApprovals.length === 0 ? (
               <div className="bg-gray-100 dark:bg-gray-700 p-8 rounded text-center">
-                <p className="text-gray-500">ไม่พบรายการข้อมูลอ้างอิงที่รอการอนุมัติในขณะนี้</p>
-                <p className="text-gray-400 text-sm mt-2">หากคุณเพิ่งอัปโหลดไฟล์ กรุณาลองรีเฟรชหน้านี้</p>
+                <p className="text-gray-800 dark:text-gray-300">ไม่พบรายการข้อมูลอ้างอิงที่รอการอนุมัติในขณะนี้</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">หากคุณเพิ่งอัปโหลดไฟล์ กรุณาลองรีเฟรชหน้านี้</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -258,7 +259,7 @@ export default function ReferenceApproval() {
                         <td className="py-3 px-4 border-b">{approval.file_name}</td>
                         <td className="py-3 px-4 border-b">{formatDate(approval.upload_date)}</td>
                         <td className="py-3 px-4 border-b">{approval.table_name}</td>
-                        <td className="py-3 px-4 border-b">{approval.uploaded_by}</td>
+                        <td className="py-3 px-4 border-b">{approval.uploaded_by_name || approval.uploaded_by}</td>
                         <td className="py-3 px-4 border-b text-center">
                           <div className="flex justify-center space-x-2">
                             <button
