@@ -175,7 +175,7 @@ export default function ApproveUser() {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
           ) : pendingApprovals.length === 0 ? (
-            <div className="bg-gray-100 p-8 rounded text-center">
+            <div className="bg-gray-100 dark:bg-gray-700 p-8 rounded text-center">
               <p className="text-gray-800 dark:text-gray-300">ไม่พบรายการข้อมูลผู้ใช้ที่รอการอนุมัติในขณะนี้</p> {/* Eng name: No pending approvals found. */}
               <p className="text-gray-600 dark:text-gray-400 text-sm mt-2">หากคุณเพิ่งลงทะเบียนผู้ใช้ กรุณาลองรีเฟรชหน้านี้</p>
             </div>

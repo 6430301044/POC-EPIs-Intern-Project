@@ -1,10 +1,13 @@
 import { Container } from '@/components/template/Container'
 import { SectionTitle } from '@/components/template/SectionTitle'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { jwtDecode } from 'jwt-decode'
 import API_BASE_URL from '@/config/apiConfig'
+import { hasEditPermission } from '@/utils/authUtils'
+import { Box, Typography } from '@mui/material'
+import { useTheme } from '@/contexts/ThemeContext'
 
 
 export default function NewsUpload() {
@@ -15,6 +18,8 @@ export default function NewsUpload() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [showPreview, setShowPreview] = useState(false);
+  const [canEdit, setCanEdit] = useState(false);
+  const { theme } = useTheme();
 
   const [toast, setToast] = useState<{
     show: boolean;
@@ -27,6 +32,15 @@ export default function NewsUpload() {
     message: '',
     type: 'success'
   });
+  
+  useEffect(() => {
+    const checkPermission = async () => {
+      const hasPermission = await hasEditPermission();
+      setCanEdit(hasPermission);
+    };
+    
+    checkPermission();
+  }, []);
 
   // ฟังก์ชันสำหรับแสดง toast
   const showToast = (title: string, message: string, type: 'success' | 'error' | 'warning') => {
@@ -101,11 +115,33 @@ export default function NewsUpload() {
   return (
     
     <Container>
-      <SectionTitle title="News" align="center" />
-
-      <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-md">
+      <SectionTitle 
+      title="News" 
+      align="center" />
+      {!canEdit && (
+        <Box sx={{ 
+          mt: 2, 
+          p: 2, 
+          bgcolor: theme === 'dark' ? 'gray.700' : '#fff9c4', 
+          borderRadius: 1, 
+          textAlign: 'center',
+          maxWidth: '2xl',
+          mx: 'auto',
+          mb: 2
+        }}>
+          <Typography variant="body2" color={theme === 'dark' ? 'warning.light' : 'warning.dark'}>
+            คุณกำลังดูข้อมูลในโหมดอ่านอย่างเดียว เนื่องจากคุณไม่มีสิทธิ์ในการอัปโหลดข่าวสาร
+          </Typography>
+        </Box>
+      )}
+      <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-md text-black">
         <h2 className="text-2xl font-bold mb-4">📰 อัปโหลดข่าวสาร</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {!canEdit && (
+          <div className="p-4 bg-yellow-100 text-yellow-800 rounded-md mb-4">
+            <p className="text-center">คุณไม่มีสิทธิ์ในการอัปโหลดข่าวสาร กรุณาติดต่อผู้ดูแลระบบ</p>
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="space-y-4" style={{ opacity: canEdit ? 1 : 0.6, pointerEvents: canEdit ? 'auto' : 'none' }}>
           <div>
             <label className="block font-semibold">หมวดหมู่</label>
             <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full p-2 border rounded">
@@ -144,7 +180,7 @@ export default function NewsUpload() {
             <button type="button" onClick={() => setShowPreview(!showPreview)} className="w-1/2 p-2 bg-gray-500 text-white font-bold rounded hover:bg-gray-600">
               {showPreview ? "❌ ซ่อนตัวอย่าง" : "👀 Preview"}
             </button>
-            <button type="submit" className="w-1/2 p-2 bg-blue-500 text-white font-bold rounded hover:bg-blue-600" disabled={loading}>
+            <button type="submit" className="w-1/2 p-2 bg-blue-500 text-white font-bold rounded hover:bg-blue-600" disabled={loading || !canEdit}>
               {loading ? "กำลังอัปโหลด..." : "📤 อัปโหลดข่าว"}
             </button>
           </div>
