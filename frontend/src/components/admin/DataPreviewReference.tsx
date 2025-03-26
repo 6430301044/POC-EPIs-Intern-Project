@@ -22,6 +22,9 @@ interface PreviewData {
   columns: Column[];
   rows: number[];
   totalRows: number;
+  currentPage?: number;
+  pageSize?: number;
+  totalPages?: number;
   fileInfo: FileInfo;
 }
 
@@ -30,22 +33,35 @@ const DataPreviewReference: React.FC<DataPreviewReferenceProps> = ({ uploadId, i
   const [error, setError] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [displayData, setDisplayData] = useState<any[]>([]);
   const rowsPerPage = 10;
 
   useEffect(() => {
     if (isOpen && uploadId) {
-      fetchPreviewData(uploadId);
+      // รีเซ็ต currentPage เป็น 1 เมื่อมีการเปลี่ยน uploadId หรือเมื่อเปิด modal ใหม่
+      setCurrentPage(1);
+      fetchPreviewData(uploadId, 1);
     } else {
       setPreviewData(null);
+      setDisplayData([]);
     }
   }, [isOpen, uploadId]);
 
-  const fetchPreviewData = async (id: string) => {
+  // Update display data when previewData changes
+  useEffect(() => {
+    if (previewData && previewData.rows) {
+      setDisplayData(previewData.rows);
+    }
+  }, [previewData]);
+
+  const fetchPreviewData = async (id: string, page: number = currentPage) => {
+    // ตรวจสอบว่าหน้าที่ต้องการดูมีอยู่จริงหรือไม่ (ถ้าไม่มีให้กลับไปหน้า 1)
+    const actualPage = page || 1; // ป้องกันกรณี page เป็น 0 หรือ undefined
     try {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_BASE_URL}/upload/preview-reference/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/upload/preview-reference/${id}?page=${actualPage}&pageSize=${rowsPerPage}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -63,6 +79,13 @@ const DataPreviewReference: React.FC<DataPreviewReferenceProps> = ({ uploadId, i
 
       const data = await response.json();
       if (data.success) {
+        // ถ้าข้อมูลที่ได้รับมามีหน้าน้อยกว่าหน้าที่ต้องการดู ให้กลับไปหน้า 1
+        if (data.data.totalPages && actualPage > data.data.totalPages) {
+          // ถ้าหน้าที่ต้องการดูมากกว่าจำนวนหน้าทั้งหมด ให้กลับไปหน้า 1
+          setCurrentPage(1);
+          fetchPreviewData(id, 1);
+          return;
+        }
         setPreviewData(data.data);
       } else {
         throw new Error(data.message || 'Failed to fetch preview data');
@@ -75,7 +98,14 @@ const DataPreviewReference: React.FC<DataPreviewReferenceProps> = ({ uploadId, i
   };
 
   const handlePageChange = (page: number) => {
+    // ตรวจสอบว่าหน้าที่ต้องการดูมีค่ามากกว่า 0
+    if (page < 1) return;
+    
     setCurrentPage(page);
+    // เรียก API ใหม่เพื่อดึงข้อมูลของหน้าที่ต้องการ
+    if (uploadId) {
+      fetchPreviewData(uploadId, page);
+    }
   };
 
   // Format date for display
@@ -159,7 +189,7 @@ const DataPreviewReference: React.FC<DataPreviewReferenceProps> = ({ uploadId, i
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {previewData.rows.map((row, rowIndex) => (
+                    {displayData.map((row, rowIndex) => (
                       <tr key={rowIndex} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                         {previewData.columns.map((column) => (
                           <td
@@ -179,7 +209,12 @@ const DataPreviewReference: React.FC<DataPreviewReferenceProps> = ({ uploadId, i
               {previewData.totalRows > rowsPerPage && (
                 <div className="flex justify-between items-center mt-4">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Showing {Math.min(rowsPerPage, previewData.rows.length)} of {previewData.totalRows} rows
+                    Showing {Math.min(rowsPerPage, displayData.length)} of {previewData.totalRows} rows
+                    {previewData.currentPage && previewData.totalPages && (
+                      <span className="ml-2">
+                        (Page {previewData.currentPage} of {previewData.totalPages})
+                      </span>
+                    )}
                   </p>
                   <div className="flex space-x-2">
                     <button
@@ -191,7 +226,9 @@ const DataPreviewReference: React.FC<DataPreviewReferenceProps> = ({ uploadId, i
                     </button>
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage * rowsPerPage >= previewData.totalRows}
+                      disabled={previewData.currentPage && previewData.totalPages ? 
+                        previewData.currentPage >= previewData.totalPages : 
+                        currentPage * rowsPerPage >= previewData.totalRows}
                       className="px-3 py-1 border rounded text-sm disabled:opacity-50"
                     >
                       Next

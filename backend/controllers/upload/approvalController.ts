@@ -581,6 +581,11 @@ export const getPendingReferenceApprovals = async (req: Request, res: Response) 
 export const getPreviewReferenceData = async (req: Request, res: Response) => {
     try {
         const { uploadId } = req.params;
+        const { page = 1, pageSize = 10 } = req.query;
+        
+        // Convert to numbers and validate
+        const pageNum = parseInt(page as string) || 1;
+        const pageSizeNum = parseInt(pageSize as string) || 10;
         
         if (!uploadId) {
             res.status(400).json({
@@ -623,13 +628,21 @@ export const getPreviewReferenceData = async (req: Request, res: Response) => {
                 WHERE TABLE_NAME = '${targetTable}'
             `);
         
-        // Return preview data
+        // Calculate pagination
+        const startIndex = (pageNum - 1) * pageSizeNum;
+        const endIndex = startIndex + pageSizeNum;
+        const paginatedData = parsedData.slice(startIndex, endIndex);
+        
+        // Return preview data with pagination
         res.status(200).json({
             success: true,
             data: {
                 columns: schemaResult.recordset,
-                rows: parsedData.slice(0, 10), // Return first 10 rows for preview
+                rows: paginatedData,
                 totalRows: parsedData.length,
+                currentPage: pageNum,
+                pageSize: pageSizeNum,
+                totalPages: Math.ceil(parsedData.length / pageSizeNum),
                 fileInfo: {
                     filename: uploadData.filename,
                     upload_date: uploadData.upload_date,
