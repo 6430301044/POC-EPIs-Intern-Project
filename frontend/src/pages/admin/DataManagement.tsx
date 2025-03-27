@@ -119,6 +119,7 @@ export default function DataManagement() {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include', // ส่ง cookies ไปด้วย
         body: JSON.stringify({
           periodId: selectedPeriod,
           targetTable: selectedTable

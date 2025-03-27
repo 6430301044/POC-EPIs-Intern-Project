@@ -1,7 +1,7 @@
 import API_BASE_URL from "@/config/apiConfig";
 
 const getMainCategoryIdentifier = (mainCategory: string): string => {
-    const mainCategoryMappings: { [key: string]: string } = {
+    const mainCategoryMappingsIdentifier: { [key: string]: string } = {
         "คุณภาพอากาศในบรรยากาศ": "Env_Wind",
         "คุณภาพอากาศภายในสถานประกอบการ": "Env_Air",
         "ผลการตรวจวัดคุณภาพเสียงโดยทั่วไป": "Env_Noise",
@@ -9,13 +9,13 @@ const getMainCategoryIdentifier = (mainCategory: string): string => {
         "คุณภาพน้ำทะเล": "Env_SeaWater",
         "นิเวศวิทยาทางทะเล": "Env_MarineEcology"
     };
-    console.log("✅ Mapping Main Category:", mainCategory, "→", mainCategoryMappings[mainCategory]);
-    return mainCategoryMappings[mainCategory] || "";
+    console.log("✅ Mapping Main Category Identifier:", mainCategory, "→", mainCategoryMappingsIdentifier[mainCategory]);
+    return mainCategoryMappingsIdentifier[mainCategory] || "";
 };
 
 // ✅ ฟังก์ชันแมป `Sub Category` ภาษาไทยเป็น `Table Identifier`
 const getTableIdentifier = (subCategory: string): string => {
-    const subCategoryMappings: { [key: string]: string } = {
+    const subCategoryMappingsIdentifier: { [key: string]: string } = {
         "ผลการตรวจวัดทิศทางและความเร็วลมเฉลี่ยรายชั่วโมง": "WDWS",
         "ผลการตรวจวัดคุณภาพอากาศในบรรยากาศ": "WindQuality",
         "ผลการตรวจวัดค่าความเข้มข้นของก๊าซซัลเฟอร์ไดออกไซด์ในบรรยากาศ": "SO2",
@@ -28,12 +28,12 @@ const getTableIdentifier = (subCategory: string): string => {
         "ผลการตรวจวัดคุณภาพน้ำทะเล": "SeaWater",
         "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนพืช": "PlanktonPhytos",
         "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนสัตว์": "PlanktonZoos",
-        "Benthos": "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์หน้าดิน",
-        "FishLarvaeEggs": "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของลูกปลาและไข่ปลา",
-        "JuvenileAquaticAnimals": "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์น้ำวัยอ่อน"
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์หน้าดิน": "Benthos",
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของลูกปลาและไข่ปลา": "FishLarvaeEggs",
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์น้ำวัยอ่อน": "JuvenileAquaticAnimals"
     };
-    console.log("✅ Mapping Sub Category:", subCategory, "→", subCategoryMappings[subCategory]);
-    return subCategoryMappings[subCategory] || "";
+    console.log("✅ Mapping Sub Category Identifier:", subCategory, "→", subCategoryMappingsIdentifier[subCategory]);
+    return subCategoryMappingsIdentifier[subCategory] || "";
 };
 
 // ✅ ดึง `Main Category`

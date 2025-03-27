@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { Container } from "@/components/template/Container";
 import { SectionTitle } from "@/components/template/SectionTitle";
 import DataManagement from "@/pages/admin/DataManagement";
-import BulkDataDeletion from "@/pages/admin/BulkDataDeletion";
+// import BulkDataDeletion from "@/pages/admin/BulkDataDeletion";
+import BulkDataDeletion2 from '@/pages/admin/BulkDataDeletion2';
 
 export default function DataManagementCenter() {
   const [activeTab, setActiveTab] = useState<"data-management" | "bulk-deletion">("data-management");
@@ -75,7 +76,7 @@ export default function DataManagementCenter() {
           transition={{ duration: 0.3 }}
           className="min-h-[400px]"
         >
-          {activeTab === "data-management" ? <DataManagement /> : <BulkDataDeletion />}
+          {activeTab === "data-management" ? <DataManagement /> : <BulkDataDeletion2 />}
         </motion.div>
       </div>
     </Container>

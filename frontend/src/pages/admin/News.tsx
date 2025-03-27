@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { jwtDecode } from 'jwt-decode'
 import API_BASE_URL from '@/config/apiConfig'
-import { hasApprovePermission } from '@/utils/authUtils'
+import { hasApprovePermission, getDecodedToken } from '@/utils/authUtils'
 import { Box, Typography } from '@mui/material'
 import { useTheme } from '@/contexts/ThemeContext'
 
@@ -13,7 +13,7 @@ import { useTheme } from '@/contexts/ThemeContext'
 export default function NewsUpload() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState("General");
+  const [category, setCategory] = useState("Activity");
   const [images, setImages] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -75,14 +75,21 @@ export default function NewsUpload() {
     setMessage("");
   
     try {
+      // ดึงข้อมูลผู้ใช้จาก token
+      const userData = await getDecodedToken();
+      if (!userData || !userData.userId) {
+        throw new Error("ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่");
+      }
+      
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
       formData.append("category", category);
+      formData.append("Create_by", userData.userId); // เพิ่ม Create_by
   
       images.forEach((image: File) => formData.append("file", image));
   
-      const response = await fetch(`${API_BASE_URL}/upload/news`, {
+      const response = await fetch(`http://localhost:5000/upload/news`, {
         method: "POST",
         body: formData,
         credentials: 'include' // ส่ง cookies ไปด้วย

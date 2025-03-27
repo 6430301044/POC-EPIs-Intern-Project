@@ -77,17 +77,24 @@ export const deleteNewsById = async (id: number): Promise<{success: boolean; mes
     const response = await fetch(`${API_BASE_URL}/news/${id}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
-      credentials: 'include' // ส่ง cookies ไปด้วย
+      credentials: 'include'
     });
     
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await response.text();
+      throw new Error('Server returned non-JSON response: ' + text.substring(0, 100));
+    }
+
+    const result = await response.json();
+    
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to delete news');
+      throw new Error(result.message || 'Failed to delete news');
     }
     
-    const result = await response.json();
     return result;
   } catch (error) {
     console.error('Error deleting news by ID:', error);

@@ -1,5 +1,5 @@
 import React from "react";
-import Table from "@/components/main/TableNC";
+import Table from "@/components/main/Table";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
 import { useLocation } from "react-router";

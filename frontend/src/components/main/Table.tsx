@@ -12,53 +12,43 @@ import {
 
 export default function Table() {
   const getMainCategoryIdentifier = (mainCategory: string): string => {
-    const mainCategoryMappings: { [key: string]: string } = {
-      คุณภาพอากาศในบรรยากาศ: "Env_Wind",
-      คุณภาพอากาศภายในสถานประกอบการ: "Env_Air",
-      ผลการตรวจวัดคุณภาพเสียงโดยทั่วไป: "Env_Noise",
-      คุณภาพน้ำทิ้ง: "Env_WasteWater",
-      คุณภาพน้ำทะเล: "Env_SeaWater",
-      นิเวศวิทยาทางทะเล: "Env_MarineEcology",
+    const mainCategoryMappingsIdentifier: { [key: string]: string } = {
+        "คุณภาพอากาศในบรรยากาศ": "Env_Wind",
+        "คุณภาพอากาศภายในสถานประกอบการ": "Env_Air",
+        "ผลการตรวจวัดคุณภาพเสียงโดยทั่วไป": "Env_Noise",
+        "คุณภาพน้ำทิ้ง": "Env_WasteWater",
+        "คุณภาพน้ำทะเล": "Env_SeaWater",
+        "นิเวศวิทยาทางทะเล": "Env_MarineEcology"
     };
-    console.log(
-      "✅ Mapping Main Category Filter:",
-      mainCategory,
-      "→",
-      mainCategoryMappings[mainCategory]
-    );
-    return mainCategoryMappings[mainCategory] || "";
-  };
+    console.log("✅ Mapping Main Category Identifier:", mainCategory, "→", mainCategoryMappingsIdentifier[mainCategory]);
+    return mainCategoryMappingsIdentifier[mainCategory] || "";
+};
 
-  const getTableIdentifier = (subCategory: string): string => {
-    const subCategoryMappings: { [key: string]: string } = {
-      ผลการตรวจวัดทิศทางและความเร็วลมเฉลี่ยรายชั่วโมง: "WDWS",
-      ผลการตรวจวัดคุณภาพอากาศในบรรยากาศ: "WindQuality",
-      ผลการตรวจวัดค่าความเข้มข้นของก๊าซซัลเฟอร์ไดออกไซด์ในบรรยากาศ: "SO2",
-      ผลการตรวจวัดสารอินทรีย์ระเหยง่ายในบรรยากาศ: "Vocs",
-      ผลการตรวจวัดคุณภาพอากาศภายในสถานประกอบการ: "AirQuality",
-      ผลการตรวจวัดระดับเสียงโดยทั่วไป: "NoiseLevelNormal",
-      "ผลการตรวจวัดคุณภาพเสียง 90": "NoiseLevel90",
-      ผลการติดตามตรวจสอบ: "Monitorresult",
-      ผลการตรวจวัดคุณภาพน้ำทิ้ง: "WasteWater",
-      ผลการตรวจวัดคุณภาพน้ำทะเล: "SeaWater",
-      "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนพืช": "PlanktonPhytos",
-      "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนสัตว์": "PlanktonZoos",
-      Benthos: "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์หน้าดิน",
-      FishLarvaeEggs: "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของลูกปลาและไข่ปลา",
-      JuvenileAquaticAnimals:
-        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์น้ำวัยอ่อน",
+// ✅ ฟังก์ชันแมป `Sub Category` ภาษาไทยเป็น `Table Identifier`
+const getTableIdentifier = (subCategory: string): string => {
+    const subCategoryMappingsIdentifier: { [key: string]: string } = {
+        "ผลการตรวจวัดทิศทางและความเร็วลมเฉลี่ยรายชั่วโมง": "WDWS",
+        "ผลการตรวจวัดคุณภาพอากาศในบรรยากาศ": "WindQuality",
+        "ผลการตรวจวัดค่าความเข้มข้นของก๊าซซัลเฟอร์ไดออกไซด์ในบรรยากาศ": "SO2",
+        "ผลการตรวจวัดสารอินทรีย์ระเหยง่ายในบรรยากาศ": "Vocs",
+        "ผลการตรวจวัดคุณภาพอากาศภายในสถานประกอบการ": "AirQuality",
+        "ผลการตรวจวัดระดับเสียงโดยทั่วไป": "NoiseLevelNormal",
+        "ผลการตรวจวัดคุณภาพเสียง 90": "NoiseLevel90",
+        "ผลการติดตามตรวจสอบ": "Monitorresult",
+        "ผลการตรวจวัดคุณภาพน้ำทิ้ง": "WasteWater",
+        "ผลการตรวจวัดคุณภาพน้ำทะเล": "SeaWater",
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนพืช": "PlanktonPhytos",
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนสัตว์": "PlanktonZoos",
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์หน้าดิน": "Benthos",
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของลูกปลาและไข่ปลา": "FishLarvaeEggs",
+        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์น้ำวัยอ่อน": "JuvenileAquaticAnimals"
     };
-    console.log(
-      "✅ Mapping Sub Category:",
-      subCategory,
-      "→",
-      subCategoryMappings[subCategory]
-    );
-    return subCategoryMappings[subCategory] || "";
-  };
+    console.log("✅ Mapping Sub Category Identifier:", subCategory, "→", subCategoryMappingsIdentifier[subCategory]);
+    return subCategoryMappingsIdentifier[subCategory] || "";
+};
 
   const getMainCategoryIdentifierReceived = (mainCategory: string): string => {
-    const mainCategoryMappings: { [key: string]: string } = {
+    const mainCategoryMappingsReceived: { [key: string]: string } = {
       Env_Wind: "คุณภาพอากาศในบรรยากาศ",
       Env_Air: "คุณภาพอากาศภายในสถานประกอบการ",
       Env_Noise: "ผลการตรวจวัดคุณภาพเสียงโดยทั่วไป",
@@ -70,13 +60,13 @@ export default function Table() {
       "✅ Mapping Main Category Filter Received:",
       mainCategory,
       "→",
-      mainCategoryMappings[mainCategory]
+      mainCategoryMappingsReceived[mainCategory]
     );
-    return mainCategoryMappings[mainCategory] || "";
+    return mainCategoryMappingsReceived[mainCategory] || "";
   };
 
   const getTableIdentifierReceived = (subCategory: string): string => {
-    const subCategoryMappings: { [key: string]: string } = {
+    const subCategoryMappingsReceived: { [key: string]: string } = {
       WDWS: "ผลการตรวจวัดทิศทางและความเร็วลมเฉลี่ยรายชั่วโมง",
       WindQuality: "ผลการตรวจวัดคุณภาพอากาศในบรรยากาศ",
       SO2: "ผลการตรวจวัดค่าความเข้มข้นของก๊าซซัลเฟอร์ไดออกไซด์ในบรรยากาศ",
@@ -91,16 +81,15 @@ export default function Table() {
       PlanktonZoos: "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของแพลงก์ตอนสัตว์",
       Benthos: "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์หน้าดิน",
       FishLarvaeEggs: "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของลูกปลาและไข่ปลา",
-      JuvenileAquaticAnimals:
-        "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์น้ำวัยอ่อน",
+      JuvenileAquaticAnimals: "ผลการสำรวจชนิด ปริมาณ และความหนาแน่นของสัตว์น้ำวัยอ่อน",
     };
     console.log(
       "✅ Mapping Sub Category Filter Received:",
       subCategory,
       "→",
-      subCategoryMappings[subCategory]
+      subCategoryMappingsReceived[subCategory]
     );
-    return subCategoryMappings[subCategory] || "";
+    return subCategoryMappingsReceived[subCategory] || "";
   };
 
   const [data, setData] = useState<any[]>([]);
@@ -206,10 +195,9 @@ export default function Table() {
       
       setLoading(true);
       
-      const mainCategoryIdentifier = getMainCategoryIdentifier(
-        filters.mainCategory
-      );
+      const mainCategoryIdentifier = getMainCategoryIdentifier(filters.mainCategory);
       const tableIdentifier = getTableIdentifier(filters.subCategory);
+
       console.log("✅ Fetching data with:");
       console.log("➡️ Main Category:", mainCategoryIdentifier);
       console.log("➡️ Sub Category:", filters.subCategory);

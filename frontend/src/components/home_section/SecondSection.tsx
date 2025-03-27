@@ -18,7 +18,7 @@ export default function SecondSection() {
 
         {/* ส่วนที่สอง */}
         <div className="flex-shrink-0 justify-center items-center bg-gray-200 shadow-lg w-[460px] h-[385px] mt-4 md:mt-0 ml-4 overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:cursor-pointer relative">
-          <a href="/path-to-other-page">
+          <a href="/khaoboya-terminal">
             <img 
               src="/images/DJI_0138.JPG" 
               alt="คลังก๊าซเขาบ่อยา" 
@@ -31,7 +31,7 @@ export default function SecondSection() {
         </div>
 
         <div className="flex-shrink-0 justify-center items-center bg-gray-300 shadow-lg w-[460px] h-[385px] mt-4 md:mt-0 ml-4 overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:cursor-pointer relative">
-          <a href="/path-to-other-page">
+          <a href="/sriracha-oil">
             <img 
               src="/images/DJI_0050.JPG" 
               alt="คลังน้ำมันศรีราชา" 

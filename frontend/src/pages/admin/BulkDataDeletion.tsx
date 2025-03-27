@@ -158,11 +158,18 @@ export default function BulkDataDeletion() {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        credentials: 'include', // ส่ง cookies ไปด้วย
+        credentials: 'include',
         body: JSON.stringify(requestBody)
       });
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error('Server returned non-JSON response: ' + text.substring(0, 100));
+      }
 
       const data = await response.json();
       
@@ -248,7 +255,7 @@ export default function BulkDataDeletion() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             {/* Date Range */}
-            <div>
+            {/* <div>
               <label className="block text-gray-700 dark:text-white mb-2">วันที่เริ่มต้น</label>
               <input
                 type="date"
@@ -268,10 +275,10 @@ export default function BulkDataDeletion() {
                 value={conditions.endDate}
                 onChange={handleInputChange}
               />
-            </div>
+            </div> */}
             
             {/* Status Selection */}
-            <div>
+            {/* <div>
               <label className="block text-gray-700 dark:text-white mb-2">สถานะ</label>
               <select
                 name="status"
@@ -288,12 +295,12 @@ export default function BulkDataDeletion() {
                     ))
                 }
               </select>
-            </div>
+            </div> */}
             
             {/* Category or Uploaded By */}
             {dataType === 'news' ? (
               <div>
-                <label className="block text-gray-700 dark:text-white mb-2">หมวดหมู่</label>
+                {/* <label className="block text-gray-700 dark:text-white mb-2">หมวดหมู่</label>
                 <select
                   name="category"
                   className="w-full p-2 border rounded"
@@ -303,12 +310,12 @@ export default function BulkDataDeletion() {
                   {newsCategoryOptions.map(option => (
                     <option className="dark:bg-gray-700" key={option.value} value={option.value}>{option.label}</option>
                   ))}
-                </select>
+                </select> */}
               </div>
             ) : (
               <>
                 <div>
-                  <label className="block text-gray-700 dark:text-white mb-2">ผู้อัปโหลด</label>
+                  {/* <label className="block text-gray-700 dark:text-white mb-2">ผู้อัปโหลด</label>
                   <input
                     type="text"
                     name="uploadedBy"
@@ -316,9 +323,9 @@ export default function BulkDataDeletion() {
                     placeholder="ชื่อผู้ใช้หรือ ID ผู้อัปโหลด"
                     value={conditions.uploadedBy}
                     onChange={handleInputChange}
-                  />
+                  /> */}
                 </div>
-                <div>
+                {/* <div>
                   <label className="block text-gray-700 dark:text-white mb-2">รหัสช่วงเวลา (Period ID)</label>
                   <input
                     type="text"
@@ -328,7 +335,7 @@ export default function BulkDataDeletion() {
                     value={conditions.periodId}
                     onChange={handleInputChange}
                   />
-                </div>
+                </div> */}
               </>
             )}
           </div>
@@ -337,23 +344,23 @@ export default function BulkDataDeletion() {
           <div className="flex flex-wrap gap-2 mt-6">
             {hasApprovePermission() && (
               <>
-                <button
+                {/* <button
                   className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 flex items-center"
                   onClick={() => setShowConfirmDelete(true)}
                   disabled={!hasCondition() || loading}
                 >
                   <FontAwesomeIcon icon={faTrash} className="mr-2" />
                   ลบข้อมูลตามเงื่อนไข
-                </button>
+                </button> */}
                 
-                {dataType === 'news' && (
+                {(dataType === 'news' || dataType === 'uploads') && (
                   <button
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 flex items-center"
                     onClick={fetchNewsData}
                     disabled={loading}
                   >
                     <FontAwesomeIcon icon={faSearch} className="mr-2" />
-                    แสดงรายการข่าวทั้งหมด
+                    {dataType === 'news' ? 'แสดงรายการข่าวทั้งหมด' : 'แสดงรายการไฟล์ที่อัปโหลดทั้งหมด'}
                   </button>
                 )}
               </>

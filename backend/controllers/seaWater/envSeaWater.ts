@@ -81,26 +81,23 @@ export async function getSeaWaterData(
     query += ` AND ms.stationName = @stationName`;
   }
   if (filters.year) {
-    query += ` AND y.year IN (${filters.year
-      .split(",")
-      .map(() => "?")
-      .join(",")})`;
+    const yearParams = filters.year.split(",").map((_, i) => `@year${i}`).join(",");
+    query += ` AND y.year IN (${yearParams})`;
   }
   if (filters.semiannual) {
-    query += ` AND s.semiannual IN (${filters.semiannual
-      .split(",")
-      .map(() => "?")
-      .join(",")})`;
+    const semiannualParams = filters.semiannual.split(",").map((_, i) => `@semiannual${i}`).join(",");
+    query += ` AND s.semiannual IN (${semiannualParams})`;
   }
   if (filters.valueColumns) {
-    query += ` AND sw.parameter IN (${filters.valueColumns
-      .split(",")
-      .map(() => "?")
-      .join(",")})`;
+    const valueColumnParams = filters.valueColumns.split(",").map((_, i) => `@valueColumn${i}`).join(",");
+    query += ` AND sw.parameter IN (${valueColumnParams})`;
   }
 
-  query += `
-    ORDER BY y.year DESC
+  query = `
+    SELECT * FROM (
+      ${query}
+    ) AS subquery
+    ORDER BY year DESC
     OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY;
   `;
 

@@ -10,7 +10,7 @@ import {
   fetchSemiannuals,
 } from "@/services/environmentService";
 
-export default function Table() {
+export default function TableNC() {
   const getMainCategoryIdentifier = (mainCategory: string): string => {
     const mainCategoryMappings: { [key: string]: string } = {
       คุณภาพอากาศในบรรยากาศ: "Env_Wind",

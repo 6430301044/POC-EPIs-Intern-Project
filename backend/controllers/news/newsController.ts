@@ -27,6 +27,28 @@ async function ensureContainerExists() {
   }
 }
 
+// ฟังก์ชันลบไฟล์จาก Azure Blob Storage
+async function deleteNewsImage(imageUrl: string) {
+  try {
+    // แยก blobName จาก URL
+    const urlParts = imageUrl.split('/');
+    const blobName = urlParts[urlParts.length - 1];
+
+    // ตรวจสอบว่า blob มีอยู่จริงหรือไม่
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    const exists = await blockBlobClient.exists();
+
+    if (exists) {
+      // ลบ blob
+      await blockBlobClient.delete();
+      console.log(`✅ Deleted news image: ${blobName}`);
+    }
+  } catch (error) {
+    console.error(`❌ Error deleting news image:`, error);
+    // ไม่ throw error เพื่อให้กระบวนการลบข่าวดำเนินต่อไปได้
+  }
+}
+
 // สร้าง interface ที่ขยาย Request และเพิ่ม property files
 interface MulterRequest extends Request {
   files?: Express.Multer.File[] | { [fieldname: string]: Express.Multer.File[]; };
@@ -183,24 +205,30 @@ export const deleteNewsById = async (req: Request, res: Response) => {
       transaction = pool.transaction();
       await transaction.begin();
       
-      // ตรวจสอบว่ามีข่าวที่ต้องการลบหรือไม่
+      // ตรวจสอบว่ามีข่าวและรูปภาพที่ต้องการลบหรือไม่
       const checkRequest = transaction.request();
       checkRequest.input('id', sql.Int, id);
       
       const checkResult = await checkRequest.query(`
-        SELECT COUNT(*) as count 
-        FROM dbo.News 
-        WHERE id = @id
+        SELECT n.id, ni.image_url
+        FROM dbo.News n
+        LEFT JOIN dbo.NewsImages ni ON n.id = ni.news_id
+        WHERE n.id = @id
       `);
       
-      const recordCount = checkResult.recordset[0].count;
-      
-      if (recordCount === 0) {
+      if (checkResult.recordset.length === 0) {
         res.status(404).json({
           success: false,
           message: "ไม่พบข้อมูลข่าวที่ต้องการลบ"
         });
         return;
+      }
+
+      // ลบรูปภาพจาก Azure Blob Storage
+      for (const record of checkResult.recordset) {
+        if (record.image_url) {
+          await deleteNewsImage(record.image_url);
+        }
       }
       
       // ลบข้อมูลจากตาราง News
