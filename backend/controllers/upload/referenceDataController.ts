@@ -13,7 +13,7 @@ export const getReferenceData = async (req: Request, res: Response) => {
         // Validate table name to prevent SQL injection
         const validTables = [
             'Years', 'Daysperiod', 'Mcategories', 'SbCategories',
-            'Companies', 'Monitoring_Station', 'Tool', 'Semiannual','EnhanceTable'
+            'Companies', 'Monitoring_Station', 'Tool', 'Semiannual'
         ];
         
         if (!validTables.includes(table)) {
@@ -80,7 +80,7 @@ export const addReferenceData = async (req: Request, res: Response) => {
         // Validate table name to prevent SQL injection
         const validTables = [
             'Years', 'Daysperiod', 'Mcategories', 'SbCategories',
-            'Companies', 'Monitoring_Station', 'Tool', 'Semiannual','EnhanceTable'
+            'Companies', 'Monitoring_Station', 'Tool', 'Semiannual'
         ];
         
         if (!validTables.includes(table)) {
@@ -204,7 +204,7 @@ export const updateReferenceData = async (req: Request, res: Response) => {
         // Validate table name to prevent SQL injection
         const validTables = [
             'Years', 'Daysperiod', 'Mcategories', 'SbCategories',
-            'Companies', 'Monitoring_Station', 'Tool', 'Semiannual','EnhanceTable'
+            'Companies', 'Monitoring_Station', 'Tool', 'Semiannual'
         ];
         
         if (!validTables.includes(table)) {
@@ -230,9 +230,7 @@ export const updateReferenceData = async (req: Request, res: Response) => {
         } else if (table === 'Monitoring_Station') {
             primaryKeyColumn = 'station_id';
         } else if (table === 'Companies') {
-            primaryKeyColumn = 'company_id'; 
-        } else if (table === 'EnhanceTable') {
-            primaryKeyColumn = 'enhance_id';
+            primaryKeyColumn = 'company_id';    
         } else {
             // Default pattern for other tables
             primaryKeyColumn = `${table.toLowerCase().replace(/s$/, '')}_id`;
@@ -244,10 +242,8 @@ export const updateReferenceData = async (req: Request, res: Response) => {
                 SELECT COLUMN_NAME, DATA_TYPE 
                 FROM INFORMATION_SCHEMA.COLUMNS 
                 WHERE TABLE_NAME = '${table}'
-                AND COLUMN_NAME <> '${primaryKeyColumn}' -- Exclude only the primary key column
+                AND COLUMN_NAME <> '${primaryKeyColumn}' -- Exclude ID column
             `);
-        
-        // Now we allow foreign key columns (ending with _id) to be updated
         
         const validColumns = schemaResult.recordset.map(col => col.COLUMN_NAME);
         
@@ -358,7 +354,7 @@ export const deleteReferenceData = async (req: Request, res: Response) => {
         // Validate table name to prevent SQL injection
         const validTables = [
             'Years', 'Daysperiod', 'Mcategories', 'SbCategories',
-            'Companies', 'Monitoring_Station', 'Tool', 'Semiannual','EnhanceTable'
+            'Companies', 'Monitoring_Station', 'Tool', 'Semiannual'
         ];
         
         if (!validTables.includes(table)) {
@@ -384,9 +380,7 @@ export const deleteReferenceData = async (req: Request, res: Response) => {
         } else if (table === 'Monitoring_Station') {
             primaryKeyColumn = 'station_id';
         } else if (table === 'Companies') {
-            primaryKeyColumn = 'company_id'; 
-        } else if (table === 'EnhanceTable') {
-            primaryKeyColumn = 'enhance_id';
+            primaryKeyColumn = 'company_id';    
         } else {
             // Default pattern for other tables
             primaryKeyColumn = `${table.toLowerCase().replace(/s$/, '')}_id`;

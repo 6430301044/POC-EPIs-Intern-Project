@@ -8,7 +8,7 @@ import { connectToDB } from "../../db/dbConfig";
 const MAX_ATTEMPTS = 5;
 const BASE_LOCK_TIME = 10 * 60 * 1000; // 10 นาที
 const LOCK_TIME_INCREMENT = 15 * 60 * 1000; // เพิ่มเวลาล็อค 15 นาทีทุกครั้งที่ล็อคใหม่
-const RESET_LOCK_PERIOD = 1 * 24 * 60 * 60 * 1000; // รีเซ็ตการล็อคหากเกิน 1 วัน
+const RESET_LOCK_PERIOD = 7 * 24 * 60 * 60 * 1000; // รีเซ็ตการล็อคหากเกิน 7 วัน
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {

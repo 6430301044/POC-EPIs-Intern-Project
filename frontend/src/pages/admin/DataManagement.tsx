@@ -238,7 +238,7 @@ export default function DataManagement() {
       
       <div className="p-8">
         {/* Form Section */}
-        <div className="bg-white p-6 dark:bg-gray-700 rounded-lg shadow-md mb-6 text-black dark:text-white">
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6 text-black">
           <h2 className="text-xl font-semibold mb-4">เลือกข้อมูลที่ต้องการจัดการ</h2>
           
           {error && (
@@ -275,9 +275,9 @@ export default function DataManagement() {
                 onChange={(e) => handleYearChange(e.target.value ? parseInt(e.target.value) : null)}
                 disabled={loading}
               >
-                <option className="dark:bg-gray-700 dark:text-white" value="">-- เลือกปี --</option>
+                <option value="">-- เลือกปี --</option>
                 {availableYears.map((year) => (
-                  <option className="dark:bg-gray-700" key={year} value={year}>
+                  <option key={year} value={year}>
                     {year + BUDDHA_YRARS}
                   </option>
                 ))}
@@ -293,9 +293,9 @@ export default function DataManagement() {
                 onChange={(e) => handleSemiannualChange(e.target.value ? parseInt(e.target.value) : null)}
                 disabled={loading || !selectedYear}
               >
-                <option className="dark:bg-gray-700 dark:text-white" value="">-- เลือกช่วงที่มาเก็บข้อมูล --</option>
+                <option value="">-- เลือกช่วงที่มาเก็บข้อมูล --</option>
                 {availableSemiannuals.map((semiannual) => (
-                  <option className="dark:bg-gray-700" key={semiannual} value={semiannual}>
+                  <option key={semiannual} value={semiannual}>
                     {semiannual === 1 ? 'ม.ค. - มิ.ย.' : 'ก.ค. - ธ.ค.'}
                   </option>
                 ))}
@@ -311,9 +311,9 @@ export default function DataManagement() {
                 onChange={(e) => setSelectedPeriod(e.target.value)}
                 disabled={loading || !selectedYear || !selectedSemiannual}
               >
-                <option className="dark:bg-gray-700 dark:text-white" value="">-- เลือกวันที่เก็บข้อมูล --</option>
+                <option value="">-- เลือกวันที่เก็บข้อมูล --</option>
                 {availablePeriods.map((period) => (
-                  <option className="dark:bg-gray-700" key={period.period_id} value={period.period_id}>
+                  <option key={period.period_id} value={period.period_id}>
                     {formatDayMonth(period.startDate)} ถึง {formatDayMonth(period.endDate)}
                   </option>
                 ))}
@@ -329,9 +329,9 @@ export default function DataManagement() {
                 onChange={(e) => setSelectedTable(e.target.value)}
                 disabled={loading}
               >
-                <option className="dark:bg-gray-700 dark:text-white" value="">-- เลือกตารางข้อมูล --</option>
+                <option value="">-- เลือกตารางข้อมูล --</option>
                 {tables.map((table) => (
-                  <option className="dark:bg-gray-700" skey={table.tableName} value={table.tableName}>
+                  <option key={table.tableName} value={table.tableName}>
                     {table.category}: {table.tableName}
                   </option>
                 ))}

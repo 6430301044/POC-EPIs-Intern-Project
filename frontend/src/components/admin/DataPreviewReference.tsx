@@ -54,11 +54,6 @@ const DataPreviewReference: React.FC<DataPreviewReferenceProps> = ({ uploadId, i
     }
   }, [previewData]);
 
-  // Filter out primary key columns (columns ending with _id)
-  const filterPrimaryKeyColumns = (columns: Column[]) => {
-    return columns.filter(column => !column.COLUMN_NAME.toLowerCase().endsWith('_id'));
-  };
-
   const fetchPreviewData = async (id: string, page: number = currentPage) => {
     // ตรวจสอบว่าหน้าที่ต้องการดูมีอยู่จริงหรือไม่ (ถ้าไม่มีให้กลับไปหน้า 1)
     const actualPage = page || 1; // ป้องกันกรณี page เป็น 0 หรือ undefined

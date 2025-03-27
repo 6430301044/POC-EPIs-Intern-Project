@@ -33,17 +33,8 @@ export default function Team() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
-  const [canEdit, setCanEdit] = useState<boolean>(false);
+  const canEdit = hasEditPermission();
   const { theme } = useTheme();
-
-  useEffect(() => {
-    const checkPermission = async () => {
-      const hasPermission = await hasEditPermission();
-      setCanEdit(hasPermission);
-    };
-    
-    checkPermission();
-  }, []);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -205,7 +196,7 @@ export default function Team() {
         } else {
           return (
             <Tooltip title="คุณไม่มีสิทธิ์ในการแก้ไขข้อมูลผู้ใช้">
-              <Box sx={{ color: 'text.white', fontSize: '0.75rem', textAlign: 'center' }}>
+              <Box sx={{ color: 'text.disabled', fontSize: '0.75rem', textAlign: 'center' }}>
                 ไม่มีสิทธิ์แก้ไข
               </Box>
             </Tooltip>

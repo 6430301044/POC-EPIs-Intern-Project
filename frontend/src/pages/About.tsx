@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHome } from "@fortawesome/free-solid-svg-icons";
-import { useLocation } from "react-router";
+import { Link, useLocation } from "react-router";
 import { XCircleIcon, MapPinIcon  } from "@heroicons/react/24/solid";
 
 export default function About() {
@@ -16,14 +16,14 @@ export default function About() {
         <div className="bg-white min-h-screen">
           {/* Breadcrumb Section with Background */}
            <section
-        className="relative w-full min-h-[670px] overflow-x-auto flex flex-col md:flex-row items-center justify-center px-4 md:px-[192px]"
-        style={{
-          backgroundImage: 'url("/images/PTT_Terminal.jpg")',
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
-        }}
-      >
+            className="relative w-full min-h-[670px] overflow-x-auto flex flex-col md:flex-row items-center justify-center px-4 md:px-[192px]"
+            style={{
+              backgroundImage: 'url("/images/PTT_Terminal.jpg")',
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundAttachment: "fixed",
+            }}
+          >
         <div className="absolute inset-0 bg-[#0066a1]/53 z-0"></div>
 
         <div className="text-center text-white z-10">
@@ -172,14 +172,12 @@ export default function About() {
                   </p>
 
                   {/* "อ่านเพิ่มเติม" เป็นตัวหนังสือ และขีดเส้นใต้เมื่อ hover */}
-                  <a
-                    href="https://your-link-here.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-4 inline-block text-sm sm:text-base md:text-lg font-semibold hover:underline"
-                  >
-                    อ่านเพิ่มเติม
-                  </a>
+                  <Link
+                      to="/khaoboya-terminal"
+                      className="mt-4 inline-block text-sm sm:text-base md:text-lg font-semibold hover:underline"
+                    >
+                      อ่านเพิ่มเติม
+                    </Link>
                 </div>
               </div>
             </section>
@@ -275,14 +273,12 @@ export default function About() {
                     </p>
 
                     {/* "อ่านเพิ่มเติม" เป็นตัวหนังสือ และขีดเส้นใต้เมื่อ hover */}
-                    <a
-                      href="https://your-link-here.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <Link
+                      to="/sriracha-oil"
                       className="mt-4 inline-block text-sm sm:text-base md:text-lg font-semibold hover:underline"
                     >
                       อ่านเพิ่มเติม
-                    </a>
+                    </Link>
                   </div>
                 </div>
             </section>

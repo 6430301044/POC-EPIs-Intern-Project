@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { jwtDecode } from 'jwt-decode'
 import API_BASE_URL from '@/config/apiConfig'
-import { hasApprovePermission } from '@/utils/authUtils'
+import { hasEditPermission } from '@/utils/authUtils'
 import { Box, Typography } from '@mui/material'
 import { useTheme } from '@/contexts/ThemeContext'
 
@@ -35,7 +35,7 @@ export default function NewsUpload() {
   
   useEffect(() => {
     const checkPermission = async () => {
-      const hasPermission = await hasApprovePermission();
+      const hasPermission = await hasEditPermission();
       setCanEdit(hasPermission);
     };
     
@@ -134,7 +134,7 @@ export default function NewsUpload() {
           </Typography>
         </Box>
       )}
-      <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-700 shadow-md rounded-md text-black dark:text-white">
+      <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-md text-black">
         <h2 className="text-2xl font-bold mb-4">📰 อัปโหลดข่าวสาร</h2>
         {!canEdit && (
           <div className="p-4 bg-yellow-100 text-yellow-800 rounded-md mb-4">
@@ -144,7 +144,7 @@ export default function NewsUpload() {
         <form onSubmit={handleSubmit} className="space-y-4" style={{ opacity: canEdit ? 1 : 0.6, pointerEvents: canEdit ? 'auto' : 'none' }}>
           <div>
             <label className="block font-semibold">หมวดหมู่</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full p-2 border rounded dark:bg-gray-700">
+            <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full p-2 border rounded">
             <option value="Activity">Highlight / กิจกรรม</option>
             <option value="AnnualReport">รายงานประจำปี</option>
             <option value="Publication">ข้อมูลเผยแพร่</option>
@@ -188,8 +188,8 @@ export default function NewsUpload() {
         {message && <p className="mt-4 text-center font-bold">{message}</p>}
 
         {showPreview && (
-          <div className="mt-6 p-4 border rounded-lg shadow-md bg-gray-100 dark:bg-gray-300">
-            <h3 className="text-lg font-bold dark:text-black">🔍 Preview</h3>
+          <div className="mt-6 p-4 border rounded-lg shadow-md bg-gray-100">
+            <h3 className="text-lg font-bold">🔍 Preview</h3>
             <p className="text-sm text-gray-600">📂 หมวดหมู่: {category}</p>
             <h2 className="text-xl font-bold mt-2">{title}</h2>
             <p className="mt-2 break-words">{content}</p> {/* ข้อความจะขึ้นบรรทัดใหม่เมื่อเกินกรอบ */}

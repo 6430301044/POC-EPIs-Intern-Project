@@ -242,15 +242,14 @@ export const getAvailableTables = async (req: Request, res: Response) => {
                         WHEN t.name LIKE '%WasteWater%' THEN 'คุณภาพน้ำทิ้ง'
                         WHEN t.name LIKE '%SeaWater%' THEN 'คุณภาพน้ำทะเล'
                         WHEN t.name LIKE '%Marine%' THEN 'นิเวศวิทยาทางทะเล'
-                        ELSE 'อื่นๆ ตารางข้อมูลเสริม'
+                        ELSE 'อื่นๆ'
                     END AS category
                 FROM 
                     sys.tables t
                 JOIN 
                     sys.schemas s ON t.schema_id = s.schema_id
                 WHERE 
-                    t.name NOT IN ('UploadedFiles', 'Users', 'Daysperiod', 'Semiannual', 'Mcategories', 'SbCategories', 'Years', 'Companies', 'Tool', 'EnhanceTable',
-                    'Monitoring_Station', 'Register', 'News', 'NewsImages', 'ReferenceDataPendingApproval')
+                    t.name NOT IN ('UploadedFiles', 'Users', 'Daysperiod', 'Semiannual', 'Mcategories', 'SbCategories')
                     AND t.name NOT LIKE 'sys%'
                 ORDER BY 
                     category, tableName
