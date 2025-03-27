@@ -158,7 +158,7 @@ const parseExcel = async (filePath: string, tableName: string, originalFilename:
 const validateTableName = (tableName: string): boolean => {
     const validTables = [
         'Years', 'Daysperiod', 'Mcategories', 'SbCategories',
-        'Companies', 'Monitoring_Station', 'Tool', 'Semiannual'
+        'Companies', 'Monitoring_Station', 'Tool', 'Semiannual','EnhanceTable'
     ];
     
     return validTables.includes(tableName);

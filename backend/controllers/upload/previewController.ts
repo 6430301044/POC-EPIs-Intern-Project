@@ -8,6 +8,11 @@ import { connectToDB } from "../../db/dbConfig";
 export const getPreviewData = async (req: Request, res: Response) => {
     try {
         const { uploadId } = req.params;
+        const { page = 1, pageSize = 10 } = req.query;
+        
+        // Convert to numbers and validate
+        const pageNum = parseInt(page as string) || 1;
+        const pageSizeNum = parseInt(pageSize as string) || 10;
         
         if (!uploadId) {
             res.status(400).json({
@@ -48,8 +53,11 @@ export const getPreviewData = async (req: Request, res: Response) => {
             DATA_TYPE: 'varchar'
         }));
         
-        // Use the parsed data as rows
-        const rows = parsedData;
+        // Calculate pagination
+        const startIndex = (pageNum - 1) * pageSizeNum;
+        const endIndex = startIndex + pageSizeNum;
+        const paginatedData = parsedData.slice(startIndex, endIndex);
+        const totalPages = Math.ceil(parsedData.length / pageSizeNum);
         
         // Prepare file information
         const fileInfo = {
@@ -63,8 +71,11 @@ export const getPreviewData = async (req: Request, res: Response) => {
             success: true,
             data: {
                 columns: columns,
-                rows: rows,
+                rows: paginatedData,
                 totalRows: parsedData.length,
+                currentPage: pageNum,
+                pageSize: pageSizeNum,
+                totalPages: totalPages,
                 fileInfo: fileInfo
             }
         });

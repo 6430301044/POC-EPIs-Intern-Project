@@ -143,6 +143,11 @@ const ReferenceDataFieldStructures: { [key: string]: FieldStructure[] } = {
     { name: "toolName", type: "string", description: "ชื่อเครื่องมือ", required: true },
     { name: "toolSerial", type: "string", description: "รหัสเครื่องมือ" },
     { name: "toolRole", type: "string", description: "บทบาทของเครื่องมือ" }
+  ],
+  "ตารางข้อมูลเสริม": [
+    { name: "enhanceName", type: "string", description: "ชื่อตารางข้อมูลเสริม", required: true },
+    { name: "valueName", type: "string", description: "ค่าข้อมูลในตารางข้อมูลเสริม" },
+    { name: "sub_id", type: "int", description: "รหัสหมวดหมู่รอง", required: true }
   ]
 };
 
@@ -157,7 +162,8 @@ const ReferenceDataFieldStructures: { [key: string]: FieldStructure[] } = {
       { id: 'SbCategories', name: 'หมวดหมู่ย่อย' },
       { id: 'Companies', name: 'บริษัท' },
       { id: 'Monitoring_Station', name: 'สถานีตรวจวัด' },
-      { id: 'Tool', name: 'เครื่องมือ' }
+      { id: 'Tool', name: 'เครื่องมือ' },
+      { id: 'EnhanceTable', name: 'ตารางข้อมูลเสริม' }
     ];
     setReferenceTables(tables);
   }, []);
