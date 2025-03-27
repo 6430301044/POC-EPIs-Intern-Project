@@ -98,7 +98,8 @@ const ReferenceDataManagement: React.FC = () => {
     { id: 'SbCategories', name: 'หมวดหมู่ย่อย' },
     { id: 'Companies', name: 'บริษัท' },
     { id: 'Monitoring_Station', name: 'สถานีตรวจวัด' },
-    { id: 'Tool', name: 'เครื่องมือ' }
+    { id: 'Tool', name: 'เครื่องมือ' },
+    { id: 'EnhanceTable', name: 'ตารางข้อมูลเสริม' }
   ];
 
   // Load data when table or pagination changes

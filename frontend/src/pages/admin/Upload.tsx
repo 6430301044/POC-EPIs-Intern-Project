@@ -611,9 +611,6 @@ export default function Upload() {
       const endpoint = selectedFile.type === "text/csv" ? "upload-csv" : "upload-excel";
       const response = await fetch(`${API_BASE_URL}/upload/${endpoint}`, {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json'
-        },
         credentials: 'include', // ส่ง cookies ไปด้วย
         body: formData,
       });

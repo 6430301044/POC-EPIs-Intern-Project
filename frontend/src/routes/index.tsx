@@ -34,8 +34,7 @@ import BulkDataDeletion from "@/pages/admin/BulkDataDeletion";
 import NewsPage from "@/pages/NewsPage";
 import About from "@/pages/About";
 import Results from "@/pages/Results";
-import SrirachaOil from "@/pages/SrirachaOil";
-import KhaoBoYa from "@/pages/KhaoBoYa";
+import DataManagementCenter from "@/pages/admin/DataManagementCenter";
 
 const router = createBrowserRouter([
   {
@@ -81,15 +80,7 @@ const router = createBrowserRouter([
       {
         path: "/contact",
         element: <Contact />,
-      },
-      {
-        path: "/sriracha-oil",
-        element: <SrirachaOil />,
-      },
-      {
-        path: "/khaoboya-terminal",
-        element: <KhaoBoYa />,
-      },
+      }
     ],
   },
   {
@@ -188,6 +179,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/bulk-data-deletion",
         element: <BulkDataDeletion />,
+      },
+      {
+        path: "/admin/data-management-center",
+        element: <DataManagementCenter />,
       }
     ],
   },

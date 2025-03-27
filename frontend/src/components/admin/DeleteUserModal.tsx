@@ -59,7 +59,7 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({ open, user, onClose, 
           </Box>
         )}
         <DialogContentText>
-          Are you sure you want to delete {user?.User_name}? This action cannot be undone.
+          คุณแน่ใจนะว่าต้องการลบผู้ใช้ชื่อ {user?.User_name}? การกระทำนี้เมื่อยืนยัน ไม่สามารถย้อยกลับได้
         </DialogContentText>
       </DialogContent>
       <DialogActions>

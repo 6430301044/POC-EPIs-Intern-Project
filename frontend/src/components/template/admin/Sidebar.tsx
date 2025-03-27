@@ -24,8 +24,8 @@ export default function Sidebar() {
     // { name: 'Reports', path: '/admin/reports', icon: ReportIcon },
     { name: 'ศูนย์รวมการอัปโหลดข้อมูล', path: '/admin/upload-center', icon: UploadIcon }, //Eng name Upload Center
     { name: 'ศูนย์รวมการอนุมัติข้อมูล', path: '/admin/approval-center', icon: ApprovalIcon }, //Eng name Approval Center
-    { name: 'ศูนย์รวมการจัดการข้อมูล', path: '/admin/data-management', icon: DataIcon }, //Eng name Verification Center
-    { name: 'Bulk Data Deletion', path: '/admin/bulk-data-deletion', icon: TrashIcon },
+    { name: 'ศูนย์รวมการจัดการข้อมูล', path: '/admin/data-management-center', icon: DataIcon }, //Eng name Verification Center
+    // { name: 'Bulk Data Deletion', path: '/admin/bulk-data-deletion', icon: TrashIcon },
     { name: 'ข่าวสารประชาสัมพันธ์', path: '/admin/news', icon: ReportIcon }, //Eng name News
   ]
 

@@ -187,7 +187,7 @@ export default function BulkDataDeletion() {
       
       <div className="p-8">
         {/* Form Section */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6 text-black">
+        <div className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md mb-6 text-black dark:text-white">
           <div className="flex items-center mb-4">
             <h2 className="text-xl font-semibold">เลือกประเภทข้อมูลที่ต้องการลบ</h2>
             <FontAwesomeIcon icon={faExclamationTriangle} className="ml-2 text-yellow-500" />
@@ -249,7 +249,7 @@ export default function BulkDataDeletion() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             {/* Date Range */}
             <div>
-              <label className="block text-gray-700 mb-2">วันที่เริ่มต้น</label>
+              <label className="block text-gray-700 dark:text-white mb-2">วันที่เริ่มต้น</label>
               <input
                 type="date"
                 name="startDate"
@@ -260,7 +260,7 @@ export default function BulkDataDeletion() {
             </div>
             
             <div>
-              <label className="block text-gray-700 mb-2">วันที่สิ้นสุด</label>
+              <label className="block text-gray-700 dark:text-white mb-2">วันที่สิ้นสุด</label>
               <input
                 type="date"
                 name="endDate"
@@ -272,7 +272,7 @@ export default function BulkDataDeletion() {
             
             {/* Status Selection */}
             <div>
-              <label className="block text-gray-700 mb-2">สถานะ</label>
+              <label className="block text-gray-700 dark:text-white mb-2">สถานะ</label>
               <select
                 name="status"
                 className="w-full p-2 border rounded"
@@ -281,10 +281,10 @@ export default function BulkDataDeletion() {
               >
                 {dataType === 'news' 
                   ? newsStatusOptions.map(option => (
-                      <option key={option.value} value={option.value}>{option.label}</option>
+                      <option className="dark:bg-gray-700" key={option.value} value={option.value}>{option.label}</option>
                     ))
                   : uploadStatusOptions.map(option => (
-                      <option key={option.value} value={option.value}>{option.label}</option>
+                      <option className="dark:bg-gray-700" key={option.value} value={option.value}>{option.label}</option>
                     ))
                 }
               </select>
@@ -293,7 +293,7 @@ export default function BulkDataDeletion() {
             {/* Category or Uploaded By */}
             {dataType === 'news' ? (
               <div>
-                <label className="block text-gray-700 mb-2">หมวดหมู่</label>
+                <label className="block text-gray-700 dark:text-white mb-2">หมวดหมู่</label>
                 <select
                   name="category"
                   className="w-full p-2 border rounded"
@@ -301,14 +301,14 @@ export default function BulkDataDeletion() {
                   onChange={handleInputChange}
                 >
                   {newsCategoryOptions.map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
+                    <option className="dark:bg-gray-700" key={option.value} value={option.value}>{option.label}</option>
                   ))}
                 </select>
               </div>
             ) : (
               <>
                 <div>
-                  <label className="block text-gray-700 mb-2">ผู้อัปโหลด</label>
+                  <label className="block text-gray-700 dark:text-white mb-2">ผู้อัปโหลด</label>
                   <input
                     type="text"
                     name="uploadedBy"
@@ -319,7 +319,7 @@ export default function BulkDataDeletion() {
                   />
                 </div>
                 <div>
-                  <label className="block text-gray-700 mb-2">รหัสช่วงเวลา (Period ID)</label>
+                  <label className="block text-gray-700 dark:text-white mb-2">รหัสช่วงเวลา (Period ID)</label>
                   <input
                     type="text"
                     name="periodId"
@@ -371,32 +371,30 @@ export default function BulkDataDeletion() {
         
         {/* News List Table */}
         {showNewsList && dataType === 'news' && (
-          <div className="bg-white p-6 rounded-lg shadow-md mb-6 text-black">
+          <div className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md mb-6 text-black dark:text-white">
             <h2 className="text-xl font-semibold mb-4">รายการข่าวทั้งหมด</h2>
             
             {newsItems.length === 0 ? (
               <p className="text-gray-500">ไม่พบข้อมูลข่าว</p>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200">
+                <table className="min-w-full bg-white border dark:bg-gray-700 border-gray-200">
                   <thead>
                     <tr>
-                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">หัวข้อข่าว</th>
-                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">หมวดหมู่</th>
-                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่สร้าง</th>
-                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
-                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">การจัดการ</th>
+                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">ID</th>
+                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">หัวข้อข่าว</th>
+                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">หมวดหมู่</th>
+                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">วันที่สร้าง</th>
+                      <th className="py-2 px-4 border-b border-gray-200 bg-gray-50 dark:bg-gray-700 text-left text-xs font-medium text-gray-500 dark:text-white uppercase tracking-wider">การจัดการ</th>
                     </tr>
                   </thead>
                   <tbody>
                     {newsItems.map((news) => (
-                      <tr key={news.id} className="hover:bg-gray-50">
+                      <tr key={news.id} className="hover:bg-gray-50 dark:hover:bg-gray-400">
                         <td className="py-2 px-4 border-b border-gray-200">{news.id}</td>
                         <td className="py-2 px-4 border-b border-gray-200">{news.News_title}</td>
                         <td className="py-2 px-4 border-b border-gray-200">{news.News_category}</td>
                         <td className="py-2 px-4 border-b border-gray-200">{new Date(news.Create_at).toLocaleDateString('th-TH')}</td>
-                        <td className="py-2 px-4 border-b border-gray-200">{news.News_status || 'N/A'}</td>
                         <td className="py-2 px-4 border-b border-gray-200">
                           {hasApprovePermission() && (
                             <button
