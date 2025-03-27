@@ -1,0 +1,261 @@
+import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '@/config/apiConfig';
+
+interface DataPreviewModalProps {
+  uploadId: string | null;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+interface Column {
+  COLUMN_NAME: string;
+  DATA_TYPE: string;
+}
+
+interface FileInfo {
+  filename: string;
+  upload_date: string;
+  total_rows: number;
+}
+
+interface PreviewData {
+  columns: Column[];
+  rows: number[];
+  totalRows: number;
+  currentPage?: number;
+  pageSize?: number;
+  totalPages?: number;
+  fileInfo: FileInfo;
+}
+
+const DataPreviewModal: React.FC<DataPreviewModalProps> = ({ uploadId, isOpen, onClose }) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [previewData, setPreviewData] = useState<PreviewData | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [displayData, setDisplayData] = useState<any[]>([]);
+  const rowsPerPage = 10;
+
+  useEffect(() => {
+    if (isOpen && uploadId) {
+      // รีเซ็ต currentPage เป็น 1 เมื่อมีการเปลี่ยน uploadId หรือเมื่อเปิด modal ใหม่
+      setCurrentPage(1);
+      fetchPreviewData(uploadId, 1);
+    } else {
+      setPreviewData(null);
+      setDisplayData([]);
+    }
+  }, [isOpen, uploadId]);
+
+  // Update display data when previewData changes
+  useEffect(() => {
+    if (previewData && previewData.rows) {
+      setDisplayData(previewData.rows);
+    }
+  }, [previewData]);
+
+  const fetchPreviewData = async (id: string, page: number = currentPage) => {
+    // ตรวจสอบว่าหน้าที่ต้องการดูมีอยู่จริงหรือไม่ (ถ้าไม่มีให้กลับไปหน้า 1)
+    const actualPage = page || 1; // ป้องกันกรณี page เป็น 0 หรือ undefined
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch(`${API_BASE_URL}/upload/preview/${id}?page=${actualPage}&pageSize=${rowsPerPage}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include' // ส่ง cookies ไปด้วย
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Session expired. Please log in again.');
+        }
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch preview data');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        // ถ้าข้อมูลที่ได้รับมามีหน้าน้อยกว่าหน้าที่ต้องการดู ให้กลับไปหน้า 1
+        if (data.data.totalPages && actualPage > data.data.totalPages) {
+          // ถ้าหน้าที่ต้องการดูมากกว่าจำนวนหน้าทั้งหมด ให้กลับไปหน้า 1
+          setCurrentPage(1);
+          fetchPreviewData(id, 1);
+          return;
+        }
+        setPreviewData(data.data);
+      } else {
+        throw new Error(data.message || 'Failed to fetch preview data');
+      }
+    } catch (err: any) {
+      setError(err.message || 'An error occurred while fetching preview data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    // ตรวจสอบว่าหน้าที่ต้องการดูมีค่ามากกว่า 0
+    if (page < 1) return;
+    
+    setCurrentPage(page);
+    // เรียก API ใหม่เพื่อดึงข้อมูลของหน้าที่ต้องการ
+    if (uploadId) {
+      fetchPreviewData(uploadId, page);
+    }
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('th-TH', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col">
+        {/* Modal Header */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+            Data Preview
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="p-4 flex-1 overflow-auto">
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : error ? (
+            <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded text-red-600 dark:text-red-400">
+              <h3 className="font-bold">Error</h3>
+              <p>{error}</p>
+            </div>
+          ) : previewData ? (
+            <div className="space-y-4">
+              {/* File Information */}
+              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded">
+                <h3 className="font-medium mb-2">File Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Filename</p>
+                    <p className="font-medium">{previewData.fileInfo.filename}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Upload Date</p>
+                    <p className="font-medium">{formatDate(previewData.fileInfo.upload_date)}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Rows</p>
+                    <p className="font-medium">{previewData.totalRows}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Data Table */}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      {previewData.columns.map((column) => (
+                        <th
+                          key={column.COLUMN_NAME}
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                        >
+                          {column.COLUMN_NAME}
+                          <span className="text-xs text-gray-400 ml-1">({column.DATA_TYPE})</span>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {displayData.map((row, rowIndex) => (
+                      <tr key={rowIndex} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        {previewData.columns.map((column) => (
+                          <td
+                            key={`${rowIndex}-${column.COLUMN_NAME}`}
+                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300"
+                          >
+                            {row[column.COLUMN_NAME] !== null && row[column.COLUMN_NAME] !== undefined ? row[column.COLUMN_NAME].toString() : row[column.COLUMN_NAME] === null ? 'null' : 'undefined'}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              {previewData.totalRows > rowsPerPage && (
+                <div className="flex justify-between items-center mt-4">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Showing {Math.min(rowsPerPage, displayData.length)} of {previewData.totalRows} rows
+                    {previewData.currentPage && previewData.totalPages && (
+                      <span className="ml-2">
+                        (Page {previewData.currentPage} of {previewData.totalPages})
+                      </span>
+                    )}
+                  </p>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={previewData.currentPage && previewData.totalPages ? 
+                        previewData.currentPage >= previewData.totalPages : 
+                        currentPage * rowsPerPage >= previewData.totalRows}
+                      className="px-3 py-1 border rounded text-sm disabled:opacity-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 dark:text-gray-400 py-12">
+              No preview data available
+            </div>
+          )}
+        </div>
+
+        {/* Modal Footer */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DataPreviewModal;

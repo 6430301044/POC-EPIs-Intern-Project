@@ -10,16 +10,28 @@ import Forgotpassword from "@/pages/Forgotpassword";
 import AdminLayout from "@/layouts/AdminLayout";
 import Admin from "@/pages/admin/Admin";
 import Team from "@/pages/admin/Team";
-import Projects from "@/pages/admin/Projects";
-import Calendar from "@/pages/admin/Calendar";
-import Documents from "@/pages/admin/Documents";
-import Reports from "@/pages/admin/Reports";
-import Settings from "@/pages/admin/Settings";
 import Profile from "@/pages/admin/Profile";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
+<<<<<<< Updated upstream
 import TestAPICall from "@/components/TestAPICall";
 import Contact from "@/components/main/Contact";
 import Visualization from "@/components/main/Visualization";
+=======
+import ApproveUser from "@/pages/admin/ApproveUser";
+import ApprovalCenter from "@/pages/admin/ApprovalCenter";
+import NewsDetail from "@/pages/NewsDetail";
+import Data from "@/pages/Data";
+import Contact from "@/pages/ContactUs";
+import ReferenceDataUpload from "@/pages/admin/ReferenceDataUpload";
+import UploadCenter from "@/pages/admin/UploadCenter";
+import BulkDataDeletion from "@/pages/admin/BulkDataDeletion";
+import NewsPage from "@/pages/NewsPage";
+import About from "@/pages/About";
+import Results from "@/pages/Results";
+import DataManagementCenter from "@/pages/admin/DataManagementCenter";
+import SrirachaOil from "@/pages/SrirachaOil";
+import KhaoBoYa from "@/pages/KhaoBoYa";
+>>>>>>> Stashed changes
 
 const router = createBrowserRouter([
   {
@@ -51,8 +63,17 @@ const router = createBrowserRouter([
         element: <Contact />
       },
       {
+<<<<<<< Updated upstream
         path: "/environment",
         element: <Visualization />,
+=======
+        path: "/sriracha-oil",
+        element: <SrirachaOil />,
+      },
+      {
+        path: "/khaoboya-terminal",
+        element: <KhaoBoYa />,
+>>>>>>> Stashed changes
       }
     ],
   },
@@ -86,29 +107,60 @@ const router = createBrowserRouter([
         element: <Team />,
       },
       {
-        path: "/admin/projects",
-        element: <Projects />,
-      },
-      {
-        path: "/admin/calendar",
-        element: <Calendar />,
-      },
-      {
-        path: "/admin/documents",
-        element: <Documents />,
-      },
-      {
-        path: "/admin/reports",
-        element: <Reports />,
-      },
-      {
-        path: "/admin/settings",
-        element: <Settings />,
-      },
-      {
         path: "/admin/profile",
         element: <Profile />,
       },
+<<<<<<< Updated upstream
+=======
+      {
+        path: "/admin/upload",
+        element: <Upload />,
+      },
+      {
+        path: "/admin/enhance-table-upload",
+        element: <EnhanceTableUpload />,
+      },
+      {
+        path: "/admin/approval",
+        element: <Approval />,
+      },
+      {
+        path: "/admin/data-management",
+        element: <DataManagement />,
+      },
+      {
+        path: "/admin/reference-data",
+        element: <ReferenceDataManagement />,
+      },
+      {
+        path: "/admin/approve-user",
+        element: <ApproveUser />,
+      },
+      {
+        path: "/admin/approval-center",
+        element: <ApprovalCenter />,
+      },
+      {
+        path: "/admin/news",
+        element: <News />,
+      },
+      {
+        path: "/admin/reference-data-upload",
+        element: <ReferenceDataUpload />, 
+      },
+      {
+        path: "/admin/upload-center",
+        element: <UploadCenter />,
+      },
+      {
+        path: "/admin/bulk-data-deletion",
+        element: <BulkDataDeletion />,
+      },
+      {
+        path: "/admin/data-management-center",
+        element: <DataManagementCenter />,
+      }
+>>>>>>> Stashed changes
     ],
   },
 ]);

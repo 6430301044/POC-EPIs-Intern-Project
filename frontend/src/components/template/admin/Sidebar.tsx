@@ -15,11 +15,24 @@ export default function Sidebar() {
   
   // เมนูหลัก
   const mainMenus = [
+<<<<<<< Updated upstream
     { name: 'Team', path: '/dashboard/team', icon: TeamIcon },
     { name: 'Projects', path: '/dashboard/projects', icon: ProjectIcon },
     { name: 'Calendar', path: '/dashboard/calendar', icon: CalendarIcon },
     { name: 'Documents', path: '/dashboard/documents', icon: DocumentIcon },
     { name: 'Reports', path: '/dashboard/reports', icon: ReportIcon },
+=======
+    { name: 'จัดการดูแลข้อมูลผู้ใช้ในระบบ', path: '/admin/team', icon: TeamIcon }, //Eng name Team Management
+    // { name: 'Projects', path: '/admin/projects', icon: ProjectIcon },
+    // { name: 'Calendar', path: '/admin/calendar', icon: CalendarIcon },
+    // { name: 'Documents', path: '/admin/documents', icon: DocumentIcon },
+    // { name: 'Reports', path: '/admin/reports', icon: ReportIcon },
+    { name: 'ศูนย์รวมการอัปโหลดข้อมูล', path: '/admin/upload-center', icon: UploadIcon }, //Eng name Upload Center
+    { name: 'ศูนย์รวมการอนุมัติข้อมูล', path: '/admin/approval-center', icon: ApprovalIcon }, //Eng name Approval Center
+    { name: 'ศูนย์รวมการจัดการข้อมูล', path: '/admin/data-management-center', icon: DataIcon }, //Eng name Verification Center
+    // { name: 'Bulk Data Deletion', path: '/admin/bulk-data-deletion', icon: TrashIcon },
+    { name: 'ข่าวสารประชาสัมพันธ์', path: '/admin/news', icon: ReportIcon }, //Eng name News
+>>>>>>> Stashed changes
   ]
 
   const teams = [

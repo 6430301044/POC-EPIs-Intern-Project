@@ -12,9 +12,53 @@ interface TeamMember {
 }
 
 export default function Team() {
+<<<<<<< Updated upstream
   useEffect(() => {
     document.title = "Team | WindReact"
   }, [])
+=======
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
+  const [canEdit, setCanEdit] = useState<boolean>(false);
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    const checkPermission = async () => {
+      const hasPermission = await hasEditPermission();
+      setCanEdit(hasPermission);
+    };
+    
+    checkPermission();
+  }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const response = await getAllUsers();
+        if (response.success) {
+          setUsers(response.data);
+          // ถ้าไม่มีข้อมูลผู้ใช้ ให้แสดงข้อความที่เป็นมิตรกับผู้ใช้
+          if (response.data.length === 0) {
+            setError('ไม่พบข้อมูลผู้ใช้ในระบบ');
+          } else {
+            setError(null);
+          }
+        } else {
+          setError('ไม่สามารถดึงข้อมูลผู้ใช้ได้ กรุณาลองใหม่อีกครั้ง');
+        }
+      } catch (err) {
+        console.error('Error fetching users:', err);
+        setError('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์ กรุณาลองใหม่ภายหลัง');
+      } finally {
+        setLoading(false);
+      }
+    };
+>>>>>>> Stashed changes
 
   const [searchQuery, setSearchQuery] = useState('')
   
@@ -70,6 +114,7 @@ export default function Team() {
         department: 'Engineering',
         joinDate: '2023-01-15'
       },
+<<<<<<< Updated upstream
       {
         id: '6',
         name: 'สมบัติ ลายแทง',
@@ -79,6 +124,52 @@ export default function Team() {
         status: 'In Meeting',
         department: 'Design',
         joinDate: '2023-03-20'
+=======
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      renderCell: ({ row }) => {
+        if (canEdit) {
+          return (
+            <Box display="flex" justifyContent="center" gap={1}>
+              <Tooltip title="Edit User">
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditClick(row);
+                  }}
+                  color="primary"
+                  size="small"
+                >
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Delete User">
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteClick(row);
+                  }}
+                  color="error"
+                  size="small"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          );
+        } else {
+          return (
+            <Tooltip title="คุณไม่มีสิทธิ์ในการแก้ไขข้อมูลผู้ใช้">
+              <Box sx={{ color: 'text.white', fontSize: '0.75rem', textAlign: 'center' }}>
+                ไม่มีสิทธิ์แก้ไข
+              </Box>
+            </Tooltip>
+          );
+        }
+>>>>>>> Stashed changes
       },
   ]
 

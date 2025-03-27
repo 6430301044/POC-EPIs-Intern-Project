@@ -7,6 +7,12 @@ import seaWaterDataRoutes from "./seaWaterDataRoutes";
 import wasteWaterDataRoutes from "./wasteWaterDataRoutes";
 import uploadRoutes from "./uploadRoutes";
 import filterOptionsRoutes from "./filterOptionsRoutes";
+<<<<<<< Updated upstream
+=======
+import userRoutes from "./userRoutes";
+import newsRoutes from "./newsRoutes";
+import enhanceTableRoutes from "./enhanceTableRoutes";
+>>>>>>> Stashed changes
 
 const router = express.Router();
 
@@ -24,5 +30,11 @@ router.use("/Env_SeaWater", seaWaterDataRoutes);
 router.use("/Env_WasteWater", wasteWaterDataRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/filter-options", filterOptionsRoutes);
+<<<<<<< Updated upstream
+=======
+router.use("/user", userRoutes);
+router.use("/news", newsRoutes);
+router.use("/enhance-table", enhanceTableRoutes);
+>>>>>>> Stashed changes
 
 export default router;
