@@ -207,7 +207,6 @@ export default function Register() {
 
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4 rounded-md">
-                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       First Name
@@ -220,7 +219,7 @@ export default function Register() {
                       onChange={(e) => setFirstName(e.target.value)}
                       required
                       className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                      placeholder="Jane"
+                      placeholder="Enter your first name"
                     />
                   </div>
                   <div>
@@ -235,10 +234,9 @@ export default function Register() {
                       onChange={(e) => setLastName(e.target.value)}
                       required
                       className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                      placeholder="Doe"
+                      placeholder="Enter your last name"
                     />
                   </div>
-                </div>
                 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -253,7 +251,7 @@ export default function Register() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    placeholder="janeD@example.com"
+                    placeholder="Enter your email"
                   />
                 </div>
 
@@ -269,7 +267,7 @@ export default function Register() {
                     onChange={(e) => setPhone(e.target.value)}
                     required
                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    placeholder="Phone number"
+                    placeholder="Enter your phone number"
                   />
                 </div>
 
@@ -306,7 +304,7 @@ export default function Register() {
                     onChange={(e) => setJobPosition(e.target.value)}
                     required
                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    placeholder="Job position"
+                    placeholder="Enter your job position"
                   />
                 </div>
 
@@ -323,7 +321,7 @@ export default function Register() {
                       onChange={handlePasswordChange}
                       required
                       className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white pr-10"
-                      placeholder="••••••••"
+                      placeholder="Enter your password"
                     />
                     <button
                       type="button"
@@ -369,7 +367,7 @@ export default function Register() {
                     className={`mt-1 block w-full rounded-lg border px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 dark:bg-gray-700 dark:text-white ${
                       passwordError ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-indigo-500"
                     }`}
-                    placeholder="••••••••"
+                    placeholder="Confirm Your Password"
                   />
                   {/* แสดงข้อความผิดพลาด ถ้ารหัสผ่านไม่ตรงกัน */}
                   {passwordError && <p className="mt-1 text-sm text-red-500">{passwordError}</p>}
