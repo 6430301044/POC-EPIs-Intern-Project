@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router'
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string
@@ -9,19 +10,13 @@ export default function Sidebar() {
   const location = useLocation()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { theme } = useTheme();
   
-  // แยก Dashboard ออกมา
-  const dashboard = { name: 'Dashboard', path: '/dashboard', icon: HomeIcon }
+  // แยก Home ออกมา
+  const admin = { name: 'หน้าหลัก', path: '/admin', icon: HomeIcon } //Eng name Home
   
   // เมนูหลัก
   const mainMenus = [
-<<<<<<< Updated upstream
-    { name: 'Team', path: '/dashboard/team', icon: TeamIcon },
-    { name: 'Projects', path: '/dashboard/projects', icon: ProjectIcon },
-    { name: 'Calendar', path: '/dashboard/calendar', icon: CalendarIcon },
-    { name: 'Documents', path: '/dashboard/documents', icon: DocumentIcon },
-    { name: 'Reports', path: '/dashboard/reports', icon: ReportIcon },
-=======
     { name: 'จัดการดูแลข้อมูลผู้ใช้ในระบบ', path: '/admin/team', icon: TeamIcon }, //Eng name Team Management
     // { name: 'Projects', path: '/admin/projects', icon: ProjectIcon },
     // { name: 'Calendar', path: '/admin/calendar', icon: CalendarIcon },
@@ -32,14 +27,13 @@ export default function Sidebar() {
     { name: 'ศูนย์รวมการจัดการข้อมูล', path: '/admin/data-management-center', icon: DataIcon }, //Eng name Verification Center
     // { name: 'Bulk Data Deletion', path: '/admin/bulk-data-deletion', icon: TrashIcon },
     { name: 'ข่าวสารประชาสัมพันธ์', path: '/admin/news', icon: ReportIcon }, //Eng name News
->>>>>>> Stashed changes
   ]
 
-  const teams = [
-    { name: 'Heroicons', path: '#heroicons', initial: 'H' },
-    { name: 'Tailwind Labs', path: '#tailwind', initial: 'T' },
-    { name: 'Workcation', path: '#workcation', initial: 'W' },
-  ]
+  // const teams = [
+  //   { name: 'Heroicons', path: '#heroicons', initial: 'H' },
+  //   { name: 'Tailwind Labs', path: '#tailwind', initial: 'T' },
+  //   { name: 'Workcation', path: '#workcation', initial: 'W' },
+  // ]
 
   // เพิ่มฟังก์ชันสำหรับจัดการการคลิกเมนู
   const handleMenuClick = () => {
@@ -77,9 +71,8 @@ export default function Sidebar() {
           <div className="flex items-center justify-between px-6">
             {!isCollapsed && (
               <div className="flex items-center flex-shrink-0">
-                <Link to="/dashboard" className="flex items-center">
-                  <img className="w-8" src="/images/wrlogo.png" alt="" />
-                    <span className="ml-2 text-xl font-semibold text-gray-900 dark:text-white">WindReact</span>
+                <Link to="/admin" className="flex items-center">
+                  <img className="w-20 items-center justify-center" src={theme === "light" ? "/images/pttwm.svg" : "/images/pttdm.svg"} alt="" />
                 </Link>
               </div>
             )}
@@ -94,19 +87,19 @@ export default function Sidebar() {
 
           {/* Main Navigation */}
           <nav className="flex-1 px-3 mt-5">
-            {/* Dashboard */}
+            {/* Admin */}
             <div className="space-y-1">
               <Link
-                to={dashboard.path}
+                to={admin.path}
                 onClick={handleMenuClick}
                 className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
-                  location.pathname === dashboard.path
+                  location.pathname === admin.path
                     ? 'bg-indigo-50 text-indigo-600 dark:bg-gray-800 dark:text-white'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'
                 }`}
               >
-                <dashboard.icon className="w-6 h-6 mr-3" />
-                {!isCollapsed && dashboard.name}
+                <admin.icon className="w-6 h-6 mr-3" />
+                {!isCollapsed && admin.name}
               </Link>
 
               {/* Main Menus */}
@@ -128,6 +121,7 @@ export default function Sidebar() {
             </div>
 
             {/* Teams Section */}
+            {/*
             {!isCollapsed && (
               <div className="pt-6">
                 <div className="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -150,15 +144,16 @@ export default function Sidebar() {
                 </div>
               </div>
             )}
+            */}
           </nav>
 
           {/* Settings - Fixed at bottom */}
-          <div className="px-3 pb-4">
+          {/* <div className="px-3 pb-4">
             <Link
-              to="/dashboard/settings"
+              to="/admin/settings"
               onClick={handleMenuClick}
               className={`flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 ${
-                location.pathname === '/dashboard/settings'
+                location.pathname === '/admin/settings'
                   ? 'bg-indigo-50 text-indigo-600 dark:bg-gray-800 dark:text-white'
                   : ''
               }`}
@@ -166,7 +161,7 @@ export default function Sidebar() {
               <SettingsIcon className="w-6 h-6 mr-3" />
               {!isCollapsed && 'Settings'}
             </Link>
-          </div>
+          </div> */}
         </div>
       </div>
     </>
@@ -186,6 +181,26 @@ function ChevronRightIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg {...props} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M9 5L16 12L9 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
+// เพิ่ม Approval Icon
+function ApprovalIcon(props: IconProps) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
     </svg>
   )
 }
@@ -244,34 +259,58 @@ function TeamIcon(props: IconProps) {
   )
 }
 
-function ProjectIcon(props: IconProps) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-    </svg>
-  )
-}
+// function ProjectIcon(props: IconProps) {
+//   return (
+//     <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+//     </svg>
+//   )
+// }
 
-function CalendarIcon(props: IconProps) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-    </svg>
-  )
-}
+// function CalendarIcon(props: IconProps) {
+//   return (
+//     <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+//     </svg>
+//   )
+// }
 
-function DocumentIcon(props: IconProps) {
-  return (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-    </svg>
-  )
-}
+// function DocumentIcon(props: IconProps) {
+//   return (
+//     <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+//       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+//     </svg>
+//   )
+// }
 
 function ReportIcon(props: IconProps) {
   return (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  )
+}
+
+function UploadIcon(props: IconProps) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+    </svg>
+  )
+}
+
+function DataIcon(props: IconProps) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+    </svg>
+  )
+}
+
+function ReferenceDataIcon(props: IconProps) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
     </svg>
   )
 }
@@ -294,4 +333,24 @@ function MenuIcon(props: IconProps) {
       />
     </svg>
   )
-} 
+}
+
+// เพิ่ม Trash Icon
+function TrashIcon(props: IconProps) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+      />
+    </svg>
+  );
+}

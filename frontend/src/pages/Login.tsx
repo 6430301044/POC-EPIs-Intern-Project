@@ -1,39 +1,71 @@
 import { Container } from "@/components/template/Container"
 import DarkSwitch from "@/components/template/DarkSwitch"
 import { SectionTitle } from "@/components/template/SectionTitle"
+import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router"
-import { useState, useEffect } from "react";
-
+import API_BASE_URL from '@/config/apiConfig';
+import { Eye, EyeOff } from "lucide-react";
+import { isAuthenticated, isTokenExpired } from "@/utils/authUtils";
+import { getDecodedToken } from "@/utils/authUtils";
 
 export default function Login() {
-  const navigate = useNavigate();
-  
+
+  const navigate = useNavigate()
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+  const [showPassword, setShowPassword] = useState(false);
+
   useEffect(() => {
-    document.title = "Login | WindReact";
-  }, []);
+    document.title = "Login | WindReact"
+
+    // ตรวจสอบ Token ว่าหมดอายุหรือยัง
+    const checkTokenExpiration = async () => {
+      try {
+        // ตรวจสอบว่ามีการล็อกอินแล้วหรือไม่ก่อนที่จะเรียก API
+        const auth = await isAuthenticated();
+        
+        if (auth) {
+          // ถ้าผู้ใช้ล็อกอินแล้ว ให้ redirect ไปหน้า admin
+          navigate("/admin");
+        }
+        // ไม่ต้องเรียก isTokenExpired() เพราะถ้าไม่มีการล็อกอิน จะทำให้เกิด error 401 โดยไม่จำเป็น
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        // ไม่ต้องทำอะไรเพิ่มเติม เพราะอยู่ในหน้า Login อยู่แล้ว
+      }
+    }
+
+    checkTokenExpiration(); // ตรวจสอบตอนเข้าเว็บ
+    const interval = setInterval(checkTokenExpiration, 10 * 1000); // เช็คทุก 10 วินาที
+
+    // เมื่อใช้ HttpOnly Cookie แล้ว ไม่จำเป็นต้องมี listener สำหรับการเปลี่ยนแปลงใน localStorage อีกต่อไป
+
+    return () => {
+      clearInterval(interval); // ล้าง interval ตอนออกจากหน้า
+    };
+  }, [navigate])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+    e.preventDefault()
+    console.log("Form submitted")
+    // to login
     try {
-      const response = await fetch("http://localhost:5000/api/login", {
+      const response = await fetch(`${API_BASE_URL}/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        credentials: 'include', // เพิ่ม credentials เพื่อให้ browser ส่ง cookies ไปกับ request
+        body: JSON.stringify({ User_email: email, User_password: password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("token", data.token); // เก็บ Token
+        // ไม่ต้องเก็บ token ใน localStorage อีกต่อไป เพราะใช้ HttpOnly Cookie แล้ว
         alert("Login successful!");
-        navigate("/dashboard"); // ไปหน้า Dashboard
+        navigate("/admin"); // ไปหน้า Dashboard
       } else {
         alert(data.message || "Login failed");
       }
@@ -46,24 +78,29 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Container>
+        {/* Back to Home Button */}
+        <div className="py-4 flex justify-center">
+          <Link 
+            to="/" 
+            className="flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+          >
+            <svg className="mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Home
+          </Link>
+        </div>
+
         <div className="flex min-h-[80vh] items-center justify-center flex-col space-y-4">
           <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-8 shadow-lg dark:bg-gray-800">
-            {/* Back to Home Button */}
-            <div className="flex justify-start">
-              <Link 
-                to="/" 
-                className="flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
-              >
-                <svg className="mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to Home
-              </Link>
-            </div>
             <div>
-              <SectionTitle preTitle="Welcome back" title="Sign In" align="center" />
+              <SectionTitle
+                preTitle="Welcome back"
+                title="Sign In"
+                align="center"
+              >
+              </SectionTitle>
             </div>
-
             {/* Form Login */}
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4 rounded-md">
@@ -84,23 +121,33 @@ export default function Login() {
                     placeholder="Enter your email"
                   />
                 </div>
-
                 {/* Password */}
-                <div>
+                <div className="relative">
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Password
                   </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                    placeholder="Enter your password"
-                  />
+                  <div className="relative">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white pr-10"
+                      placeholder="Enter your password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-400"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      tabIndex={0}
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -141,13 +188,13 @@ export default function Login() {
               </div>
             </form>
           </div>
-
+          
           {/* Dark Mode Switch */}
           <div className="flex justify-center mt-4">
-            <DarkSwitch />
+            <DarkSwitch variant="default" />
           </div>
         </div>
       </Container>
     </div>
-  );
+  )
 }

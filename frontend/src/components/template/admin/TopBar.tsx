@@ -1,15 +1,64 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router'
 import DarkSwitch from '@/components/template/DarkSwitch'
+import { getDecodedToken } from '@/utils/authUtils'
+import API_BASE_URL from '@/config/apiConfig'
 
 // กำหนด interface สำหรับ SVG props
-interface IconProps extends React.SVGProps<SVGSVGElement> {
-  className?: string
-}
+// interface IconProps extends React.SVGProps<SVGSVGElement> {
+//   className?: string
+// }
 
 export default function TopBar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [userName, setUserName] = useState<string>('User')
+  const [userImage, setUserImage] = useState<string>('https://episstorageblob.blob.core.windows.net/profile/defaultProfileImage.jpg')
   const dropdownRef = useRef<HTMLDivElement>(null)
+  
+  // ฟังก์ชันสำหรับอัพเดทข้อมูลผู้ใช้จาก token
+  const updateUserFromToken = async () => {
+    const decoded = await getDecodedToken()
+    if (decoded) {
+      if (decoded.name) {
+        setUserName(decoded.name)
+      }
+      
+      // ดึงรูปภาพผู้ใช้จาก token แทนการเรียก API
+      if (decoded.imageUrl) {
+        setUserImage(decoded.imageUrl)
+      }
+    }
+  }
+  
+  // เรียกใช้เมื่อ component mount
+  useEffect(() => {
+    // เรียกใช้ฟังก์ชัน async ใน useEffect
+    const fetchUserData = async () => {
+      await updateUserFromToken()
+    }
+    
+    fetchUserData()
+    
+    // สร้าง event listener สำหรับการเปลี่ยนแปลง localStorage
+    const handleStorageChange = async (e: StorageEvent) => {
+      if (e.key === 'token') {
+        await updateUserFromToken()
+      }
+    }
+    
+    // เพิ่ม event listener
+    window.addEventListener('storage', handleStorageChange)
+    
+    // Custom event สำหรับการอัพเดทภายในแอพเดียวกัน
+    const handleTokenRefresh = async () => await updateUserFromToken()
+    window.addEventListener('token-refreshed', handleTokenRefresh)
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('token-refreshed', handleTokenRefresh)
+    }
+  }, [])
 
   // Click outside handler
   useEffect(() => {
@@ -27,11 +76,32 @@ export default function TopBar() {
   const handleMenuClick = () => {
     setIsProfileOpen(false)
   }
+  
+  // ฟังก์ชันสำหรับออกจากระบบ
+  const handleSignOut = async () => {
+    try {
+      // เรียก API logout เพื่อลบ cookie ที่ server
+      const response = await fetch(`${API_BASE_URL}/user/logout`, {
+        method: 'POST',
+        credentials: 'include' // ส่ง cookies ไปด้วย
+      });
+      
+      if (response.ok) {
+        // ไม่ต้องลบ token จาก localStorage เพราะใช้ HttpOnly Cookie แล้ว
+        window.location.href = '/login';
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  }
 
   return (
     <header className="flex-shrink-0 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-      <div className="flex items-center justify-between h-16 px-4">
+      <div className="flex items-center justify-end h-16 px-4">
         {/* Search */}
+        {/* Left side 
         <div className="flex-1 flex justify-start">
           <div className="w-full max-w-md">
             <div className="relative">
@@ -46,16 +116,18 @@ export default function TopBar() {
             </div>
           </div>
         </div>
-
+        */}
         {/* Right side */}
         <div className="flex items-center space-x-4">
-          <DarkSwitch />
+          <DarkSwitch variant="dark" />
           
           {/* Notifications */}
+          {/*
           <button className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
             <span className="sr-only">Notifications</span>
             <BellIcon className="w-6 h-6" />
           </button>
+          */}
 
           {/* Profile dropdown */}
           <div className="relative" ref={dropdownRef}>
@@ -64,38 +136,41 @@ export default function TopBar() {
               className="flex items-center space-x-2 mr-2"
             >
               <img
-                className="w-8 h-8 rounded-full"
-                src="/images/avatar.avif"
-                alt=""
+                className="w-8 h-8 rounded-full object-cover"
+                src={userImage}
+                alt="User profile"
+                onError={(e) => {
+                  // ถ้าโหลดรูปไม่สำเร็จ ให้ใช้รูป default
+                  e.currentTarget.src = 'https://episstorageblob.blob.core.windows.net/profile/defaultProfileImage.jpg'
+                }}
               />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Tom Cook
+                {userName}
               </span>
             </button>
 
             {isProfileOpen && (
               <div className="absolute right-0 mt-2 w-48 py-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50">
                 <Link
-                  to="/dashboard/profile"
+                  to="/admin/profile"
                   onClick={handleMenuClick}
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   Your Profile
                 </Link>
-                <Link
-                  to="/dashboard/settings"
+                {/* <Link
+                  to="/admin/settings"
                   onClick={handleMenuClick}
                   className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   Settings
-                </Link>
-                <Link
-                  to="/login"
-                  onClick={handleMenuClick}
-                  className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                </Link> */}
+                <button
+                  onClick={handleSignOut}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   Sign out
-                </Link>
+                </button>
               </div>
             )}
           </div>
@@ -105,40 +180,40 @@ export default function TopBar() {
   )
 }
 
-function SearchIcon(props: IconProps) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-      />
-    </svg>
-  )
-}
+// function SearchIcon(props: IconProps) {
+//   return (
+//     <svg
+//       {...props}
+//       xmlns="http://www.w3.org/2000/svg"
+//       fill="none"
+//       viewBox="0 0 24 24"
+//       stroke="currentColor"
+//     >
+//       <path
+//         strokeLinecap="round"
+//         strokeLinejoin="round"
+//         strokeWidth={2}
+//         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+//       />
+//     </svg>
+//   )
+// }
 
-function BellIcon(props: IconProps) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-      />
-    </svg>
-  )
-} 
+// function BellIcon(props: IconProps) {
+//   return (
+//     <svg
+//       {...props}
+//       xmlns="http://www.w3.org/2000/svg"
+//       fill="none"
+//       viewBox="0 0 24 24"
+//       stroke="currentColor"
+//     >
+//       <path
+//         strokeLinecap="round"
+//         strokeLinejoin="round"
+//         strokeWidth={2}
+//         d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+//       />
+//     </svg>
+//   )
+// }

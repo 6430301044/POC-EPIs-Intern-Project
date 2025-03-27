@@ -21,7 +21,8 @@ const getTableIdentifier = (subCategory: string): string => {
         "ผลการตรวจวัดค่าความเข้มข้นของก๊าซซัลเฟอร์ไดออกไซด์ในบรรยากาศ": "SO2",
         "ผลการตรวจวัดสารอินทรีย์ระเหยง่ายในบรรยากาศ": "Vocs",
         "ผลการตรวจวัดคุณภาพอากาศภายในสถานประกอบการ": "AirQuality",
-        "ผลการตรวจวัดระดับเสียงโดยทั่วไป": "NoiseLevel",
+        "ผลการตรวจวัดระดับเสียงโดยทั่วไป": "NoiseLevelNormal",
+        "ผลการตรวจวัดคุณภาพเสียง 90": "NoiseLevel90",
         "ผลการติดตามตรวจสอบ": "Monitorresult",
         "ผลการตรวจวัดคุณภาพน้ำทิ้ง": "WasteWater",
         "ผลการตรวจวัดคุณภาพน้ำทะเล": "SeaWater",
@@ -172,10 +173,17 @@ export const fetchEnvironmentalData = async (mainCategory: string, subCategory: 
             console.log("✅ tableIdentifier Pass:", mainCategoryIdentifier, tableIdentifier);
         }
 
+        // คำนวณ offset จาก page (ถ้ามี)
+        const offset = filters.page ? (filters.page - 1) * (filters.pageSize || 10) : 0;
+        const pageSize = filters.pageSize || 10;
+
+        // Add pagination parameters to the query
         const queryParams = new URLSearchParams({
             ...(filters.stationName && { stationName: filters.stationName }),
             ...(filters.semiannual && { semiannual: filters.semiannual }),
             ...(filters.year && { year: filters.year }),
+            offset: String(offset),
+            pageSize: String(pageSize),
         }).toString();
         
         let response;

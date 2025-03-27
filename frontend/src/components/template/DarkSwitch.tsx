@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react"
 import { useTheme } from "@/contexts/ThemeContext"
 
-export default function DarkSwitch() {
+type DarkSwitchProps = {
+  variant?: 'default' | 'light' | 'dark'
+}
+
+export default function DarkSwitch({ variant = 'default' }: DarkSwitchProps) {
 
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
@@ -16,7 +20,7 @@ export default function DarkSwitch() {
       {theme === "dark" ? (
         <button
           onClick={() => setTheme("light")}
-          className="text-gray-300 rounded-full outline-none focus:outline-none"
+          className={`rounded-full outline-none focus:outline-none ${variant === 'light' ? 'text-white' : variant === 'dark' ? 'text-gray-200' : 'text-gray-300'}`}
         >
           <span className="sr-only">Light Mode</span>
           <svg
@@ -31,7 +35,7 @@ export default function DarkSwitch() {
       ) : (
         <button
           onClick={() => setTheme("dark")}
-          className="text-gray-500 rounded-full outline-none focus:outline-none focus-visible:ring focus-visible:ring-gray-100 focus:ring-opacity-20"
+          className={`rounded-full outline-none focus:outline-none focus-visible:ring focus-visible:ring-gray-100 focus:ring-opacity-20 ${variant === 'light' ? 'text-white' : variant === 'dark' ? 'text-gray-600 dark:text-gray-400' : 'text-gray-400 dark:text-gray-500'}`}
         >
           <span className="sr-only">Dark Mode</span>
           <svg

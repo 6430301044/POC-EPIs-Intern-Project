@@ -8,15 +8,16 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Forgotpassword from "@/pages/Forgotpassword";
 import AdminLayout from "@/layouts/AdminLayout";
-import Admin from "@/pages/admin/Admin";
+import AdminHome from "@/pages/admin/AdminHome";
 import Team from "@/pages/admin/Team";
 import Profile from "@/pages/admin/Profile";
+import Upload from "@/pages/admin/Upload";
+import EnhanceTableUpload from "@/pages/admin/EnhanceTableUpload";
+import Approval from "@/pages/admin/Approval";
+import DataManagement from "@/pages/admin/DataManagement";
+import ReferenceDataManagement from "@/pages/admin/ReferenceDataManagement";
+import News from "@/pages/admin/News";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
-<<<<<<< Updated upstream
-import TestAPICall from "@/components/TestAPICall";
-import Contact from "@/components/main/Contact";
-import Visualization from "@/components/main/Visualization";
-=======
 import ApproveUser from "@/pages/admin/ApproveUser";
 import ApprovalCenter from "@/pages/admin/ApprovalCenter";
 import NewsDetail from "@/pages/NewsDetail";
@@ -31,7 +32,6 @@ import Results from "@/pages/Results";
 import DataManagementCenter from "@/pages/admin/DataManagementCenter";
 import SrirachaOil from "@/pages/SrirachaOil";
 import KhaoBoYa from "@/pages/KhaoBoYa";
->>>>>>> Stashed changes
 
 const router = createBrowserRouter([
   {
@@ -55,25 +55,36 @@ const router = createBrowserRouter([
         element: <Legal />,
       },
       {
+        path: "/news",
+        element: <NewsPage />, 
+      },
+      {
+        path: "/news/:id",
+        element: <NewsDetail />,
+      },
+      {
         path: "/about",
-        element: <TestAPICall />,
+        element: <About />
+      },
+      {
+        path: "/environment-data",
+        element: <Data />,
+      },
+      {
+        path: "/environment-measurement",
+        element: <Results />,
       },
       {
         path: "/contact",
-        element: <Contact />
+        element: <Contact />,
       },
       {
-<<<<<<< Updated upstream
-        path: "/environment",
-        element: <Visualization />,
-=======
         path: "/sriracha-oil",
         element: <SrirachaOil />,
       },
       {
         path: "/khaoboya-terminal",
         element: <KhaoBoYa />,
->>>>>>> Stashed changes
       }
     ],
   },
@@ -100,7 +111,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Admin />,
+        element: <AdminHome />,
       },
       {
         path: "/admin/team",
@@ -110,8 +121,6 @@ const router = createBrowserRouter([
         path: "/admin/profile",
         element: <Profile />,
       },
-<<<<<<< Updated upstream
-=======
       {
         path: "/admin/upload",
         element: <Upload />,
@@ -160,7 +169,6 @@ const router = createBrowserRouter([
         path: "/admin/data-management-center",
         element: <DataManagementCenter />,
       }
->>>>>>> Stashed changes
     ],
   },
 ]);

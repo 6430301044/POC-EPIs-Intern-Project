@@ -1,13 +1,53 @@
 import { Container } from "@/components/template/Container"
 import DarkSwitch from "@/components/template/DarkSwitch"
 import { SectionTitle } from "@/components/template/SectionTitle"
-import { useEffect } from "react"
-import { Link } from "react-router"
+import { useEffect, useState } from "react"
+import { Link, useNavigate } from "react-router"
+import API_BASE_URL from '@/config/apiConfig';
 
 export default function Forgotpassword() {
+  // const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error" | "">("");
+
   useEffect(() => {
     document.title = "Forgot Password | WindReact"
   }, [])
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setMessage("");
+    setMessageType("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessageType("success");
+        setMessage("Password reset link has been sent to your email.");
+        // อาจจะเพิ่มการ redirect หลังจากส่งอีเมลสำเร็จ
+        // setTimeout(() => navigate("/login"), 3000);
+      } else {
+        setMessageType("error");
+        setMessage(data.message || "Failed to send reset link. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setMessageType("error");
+      setMessage("Something went wrong. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -37,7 +77,7 @@ export default function Forgotpassword() {
               </SectionTitle>
             </div>
 
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4 rounded-md">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -48,6 +88,8 @@ export default function Forgotpassword() {
                     name="email"
                     type="email"
                     autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     placeholder="Enter your email"
@@ -55,12 +97,19 @@ export default function Forgotpassword() {
                 </div>
               </div>
 
+              {message && (
+                <div className={`p-3 rounded-md ${messageType === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                  {message}
+                </div>
+              )}
+
               <div>
                 <button
                   type="submit"
-                  className="group relative flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  disabled={isSubmitting}
+                  className="group relative flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-400 disabled:cursor-not-allowed"
                 >
-                  Send Reset Link
+                  {isSubmitting ? "Sending..." : "Send Reset Link"}
                 </button>
               </div>
 
