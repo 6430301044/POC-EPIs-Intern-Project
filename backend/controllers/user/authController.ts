@@ -4,7 +4,12 @@ import sql from "mssql";
 import jwt from "jsonwebtoken";
 import { connectToDB } from "../../db/dbConfig";
 
-// ฟังก์ชันเข้าสู่ระบบ (Login)
+// ค่าต่างๆ สำหรับการล็อคบัญชี
+const MAX_ATTEMPTS = 5;
+const BASE_LOCK_TIME = 10 * 60 * 1000; // 10 นาที
+const LOCK_TIME_INCREMENT = 15 * 60 * 1000; // เพิ่มเวลาล็อค 15 นาทีทุกครั้งที่ล็อคใหม่
+const RESET_LOCK_PERIOD = 1 * 24 * 60 * 60 * 1000; // รีเซ็ตการล็อคหากเกิน 1 วัน
+
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { User_email, User_password } = req.body;
@@ -16,8 +21,14 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     const pool = await connectToDB();
 
-    const query =
-      "SELECT u.User_id, u.User_name, u.User_email, u.User_password, u.User_role, u.User_Job_Position, u.User_phone, u.Company_id, u.User_image, c.companyName FROM dbo.Users u LEFT JOIN dbo.Companies c ON u.Company_id = c.company_id WHERE u.User_email = @Email";
+    // คิวรีข้อมูลผู้ใช้
+    const query = `
+      SELECT User_id, User_name, User_email, User_password, User_role, 
+             User_Job_Position, User_phone, Company_id, User_image, 
+             User_login_attempts, User_lock_time, User_lock_count 
+      FROM dbo.Users 
+      WHERE User_email = @Email
+    `;
     const result = await pool
       .request()
       .input("Email", sql.NVarChar, User_email)
@@ -29,14 +40,63 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     }
 
     const user = result.recordset[0];
+
+    // ตรวจสอบว่า User ถูกล็อคหรือไม่
+    if (user.User_lock_time && new Date(user.User_lock_time).getTime() > Date.now()) {
+      return res.status(403).json({ 
+        message: `บัญชีถูกล็อค กรุณาลองใหม่อีกครั้งใน ${Math.ceil((new Date(user.User_lock_time).getTime() - Date.now()) / 60000)} นาที`
+      });
+    }
+
+    // ตรวจสอบรหัสผ่าน
     const isMatch = await bcrypt.compare(User_password, user.User_password);
 
     if (!isMatch) {
-      res.status(401).json({ message: "Invalid email or password" });
-      return;
+      let attempts = user.User_login_attempts + 1;
+      let lock_time = null;
+      let lock_count = user.User_lock_count;
+
+      if (attempts >= MAX_ATTEMPTS) {
+        lock_count += 1;
+        lock_time = new Date(Date.now() + BASE_LOCK_TIME + (lock_count - 1) * LOCK_TIME_INCREMENT);
+
+        // ล็อคบัญชี และรีเซ็ตจำนวนครั้งที่ผิด
+        await pool.request()
+          .input("LockTime", sql.DateTime, lock_time)
+          .input("LockCount", sql.Int, lock_count)
+          .input("Email", sql.NVarChar, User_email)
+          .query("UPDATE dbo.Users SET User_login_attempts = 0, User_lock_time = @LockTime, User_lock_count = @LockCount WHERE User_email = @Email");
+
+        return res.status(403).json({ message: `บัญชีของคุณถูกล็อค กรุณาลองใหม่อีกครั้งใน ${Math.ceil((BASE_LOCK_TIME + (lock_count - 1) * LOCK_TIME_INCREMENT) / 60000)} นาที` });
+      } else {
+        // อัปเดตจำนวนครั้งที่กรอกรหัสผิด
+        await pool.request()
+          .input("Attempts", sql.Int, attempts)
+          .input("Email", sql.NVarChar, User_email)
+          .query("UPDATE dbo.Users SET User_login_attempts = @Attempts WHERE User_email = @Email");
+
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
     }
 
-    // สร้าง JWT token ข้อมูลที่ต้องการเก็บใน token นี้คือข้อมูลผู้ใช้
+    // รีเซ็ตค่าการล็อคเมื่อเข้าสู่ระบบสำเร็จ
+    let shouldResetLockCount = false;
+    if (user.User_lock_time) {
+      const lastLockDate = new Date(user.User_lock_time);
+      if (Date.now() - lastLockDate.getTime() > RESET_LOCK_PERIOD) {
+        shouldResetLockCount = true;
+      }
+    }
+
+    const resetQuery = shouldResetLockCount
+      ? "UPDATE dbo.Users SET User_login_attempts = 0, User_lock_time = NULL, User_lock_count = 0 WHERE User_email = @Email"
+      : "UPDATE dbo.Users SET User_login_attempts = 0, User_lock_time = NULL WHERE User_email = @Email";
+
+    await pool.request()
+      .input("Email", sql.NVarChar, User_email)
+      .query(resetQuery);
+
+    // สร้าง JWT token
     const token = jwt.sign(
       {
         userId: user.User_id,
@@ -45,22 +105,20 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         role: user.User_role || "uploader",
         jobPosition: user.User_Job_Position || "",
         phone: user.User_phone || "",
-        companyName: user.companyName || "ไม่ระบุบริษัท",
-        imageUrl:
-          user.User_image ||
-          "https://episstorageblob.blob.core.windows.net/profile/defaultProfileImage.jpg",
+        companyId: user.Company_id,
+        imageUrl: user.User_image || "https://episstorageblob.blob.core.windows.net/profile/defaultProfileImage.jpg",
       },
       process.env.JWT_SECRET || "your_jwt_secret_key",
       { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
     );
 
-    // ตั้งค่า cookie แบบ HttpOnly
+    // ตั้งค่า cookie
     res.cookie("token", token, {
-      httpOnly: true, // ป้องกัน JavaScript เข้าถึง cookie
-      secure: true, // ใช้เฉพาะ HTTPS (จำเป็นเมื่อใช้ sameSite: 'none')
-      sameSite: "none", // เปลี่ยนเป็น none เพื่อให้ส่ง cookie ข้าม domain ได้ดีขึ้น
-      maxAge: 3600000, // 1 ชั่วโมง (1h) ตรงกับ expiresIn ของ token
-      path: "/", // ใช้ได้ทั้งเว็บไซต์
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 3600000,
+      path: "/",
     });
 
     res.status(200).json({
@@ -72,10 +130,8 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         role: user.User_role || "uploader",
         jobPosition: user.User_Job_Position || "",
         phone: user.User_phone || "",
-        companyName: user.companyName || "ไม่ระบุบริษัท",
-        imageUrl:
-          user.User_image ||
-          "https://episstorageblob.blob.core.windows.net/profile/defaultProfileImage.jpg",
+        companyId: user.Company_id,
+        imageUrl: user.User_image || "https://episstorageblob.blob.core.windows.net/profile/defaultProfileImage.jpg",
       },
     });
   } catch (error) {
