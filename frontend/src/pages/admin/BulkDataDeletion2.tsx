@@ -114,7 +114,7 @@ export default function BulkDataDeletion2() {
   const fetchUploadedFiles = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/upload-table/files`, {
+      const response = await fetch(`${API_BASE_URL}/api/upload-table/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -311,7 +311,7 @@ export default function BulkDataDeletion2() {
                   />
                   <span className="ml-2">ข้อมูลข่าว</span>
                 </label>
-                <label className="inline-flex items-center">
+                {/* <label className="inline-flex items-center">
                   <input
                     type="radio"
                     className="form-radio"
@@ -321,8 +321,8 @@ export default function BulkDataDeletion2() {
                     onChange={() => setDataType('uploads')}
                   />
                   <span className="ml-2">ไฟล์ที่อัปโหลด</span>
-                </label>
-                <label className="inline-flex items-center">
+                </label> */}
+                {/* <label className="inline-flex items-center">
                   <input
                     type="radio"
                     className="form-radio"
@@ -332,7 +332,7 @@ export default function BulkDataDeletion2() {
                     onChange={() => setDataType('reference')}
                   />
                   <span className="ml-2">ข้อมูลอ้างอิงรอการอนุมัติ</span>
-                </label>
+                </label> */}
               </div>
             </div>
             

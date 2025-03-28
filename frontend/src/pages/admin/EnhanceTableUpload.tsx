@@ -254,22 +254,62 @@ export default function EnhanceTableUpload() {
   /**
    * ฟังก์ชันสำหรับดึงโครงสร้างฟิลด์ของ EnhanceTable
    */
-  const getEnhanceTableFields = (enhanceTableId: string): EnhanceTableField[] => {
-    // ฟิลด์ที่จำเป็นสำหรับ EnhanceTable
-    // หมายเหตุ: ในระบบจริงควรดึงข้อมูลนี้จาก API
-    return [
-      { name: 'station_id', type: 'int', required: true },
-      { name: 'indexName', type: 'string', required: true },
-      { name: 'value', type: 'decimal', required: true },
-      { name: 'date', type: 'date', required: true },
-      { name: 'remark', type: 'string', required: false }
-    ];
+  const getEnhanceTableFields = async (enhanceTableId: string): Promise<EnhanceTableField[]> => {
+    try {
+      // ถ้าไม่มี enhanceTableId ให้ส่งค่าเริ่มต้นกลับไป
+      if (!enhanceTableId) {
+        console.warn("No enhanceTableId provided, returning default fields");
+        return [
+          { name: 'station_id', type: 'int', required: true },
+          { name: 'indexName', type: 'string', required: true },
+          { name: 'quantity_per_m2', type: 'decimal', required: true },
+          { name: 'remark', type: 'string', required: false }
+        ];
+      }
+
+      // ดึงข้อมูลฟิลด์จาก API
+      const response = await fetch(`${API_BASE_URL}/enhance-table/fields/${enhanceTableId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include' // ส่ง cookies ไปด้วย
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to fetch fields: ${response.status} ${response.statusText}`);
+      }
+      
+      const responseData = await response.json();
+      if (responseData && Array.isArray(responseData.data)) {
+        return responseData.data;
+      } else {
+        console.warn("Unexpected response format for fields:", responseData);
+        // ส่งค่าเริ่มต้นกลับไปในกรณีที่ API ไม่ส่งข้อมูลที่ถูกต้อง
+        return [
+          { name: 'station_id', type: 'int', required: true },
+          { name: 'indexName', type: 'string', required: true },
+          { name: 'quantity_per_m2', type: 'decimal', required: true },
+          { name: 'remark', type: 'string', required: false }
+        ];
+      }
+    } catch (error) {
+      console.error("Error fetching fields:", error);
+      // ส่งค่าเริ่มต้นกลับไปในกรณีที่เกิดข้อผิดพลาด
+      return [
+        { name: 'station_id', type: 'int', required: true },
+        { name: 'indexName', type: 'string', required: true },
+        { name: 'quantity_per_m2', type: 'decimal', required: true },
+        { name: 'remark', type: 'string', required: false }
+      ];
+    }
   };
 
   /**
    * Validate data against expected structure for EnhanceTable
    */
-  const validateData = (data: any[], enhanceTableId: string = ''): { 
+  const validateData = async (data: any[], enhanceTableId: string = ''): Promise<{ 
     isValid: boolean; 
     message?: string; 
     fieldComparison?: {
@@ -277,73 +317,125 @@ export default function EnhanceTableUpload() {
       missingFields: string[];
       extraFields: string[];
     };
-  } => {
+  }> => {
     if (!data || data.length === 0) {
       return { isValid: false, message: "ไม่พบข้อมูลในไฟล์" };
     }
 
-    // ดึงโครงสร้างฟิลด์ของ EnhanceTable
-    const expectedFields = getEnhanceTableFields(enhanceTableId);
-    
-    // ตรวจสอบว่ามีฟิลด์ที่จำเป็นหรือไม่
-    const requiredFields = expectedFields.filter(field => field.required).map(field => field.name);
-    const firstRow = data[0];
-    const fileFields = Object.keys(firstRow).map(key => key.toLowerCase());
-    
-    const missingRequiredFields = requiredFields.filter(field => 
-      !fileFields.some(key => key.toLowerCase() === field.toLowerCase())
-    );
-
-    // ตรวจสอบฟิลด์เพิ่มเติมที่มีในไฟล์แต่ไม่มีในโครงสร้าง
-    const expectedFieldNames = expectedFields.map(field => field.name.toLowerCase());
-    const extraFields = fileFields.filter(field => 
-      !expectedFieldNames.some(name => name === field.toLowerCase())
-    );
-
-    // สร้างข้อมูลเปรียบเทียบฟิลด์
-    const fieldComparison = {
-      requiredFields: requiredFields,
-      missingFields: missingRequiredFields,
-      extraFields: extraFields
-    };
-
-    if (missingRequiredFields.length > 0) {
-      return { 
-        isValid: false, 
-        message: `ไฟล์ไม่มีฟิลด์ที่จำเป็น: ${missingRequiredFields.join(', ')}`,
-        fieldComparison
-      };
-    }
-
-    // ตรวจสอบประเภทข้อมูล
-    const typeErrors: string[] = [];
-    const numericTypes = ['decimal', 'float', 'int'];
-
-    for (let i = 0; i < Math.min(data.length, 5); i++) { // ตรวจสอบ 5 แถวแรก
-      const row = data[i];
+    try {
+      // ดึงโครงสร้างฟิลด์ของ EnhanceTable
+      const expectedFields = await getEnhanceTableFields(enhanceTableId);
       
-      // ตรวจสอบประเภทข้อมูลของฟิลด์ที่จำเป็น
-      expectedFields.forEach(field => {
-        if (numericTypes.includes(field.type)) {
-          const value = row[field.name];
-          if (value !== undefined && value !== null && value !== '') {
-            if (isNaN(Number(value))) {
-              typeErrors.push(`แถวที่ ${i+1}, ฟิลด์ ${field.name} ควรเป็นตัวเลข แต่พบค่า "${value}"`);
+      if (!expectedFields || expectedFields.length === 0) {
+        console.warn("No field structure found for enhanceTableId:", enhanceTableId);
+        return { isValid: false, message: "ไม่พบโครงสร้างฟิลด์สำหรับตารางที่เลือก" };
+      }
+      
+      // ตรวจสอบว่ามีฟิลด์ที่จำเป็นหรือไม่
+      const requiredFields = expectedFields.filter(field => field.required).map(field => field.name);
+      const firstRow = data[0];
+      const fileFields = Object.keys(firstRow).map(key => key.toLowerCase());
+      
+      const missingRequiredFields = requiredFields.filter(field => 
+        !fileFields.some(key => key.toLowerCase() === field.toLowerCase())
+      );
+
+      // ตรวจสอบฟิลด์เพิ่มเติมที่มีในไฟล์แต่ไม่มีในโครงสร้าง
+      const expectedFieldNames = expectedFields.map(field => field.name.toLowerCase());
+      const extraFields = fileFields.filter(field => 
+        !expectedFieldNames.some(name => name === field.toLowerCase())
+      );
+
+      // สร้างข้อมูลเปรียบเทียบฟิลด์
+      const fieldComparison = {
+        requiredFields: requiredFields,
+        missingFields: missingRequiredFields,
+        extraFields: extraFields
+      };
+
+      if (missingRequiredFields.length > 0) {
+        return { 
+          isValid: false, 
+          message: `ไฟล์ไม่มีฟิลด์ที่จำเป็น: ${missingRequiredFields.join(', ')}`,
+          fieldComparison
+        };
+      }
+
+      // ตรวจสอบประเภทข้อมูล
+      const typeErrors: string[] = [];
+      const numericTypes = ['decimal', 'float', 'int'];
+      const dateTypes = ['date'];
+
+      for (let i = 0; i < Math.min(data.length, 5); i++) { // ตรวจสอบ 5 แถวแรก
+        const row = data[i];
+        
+        // ตรวจสอบประเภทข้อมูลของทุกฟิลด์
+        expectedFields.forEach(field => {
+          // ตรวจสอบฟิลด์ตัวเลข
+          if (numericTypes.includes(field.type)) {
+            const value = row[field.name];
+            if (value !== undefined && value !== null && value !== '') {
+              if (isNaN(Number(value))) {
+                typeErrors.push(`แถวที่ ${i+1}, ฟิลด์ ${field.name} ควรเป็นตัวเลข แต่พบค่า "${value}"`);
+              }
             }
           }
-        }
-      });
-    }
+          
+          // ตรวจสอบฟิลด์วันที่ (เพิ่มเติม)
+          if (dateTypes.includes(field.type)) {
+            const value = row[field.name];
+            if (value !== undefined && value !== null && value !== '') {
+              const dateValue = new Date(value);
+              if (isNaN(dateValue.getTime())) {
+                typeErrors.push(`แถวที่ ${i+1}, ฟิลด์ ${field.name} ควรเป็นวันที่ แต่พบค่า "${value}"`);
+              }
+            }
+          }
+        });
 
-    if (typeErrors.length > 0) {
+        if (typeErrors.length > 10) break; // จำกัดจำนวนข้อผิดพลาดที่แสดง
+      }
+
+      if (typeErrors.length > 0) {
+        return { 
+          isValid: false, 
+          message: `พบข้อผิดพลาดในการตรวจสอบประเภทข้อมูล:\n${typeErrors.slice(0, 5).join('\n')}${typeErrors.length > 5 ? '\n...และอื่นๆ อีก ' + (typeErrors.length - 5) + ' ข้อผิดพลาด' : ''}`,
+          fieldComparison
+        };
+      }
+
+      // ตรวจสอบความสมบูรณ์ของข้อมูล
+      const dataErrors: string[] = [];
+      for (let i = 0; i < Math.min(data.length, 10); i++) { // ตรวจสอบ 10 แถวแรก
+        const row = data[i];
+        
+        // ตรวจสอบว่าฟิลด์ที่จำเป็นมีค่าหรือไม่
+        requiredFields.forEach(fieldName => {
+          const value = row[fieldName];
+          if (value === undefined || value === null || value === '') {
+            dataErrors.push(`แถวที่ ${i+1}, ฟิลด์ ${fieldName} จำเป็นต้องมีค่า`);
+          }
+        });
+
+        if (dataErrors.length > 10) break; // จำกัดจำนวนข้อผิดพลาดที่แสดง
+      }
+
+      if (dataErrors.length > 0) {
+        return { 
+          isValid: false, 
+          message: `พบข้อผิดพลาดในข้อมูล:\n${dataErrors.slice(0, 5).join('\n')}${dataErrors.length > 5 ? '\n...และอื่นๆ อีก ' + (dataErrors.length - 5) + ' ข้อผิดพลาด' : ''}`,
+          fieldComparison
+        };
+      }
+
+      return { isValid: true, fieldComparison };
+    } catch (error) {
+      console.error("Error validating data:", error);
       return { 
         isValid: false, 
-        message: `พบข้อผิดพลาดในการตรวจสอบประเภทข้อมูล:\n${typeErrors.slice(0, 5).join('\n')}${typeErrors.length > 5 ? '\n...และอื่นๆ อีก ' + (typeErrors.length - 5) + ' ข้อผิดพลาด' : ''}`,
-        fieldComparison
+        message: `เกิดข้อผิดพลาดในการตรวจสอบข้อมูล: ${error instanceof Error ? error.message : 'ข้อผิดพลาดที่ไม่ทราบสาเหตุ'}`
       };
     }
-
-    return { isValid: true, fieldComparison };
   };
 
   /**
@@ -359,20 +451,40 @@ export default function EnhanceTableUpload() {
       // Parse file based on type
       if (file.type === "text/csv") {
         data = await parseCSV(file);
-      } else {
+      } else if (file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
         data = await parseExcel(file);
+      } else {
+        throw new Error("Unsupported file type. Please upload a CSV or Excel file.");
       }
       
-      // Validate data
-      const validation = validateData(data, enhanceTable);
+      if (!data || data.length === 0) {
+        throw new Error("ไม่พบข้อมูลในไฟล์หรือไฟล์ว่างเปล่า");
+      }
+      
+      // ตรวจสอบความครบถ้วนของข้อมูลที่จำเป็นก่อนตรวจสอบความถูกต้อง
+      const isDataComplete = enhanceTable !== "" && periodId !== "";
+      setIsDataComplete(isDataComplete);
       
       // Create preview data
       const headers = data.length > 0 ? Object.keys(data[0]) : [];
       const previewRows = data.slice(0, 5); // Show first 5 rows
       
-      // ตรวจสอบความครบถ้วนของข้อมูลที่จำเป็นก่อนแสดง preview
-      const isDataComplete = enhanceTable !== "" && periodId !== "";
-      setIsDataComplete(isDataComplete);
+      // ถ้าข้อมูลครบถ้วน ให้ตรวจสอบความถูกต้องของข้อมูล
+      let validation = { isValid: true };
+      if (isDataComplete) {
+        console.log("Validating data with enhanceTable:", enhanceTable);
+        validation = await validateData(data, enhanceTable);
+        console.log("Validation result:", validation);
+      }
+      
+      // ตรวจสอบจำนวนแถวข้อมูล
+      if (data.length > 1000) {
+        showToast(
+          "Warning",
+          `ไฟล์มีข้อมูลจำนวนมาก (${data.length} แถว) อาจใช้เวลาในการอัปโหลดและประมวลผล`,
+          "warning"
+        );
+      }
       
       setPreviewData({
         headers,
@@ -382,6 +494,15 @@ export default function EnhanceTableUpload() {
         fieldComparison: validation.fieldComparison,
         showPreview: isDataComplete
       });
+      
+      // แสดงข้อความแจ้งเตือนถ้าข้อมูลไม่ครบถ้วน
+      if (!isDataComplete) {
+        showToast(
+          "Info",
+          "กรุณาเลือกช่วงเวลาและตาราง EnhanceTable เพื่อตรวจสอบความถูกต้องของข้อมูล",
+          "warning"
+        );
+      }
       
     } catch (error) {
       console.error("Error processing file:", error);
@@ -434,18 +555,25 @@ export default function EnhanceTableUpload() {
       
       // อัปเดต preview data ถ้ามีข้อมูลอยู่แล้ว
       if (previewData) {
-        setPreviewData({
-          ...previewData,
-          showPreview: isComplete
-        });
-        
         // ถ้าข้อมูลครบถ้วนและมีการเลือกตาราง EnhanceTable ใหม่ ให้ตรวจสอบข้อมูลใหม่
         if (isComplete) {
-          processFile(selectedFile);
+          // ใช้ setTimeout เพื่อหลีกเลี่ยงการเรียกใช้ processFile บ่อยเกินไป
+          const timer = setTimeout(() => {
+            processFile(selectedFile);
+          }, 300);
+          
+          // ทำความสะอาด timer เมื่อ component unmount หรือ dependencies เปลี่ยน
+          return () => clearTimeout(timer);
+        } else {
+          // ถ้าข้อมูลยังไม่ครบถ้วน เพียงแค่อัปเดตสถานะการแสดง preview
+          setPreviewData({
+            ...previewData,
+            showPreview: isComplete
+          });
         }
       }
     }
-  }, [enhanceTable, periodId]);
+  }, [enhanceTable, periodId, selectedFile, previewData]);
 
   /**
    * จัดการเมื่อผู้ใช้กดปุ่มอัปโหลด
@@ -472,41 +600,48 @@ export default function EnhanceTableUpload() {
       return;
     }
 
-    // ตรวจสอบว่ามี token หรือไม่
-    const token = localStorage.getItem('token');
-    if (!token) {
+    // ตรวจสอบสิทธิ์การเพิ่มข้อมูล
+    if (!hasAddPermission()) {
       showToast(
-        "ไม่พบข้อมูลการเข้าสู่ระบบ",
-        "กรุณาเข้าสู่ระบบใหม่อีกครั้ง",
+        "ไม่มีสิทธิ์",
+        "คุณไม่มีสิทธิ์ในการอัปโหลดข้อมูล",
         "error"
       );
       return;
     }
 
     setIsUploading(true);
+    
     // สร้าง FormData สำหรับส่งข้อมูลแบบ multipart/form-data
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("periodId", periodId);
     formData.append("enhanceTableId", enhanceTable);
+    
+    // เพิ่มข้อมูลวันที่เริ่มต้นและสิ้นสุด (ถ้ามี)
+    if (startDate && endDate) {
+      formData.append("startDate", startDate);
+      formData.append("endDate", endDate);
+    }
 
     try {
-      // ใช้ API_BASE_URL เพื่อให้ตรงกับ endpoint จริง
       // ตรวจสอบประเภทไฟล์และเลือก endpoint ที่เหมาะสม
       const endpoint = selectedFile.type === "text/csv" ? "upload-enhance-csv" : "upload-enhance-excel";
       console.log(`Uploading to endpoint: ${API_BASE_URL}/upload/${endpoint}`);
       
       const response = await fetch(`${API_BASE_URL}/upload/${endpoint}`, {
         method: "POST",
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
         credentials: 'include', // ส่ง cookies ไปด้วย
         body: formData,
       });
 
+      // ตรวจสอบสถานะการตอบกลับ
       if (response.ok) {
-        showToast("สำเร็จ", "อัปโหลดไฟล์เรียบร้อยแล้ว", "success");
+        const responseData = await response.json().catch(() => ({}));
+        const successMessage = responseData.message || "อัปโหลดไฟล์เรียบร้อยแล้ว";
+        
+        showToast("สำเร็จ", successMessage, "success");
+        
         // รีเซ็ตฟอร์มหลังจากอัปโหลดสำเร็จ
         setSelectedFile(null);
         setPeriodId("");
@@ -515,19 +650,49 @@ export default function EnhanceTableUpload() {
         setEndDate("");
         setEnhanceTable("");
         setPreviewData(null);
+        setIsDataComplete(false);
+        
         // รีเซ็ต file input
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
       } else {
-        const errorData = await response.json().catch(() => ({ message: `เกิดข้อผิดพลาด: ${response.status} ${response.statusText}` }));
-        throw new Error(errorData.message || "การอัปโหลดล้มเหลว");
+        // จัดการกรณีเกิดข้อผิดพลาด
+        let errorMessage = "การอัปโหลดล้มเหลว";
+        
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || `เกิดข้อผิดพลาด: ${response.status} ${response.statusText}`;
+        } catch (jsonError) {
+          errorMessage = `เกิดข้อผิดพลาด: ${response.status} ${response.statusText}`;
+        }
+        
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error("Error uploading file:", error);
       showToast("ข้อผิดพลาด", `การอัปโหลดไฟล์ล้มเหลว: ${error instanceof Error ? error.message : 'ข้อผิดพลาดที่ไม่ทราบสาเหตุ'}`, "error");
     } finally {
       setIsUploading(false);
+    }
+  };
+  
+  /**
+   * ฟังก์ชันสำหรับรีเซ็ตฟอร์ม
+   */
+  const resetForm = () => {
+    setSelectedFile(null);
+    setPeriodId("");
+    setSelectedPeriodInfo(null);
+    setStartDate("");
+    setEndDate("");
+    setEnhanceTable("");
+    setPreviewData(null);
+    setIsDataComplete(false);
+    
+    // รีเซ็ต file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 

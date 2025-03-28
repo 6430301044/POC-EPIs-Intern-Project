@@ -1,10 +1,12 @@
 import sql from "mssql";
 import { connectToDB } from "../../db/dbConfig";
 
-export const getAllUploadedFiles = async () => {
+export const getAllUploadedFiles = async (req: Request, res: Response) => {
   try {
+    const pool = await connectToDB();
+    
     const result = await pool.request().query(`
-                SELECT 
+      SELECT 
                     uf.*,
                     u.User_name as uploaded_by_username,
                     y.year,
@@ -18,34 +20,17 @@ export const getAllUploadedFiles = async () => {
                 LEFT JOIN dbo.Semiannual s ON dp.semiannual_id = s.semiannual_id
                 LEFT JOIN dbo.Mcategories mc ON uf.main_id = mc.main_id
                 LEFT JOIN dbo.SbCategories sc ON uf.sub_id = sc.sub_id
-            `);
-    return result.recordset;
-  } catch (error) {
-    throw error;
-  }
-};
+    `);
 
-export const getUploadedFileById = async (id: number) => {
-  try {
-    const result = await connectToDB.input("upload_id", sql.Int, id).query(`
-                SELECT 
-                    uf.*,
-                    u.username as uploaded_by_username,
-                    y.year_value,
-                    dp.period_name,
-                    mc.main_name,
-                    sc.sub_name
-                FROM UploadedFiles uf
-                LEFT JOIN Users u ON uf.uploaded_by = u.User_id
-                LEFT JOIN Years y ON uf.year_id = y.year_id
-                LEFT JOIN Daysperiod dp ON uf.period_id = dp.period_id
-                LEFT JOIN Mcategories mc ON uf.main_id = mc.main_id
-                LEFT JOIN SbCategories sc ON uf.sub_id = sc.sub_id
-                WHERE uf.upload_id = @upload_id
-            `);
+    res.status(200).json({
+      success: true,
+      data: result.recordset
+    });
+    return;
 
-    return result.recordset[0];
   } catch (error) {
-    throw error;
+    console.error("Error fetching UploadedFiles Table:", error);
+    res.status(500).json({ message: "Error fetching UploadedFiles Table", error: error.message });
+    return;
   }
 };

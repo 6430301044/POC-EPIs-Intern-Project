@@ -187,7 +187,7 @@ export default function Visualization() {
   const [subCategories, setSubCategories] = useState<{ subName: string }[]>([]);
   const [stations, setStations] = useState<{ stationName: string }[]>([]);
   const [years, setYears] = useState<{ year: number }[]>([]);
-  const [semiannual, setSemiannuals] = useState<{ semiannual: string }[]>([]);
+  const [semiannualName, setSemiannualsName] = useState<{ semiannualName: string }[]>([]);
   
   // Column selection states
   const [columns, setColumns] = useState<string[]>([]);
@@ -200,7 +200,7 @@ export default function Visualization() {
     mainCategory: "",
     subCategory: "",
     stationName: "",
-    semiannual: "",
+    semiannualName: "",
     year: "",
   });
 
@@ -227,18 +227,18 @@ export default function Visualization() {
     if (filters.mainCategory && filters.subCategory) {
       fetchStations(filters.mainCategory, filters.subCategory).then(setStations);
       fetchYears(filters.mainCategory, filters.subCategory).then(setYears);
-      fetchSemiannuals(filters.mainCategory, filters.subCategory).then(setSemiannuals);
+      fetchSemiannuals(filters.mainCategory, filters.subCategory).then(setSemiannualsName);
       fetchColumns(filters.mainCategory, filters.subCategory).then(columns => {
         // Filter out non-data columns
         const dataColumns = columns.filter(col => 
-          !['id', 'station_id', 'period_id', 'stationName', 'year', 'semiannual', 'createdAt', 'updatedAt'].includes(col)
+          !['id', 'station_id', 'period_id', 'stationName', 'year', 'semiannual','semiannualName', 'createdAt', 'updatedAt'].includes(col)
         );
         setColumns(dataColumns);
       });
     } else {
       setStations([]);
       setYears([]);
-      setSemiannuals([]);
+      setSemiannualsName([]);
       setColumns([]);
     }
   }, [filters.mainCategory, filters.subCategory]);
@@ -280,7 +280,7 @@ export default function Visualization() {
         filters.subCategory,
         {
           stationName: filters.stationName,
-          semiannual: filters.semiannual,
+          semiannualName: filters.semiannualName,
           year: filters.year,
         }
       );
@@ -624,11 +624,11 @@ export default function Visualization() {
 
             {/* Semiannual */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">ครึ่งปี</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">รอบการเก็บข้อมูล</label>
                 <Select
-                options={semiannual.map(semi => ({ value: semi.semiannual, label: semi.semiannual }))}
-                onChange={(option) => setFilters({ ...filters, semiannual: option?.value || "" })}
-                placeholder="เลือกครึ่งปี (ไม่บังคับ)"
+                options={semiannualName.map(semi => ({ value: semi.semiannualName, label: semi.semiannualName }))}
+                onChange={(option) => setFilters({ ...filters, semiannualName: option?.value || "" })}
+                placeholder="เลือกรอบการเก็บข้อมูล (ไม่บังคับ)"
                 isDisabled={!filters.subCategory}
                 isClearable
                 className="text-sm"

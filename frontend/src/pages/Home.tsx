@@ -16,9 +16,9 @@ export default function Home() {
       <div id="secondSection">
         <SecondSection />
       </div>
-      <div id="thirdSection">
+      {/* <div id="thirdSection">
         <ThirdSection /> 
-      </div>
+      </div> */}
       <div id="fourSection">
         <FourSection />
       </div>

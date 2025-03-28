@@ -89,7 +89,7 @@ export default function UploadCenter() {
           <span>จัดการข้อมูลอ้างอิง</span>
         </button>
 
-        <button
+        {/* <button
           onClick={() => setActiveTab("enhance-table")}
           className={`px-6 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 ${
             activeTab === "enhance-table"
@@ -110,7 +110,7 @@ export default function UploadCenter() {
             />
           </svg>
           <span>อัปโหลดตาราง Enhance</span>
-        </button>
+        </button> */}
       </div>
 
       {/* Content Area with Animation */}
@@ -126,7 +126,7 @@ export default function UploadCenter() {
           {activeTab === "upload" && <Upload />}
           {activeTab === "reference-upload" && <ReferenceDataUpload />}
           {activeTab === "reference-management" && <ReferenceDataManagement />}
-          {activeTab === "enhance-table" && <EnhanceTableUpload />}
+          {/* {activeTab === "enhance-table" && <EnhanceTableUpload />} */}
         </motion.div>
       </div>
     </Container>
