@@ -218,7 +218,7 @@ router.get("/semiannuals", async (req, res) => {
 
     const pool = await connectToDB();
     const result = await pool.request()
-      .query(`SELECT DISTINCT s.semiannual FROM dbo.Semiannual s
+      .query(`SELECT DISTINCT s.semiannual, s.semiannualName FROM dbo.Semiannual s
                 JOIN dbo.Daysperiod dp ON s.semiannual_id = dp.semiannual_id
                 JOIN dbo.${tableName} t ON dp.period_id = t.period_id;`);
 

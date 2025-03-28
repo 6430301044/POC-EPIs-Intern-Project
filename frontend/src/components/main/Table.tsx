@@ -104,7 +104,7 @@ const getTableIdentifier = (subCategory: string): string => {
   const [subCategories, setSubCategories] = useState<string[]>([]);
   const [stations, setStations] = useState<string[]>([]);
   const [years, setYears] = useState<number[]>([]);
-  const [semiannuals, setSemiannuals] = useState<string[]>([]);
+  const [semiannualName, setSemiannualsName] = useState<string[]>([]);
 
   const exportToCSV = () => {
     if (paginatedData.length === 0) {
@@ -133,7 +133,7 @@ const getTableIdentifier = (subCategory: string): string => {
     mainCategory: "",
     subCategory: "",
     stationName: "",
-    semiannual: "",
+    semiannualName: "",
     year: "",
   });
 
@@ -169,12 +169,12 @@ const getTableIdentifier = (subCategory: string): string => {
       );
       fetchYears(filters.mainCategory, filters.subCategory).then(setYears);
       fetchSemiannuals(filters.mainCategory, filters.subCategory).then(
-        setSemiannuals
+        setSemiannualsName
       );
     } else {
       setStations([]);
       setYears([]);
-      setSemiannuals([]);
+      setSemiannualsName([]);
     }
   }, [filters.mainCategory, filters.subCategory]);
 
@@ -203,7 +203,7 @@ const getTableIdentifier = (subCategory: string): string => {
       console.log("➡️ Sub Category:", filters.subCategory);
       console.log("➡️ Table Identifier:", tableIdentifier);
       console.log("➡️ Station Name:", filters.stationName);
-      console.log("➡️ Semiannual:", filters.semiannual);
+      console.log("➡️ SemiannualName:", filters.semiannualName);
       console.log("➡️ Year:", filters.year);
       console.log("➡️ Page:", currentPage);
       console.log("➡️ Page Size:", rowsPerPage);
@@ -224,7 +224,7 @@ const getTableIdentifier = (subCategory: string): string => {
         TableIdentifierReceived,
         {
           stationName: filters.stationName,
-          semiannual: filters.semiannual,
+          semiannualName: filters.semiannualName,
           year: filters.year,
           page: currentPage,
           pageSize: rowsPerPage
@@ -387,17 +387,17 @@ const getTableIdentifier = (subCategory: string): string => {
             {/* Semiannual */}
             <select
               className="p-2 border border-gray-300 rounded"
-              value={filters.semiannual}
+              value={filters.semiannualName}
               onChange={(e) =>
-                setFilters({ ...filters, semiannual: e.target.value })
+                setFilters({ ...filters, semiannualName: e.target.value })
               }
               disabled={!filters.subCategory}
             >
               <option value="">เลือกครั้งที่มาเก็บข้อมูล</option>
-              {Array.isArray(semiannuals) &&
-                semiannuals.map((semi, index) => (
-                  <option key={index} value={semi.semiannual}>
-                    {semi.semiannual}
+              {Array.isArray(semiannualName) &&
+                semiannualName.map((semi, index) => (
+                  <option key={index} value={semi.semiannualName}>
+                    {semi.semiannualName}
                   </option>
                 ))}
             </select>
