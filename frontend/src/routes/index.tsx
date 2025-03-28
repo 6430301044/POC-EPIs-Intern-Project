@@ -33,7 +33,6 @@ import DataManagementCenter from "@/pages/admin/DataManagementCenter";
 import SrirachaOil from "@/pages/SrirachaOil";
 import KhaoBoYa from "@/pages/KhaoBoYa";
 import BulkDataDeletion2 from "@/pages/admin/BulkDataDeletion2";
-import Visualization2 from "@/components/main/Visualization2";
 
 const router = createBrowserRouter([
   {
@@ -87,10 +86,6 @@ const router = createBrowserRouter([
       {
         path: "/khaoboya-terminal",
         element: <KhaoBoYa />,
-      },
-      {
-        path: "/visualization-2",
-        element: <Visualization2 />,
       }
     ],
   },
