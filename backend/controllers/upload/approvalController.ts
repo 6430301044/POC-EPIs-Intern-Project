@@ -247,6 +247,75 @@ const getColumnMapping = (subCategory: string): { [key: string]: string } => {
   return mappings[subCategory] || {};
 };
 
+const getColumnMappingEnhTable = (enhanceId: string): { [key: string]: string } => {
+  // Define default column mappings for all enhance tables
+  const defaultMapping = {
+      "station_id": "station_id",
+      "indexName": "indexName",
+  };
+  
+  // Add specific mappings based on enhanceId
+  // This can be expanded based on the specific requirements of each enhance table
+  const specificMappings: { [key: string]: { [key: string]: string } } = {
+      "1": { // WDWS_Calm
+          ...defaultMapping,
+          "calmValue": "calmValue"
+      },
+      "2": { // SO2
+          ...defaultMapping,
+          "day1st_result_ppm": "day1st_result_ppm",
+          "day2nd_result_ppm": "day2nd_result_ppm",
+          "day3rd_result_ppm": "day3rd_result_ppm"
+      },
+      "3": { // NoiseLevelNormal
+          ...defaultMapping,
+          "day1st_result": "day1st_result",
+          "day2nd_result": "day2nd_result",
+          "day3rd_result": "day3rd_result"
+      },
+      "4": { // NoiseLevel90_Average
+          ...defaultMapping,
+          "day1st_result": "day1st_result",
+          "day2nd_result": "day2nd_result",
+          "day3rd_result": "day3rd_result"
+      },
+      "5": { // Monitorresult
+          ...defaultMapping,
+          "day1st_Leq": "day1st_Leq",
+          "day1st_L90": "day1st_L90",
+          "day2nd_Leq": "day2nd_Leq",
+          "day2nd_L90": "day2nd_L90",
+          "day3rd_Leq": "day3rd_Leq",
+          "day3rd_L90": "day3rd_L90"
+      },
+      "6": { // PlanktonPhytos
+          ...defaultMapping,
+          "quantity_per_m3": "quantity_per_m3"
+      },
+      "7": { // PlanktonZoos
+          ...defaultMapping,
+          "quantity_per_m3": "quantity_per_m3"
+      },
+      "8": { // Benthos
+          ...defaultMapping,
+          "quantity_per_m2": "quantity_per_m2"
+      },
+      "9": { // FishLarvaeEggs
+          ...defaultMapping,
+          "quantity_per_1000m3": "quantity_per_1000m3"
+      },
+      "10": { // JuvenileAquaticAnimals
+          ...defaultMapping,
+          "quantity_per_1000m3": "quantity_per_1000m3"
+      }
+  };
+  
+  console.log(`Getting enhance mapping for ID: ${enhanceId}`);
+  console.log(`Mapping found: ${JSON.stringify(specificMappings[enhanceId] || defaultMapping)}`);
+  
+  return specificMappings[enhanceId] || defaultMapping;
+};
+
 // Function to approve an uploaded file
 export const approveUpload = async (req: Request, res: Response) => {
   try {
@@ -273,10 +342,11 @@ export const approveUpload = async (req: Request, res: Response) => {
         .request()
         .input("uploadId", uploadId).query(`
                     SELECT 
-                        upload_id, filename, period_id, main_id, sub_id, 
-                        parsed_data, target_table, column_mapping
-                    FROM dbo.UploadedFiles 
-                    WHERE upload_id = @uploadId AND status = 'รอการอนุมัติ'
+                        u.upload_id, u.filename, u.period_id, u.main_id, u.sub_id, e.enhance_id,
+                        u.parsed_data, u.target_table, u.column_mapping
+                    FROM dbo.UploadedFiles u
+                    JOIN dbo.EnhanceTable e ON e.sub_id = u.sub_id
+                    WHERE u.upload_id = @uploadId AND u.status = 'รอการอนุมัติ'
                 `);
 
       if (uploadResult.recordset.length === 0) {
@@ -300,9 +370,25 @@ export const approveUpload = async (req: Request, res: Response) => {
         .request()
         .input("subId", uploadData.sub_id)
         .query(`SELECT subName FROM dbo.SbCategories WHERE sub_id = @subId`);
+        // console.log(`subCategoryResult: ${JSON.stringify(subCategoryResult)}`);
+        // console.log(`uploadData.sub_id: ${JSON.stringify(uploadData.sub_id)}`);
+
+      const enhTableResult = await transaction
+       .request()
+       .input("enhanceId", uploadData.enhance_id)
+       .query(`SELECT enhance_id FROM dbo.EnhanceTable WHERE enhance_id = @enhanceId`);
+        // console.log(`enhTableResult: ${JSON.stringify(subCategoryResult)}`);
+        // console.log(`uploadData.enhance_id: ${JSON.stringify(uploadData.enhance_id)}`);
 
       const subCategory = subCategoryResult.recordset[0]?.subName || "";
-      const columnMapping = getColumnMapping(subCategory);
+      const enhTable = enhTableResult.recordset[0]?.enhance_id || "";
+      const columnMappingEnvTable = getColumnMapping(subCategory);
+      const columnMappingEnhTable = getColumnMappingEnhTable(enhTable);
+      const isEnvTable = targetTable.startsWith("Env_");
+      const columnMapping =
+        isEnvTable
+          ? columnMappingEnvTable
+          : columnMappingEnhTable;
 
       // Insert the approved data into the target table
       for (const record of parsedData) {
