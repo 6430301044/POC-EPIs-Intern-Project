@@ -104,7 +104,8 @@ const getTableIdentifier = (subCategory: string): string => {
   const [subCategories, setSubCategories] = useState<string[]>([]);
   const [stations, setStations] = useState<string[]>([]);
   const [years, setYears] = useState<number[]>([]);
-  const [semiannualName, setSemiannualsName] = useState<string[]>([]);
+  const [semiannuals, setSemiannuals] = useState<number[]>([]);
+  const [semiannualNames, setSemiannualNames] = useState<{semiannual: string, semiannualName: string}[]>([]);
 
   const exportToCSV = () => {
     if (paginatedData.length === 0) {
@@ -133,6 +134,7 @@ const getTableIdentifier = (subCategory: string): string => {
     mainCategory: "",
     subCategory: "",
     stationName: "",
+    semiannual: "",
     semiannualName: "",
     year: "",
   });
@@ -169,12 +171,23 @@ const getTableIdentifier = (subCategory: string): string => {
       );
       fetchYears(filters.mainCategory, filters.subCategory).then(setYears);
       fetchSemiannuals(filters.mainCategory, filters.subCategory).then(
-        setSemiannualsName
+        (data) => {
+          if (Array.isArray(data)) {
+            // แปลงข้อมูลให้มีทั้ง semiannual และ semiannualName
+            const mappedData = data.map(item => ({
+              semiannual: item.semiannual,
+              semiannualName: item.semiannualName
+            }));
+            setSemiannualNames(mappedData);
+          } else {
+            setSemiannualNames([]);
+          }
+        }
       );
     } else {
       setStations([]);
       setYears([]);
-      setSemiannualsName([]);
+      setSemiannualNames([]);
     }
   }, [filters.mainCategory, filters.subCategory]);
 
@@ -203,6 +216,7 @@ const getTableIdentifier = (subCategory: string): string => {
       console.log("➡️ Sub Category:", filters.subCategory);
       console.log("➡️ Table Identifier:", tableIdentifier);
       console.log("➡️ Station Name:", filters.stationName);
+      console.log("➡️ Semiannual:", filters.semiannual);
       console.log("➡️ SemiannualName:", filters.semiannualName);
       console.log("➡️ Year:", filters.year);
       console.log("➡️ Page:", currentPage);
@@ -224,6 +238,7 @@ const getTableIdentifier = (subCategory: string): string => {
         TableIdentifierReceived,
         {
           stationName: filters.stationName,
+          semiannual: filters.semiannual,
           semiannualName: filters.semiannualName,
           year: filters.year,
           page: currentPage,
@@ -387,16 +402,22 @@ const getTableIdentifier = (subCategory: string): string => {
             {/* Semiannual */}
             <select
               className="p-2 border border-gray-300 rounded"
-              value={filters.semiannualName}
-              onChange={(e) =>
-                setFilters({ ...filters, semiannualName: e.target.value })
-              }
+              value={filters.semiannual}
+              onChange={(e) => {
+                const selectedSemiannual = e.target.value;
+                const selectedItem = semiannualNames.find(item => item.semiannual === selectedSemiannual);
+                setFilters({ 
+                  ...filters, 
+                  semiannual: selectedSemiannual,
+                  semiannualName: selectedItem ? selectedItem.semiannualName : ""
+                });
+              }}
               disabled={!filters.subCategory}
             >
               <option value="">เลือกครั้งที่มาเก็บข้อมูล</option>
-              {Array.isArray(semiannualName) &&
-                semiannualName.map((semi, index) => (
-                  <option key={index} value={semi.semiannualName}>
+              {Array.isArray(semiannualNames) &&
+                semiannualNames.map((semi, index) => (
+                  <option key={index} value={semi.semiannual}>
                     {semi.semiannualName}
                   </option>
                 ))}
