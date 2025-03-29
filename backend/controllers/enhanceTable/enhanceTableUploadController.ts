@@ -142,7 +142,6 @@ const getColumnMapping = (enhanceId: string): { [key: string]: string } => {
     const defaultMapping = {
         "station_id": "station_id",
         "indexName": "indexName",
-        "period_id": "period_id"
     };
     
     // Add specific mappings based on enhanceId
@@ -317,7 +316,7 @@ const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, p
         await transaction.request()
             .input('uploadId', uploadId)
             .input('jsonData', jsonData)
-            .input('tableName', getTableName(enhanceTable.enhanceName))
+            .input('tableName', getTableName(enhanceTable.enhanceTableName))
             .input('columnMapping', JSON.stringify(columnMapping))
             .query(`
                 UPDATE dbo.UploadedFiles 

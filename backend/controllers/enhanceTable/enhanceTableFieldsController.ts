@@ -10,10 +10,11 @@ export const getEnhanceTableFields = async (req: Request, res: Response) => {
         const { enhanceTableId } = req.params;
         
         if (!enhanceTableId) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: "กรุณาระบุ enhanceTableId"
             });
+            return;
         }
         
         // Get the field structure based on enhanceTableId
@@ -24,6 +25,7 @@ export const getEnhanceTableFields = async (req: Request, res: Response) => {
             success: true,
             data: fieldStructure
         });
+        return;
         
     } catch (error) {
         console.error("Error fetching EnhanceTable fields:", error);
@@ -32,6 +34,7 @@ export const getEnhanceTableFields = async (req: Request, res: Response) => {
             message: "เกิดข้อผิดพลาดในการดึงข้อมูลโครงสร้างฟิลด์", 
             error: error.message 
         });
+        return;
     }
 };
 
@@ -43,7 +46,6 @@ const getFieldStructure = (enhanceId: string): { name: string, type: string, req
     const defaultFields = [
         { name: 'station_id', type: 'int', required: true },
         { name: 'indexName', type: 'string', required: true },
-        { name: 'period_id', type: 'string', required: true }
     ];
     
     // Add specific fields based on enhanceId

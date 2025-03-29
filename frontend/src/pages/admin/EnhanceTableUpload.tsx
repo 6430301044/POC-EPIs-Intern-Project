@@ -36,6 +36,7 @@ interface PreviewData {
 // Define interface for EnhanceTable data
 interface EnhanceTable {
   enhance_id: number;
+  enhanceTableName: string;
   enhanceName: string;
   valueName: string;
   sub_id: number;
@@ -261,9 +262,7 @@ export default function EnhanceTableUpload() {
         console.warn("No enhanceTableId provided, returning default fields");
         return [
           { name: 'station_id', type: 'int', required: true },
-          { name: 'indexName', type: 'string', required: true },
-          { name: 'quantity_per_m2', type: 'decimal', required: true },
-          { name: 'remark', type: 'string', required: false }
+          { name: 'indexName', type: 'string', required: true }
         ];
       }
 
@@ -289,9 +288,7 @@ export default function EnhanceTableUpload() {
         // ส่งค่าเริ่มต้นกลับไปในกรณีที่ API ไม่ส่งข้อมูลที่ถูกต้อง
         return [
           { name: 'station_id', type: 'int', required: true },
-          { name: 'indexName', type: 'string', required: true },
-          { name: 'quantity_per_m2', type: 'decimal', required: true },
-          { name: 'remark', type: 'string', required: false }
+          { name: 'indexName', type: 'string', required: true }
         ];
       }
     } catch (error) {
@@ -299,9 +296,7 @@ export default function EnhanceTableUpload() {
       // ส่งค่าเริ่มต้นกลับไปในกรณีที่เกิดข้อผิดพลาด
       return [
         { name: 'station_id', type: 'int', required: true },
-        { name: 'indexName', type: 'string', required: true },
-        { name: 'quantity_per_m2', type: 'decimal', required: true },
-        { name: 'remark', type: 'string', required: false }
+        { name: 'indexName', type: 'string', required: true }
       ];
     }
   };
@@ -442,6 +437,11 @@ export default function EnhanceTableUpload() {
    * Process the selected file and generate preview
    */
   const processFile = async (file: File) => {
+    // ป้องกันการประมวลผลซ้ำถ้ากำลังประมวลผลอยู่แล้ว
+    if (isProcessingFile) {
+      return;
+    }
+    
     setIsProcessingFile(true);
     setPreviewData(null);
     
@@ -486,23 +486,26 @@ export default function EnhanceTableUpload() {
         );
       }
       
-      setPreviewData({
-        headers,
-        rows: previewRows,
-        isValid: validation.isValid,
-        validationMessage: validation.message,
-        fieldComparison: validation.fieldComparison,
-        showPreview: isDataComplete
-      });
-      
-      // แสดงข้อความแจ้งเตือนถ้าข้อมูลไม่ครบถ้วน
-      if (!isDataComplete) {
-        showToast(
-          "Info",
-          "กรุณาเลือกช่วงเวลาและตาราง EnhanceTable เพื่อตรวจสอบความถูกต้องของข้อมูล",
-          "warning"
-        );
-      }
+      // ใช้ setTimeout เพื่อหน่วงเวลาการอัปเดต state เพื่อป้องกันการ re-render ที่เร็วเกินไป
+      setTimeout(() => {
+        setPreviewData({
+          headers,
+          rows: previewRows,
+          isValid: validation.isValid,
+          validationMessage: validation.message,
+          fieldComparison: validation.fieldComparison,
+          showPreview: isDataComplete
+        });
+        
+        // แสดงข้อความแจ้งเตือนถ้าข้อมูลไม่ครบถ้วน
+        if (!isDataComplete) {
+          showToast(
+            "Info",
+            "กรุณาเลือกช่วงเวลาและตาราง EnhanceTable เพื่อตรวจสอบความถูกต้องของข้อมูล",
+            "warning"
+          );
+        }
+      }, 100);
       
     } catch (error) {
       console.error("Error processing file:", error);
@@ -512,7 +515,10 @@ export default function EnhanceTableUpload() {
         "error"
       );
     } finally {
-      setIsProcessingFile(false);
+      // ใช้ setTimeout เพื่อหน่วงเวลาการอัปเดตสถานะการประมวลผล
+      setTimeout(() => {
+        setIsProcessingFile(false);
+      }, 200);
     }
   };
 
@@ -573,7 +579,8 @@ export default function EnhanceTableUpload() {
         }
       }
     }
-  }, [enhanceTable, periodId, selectedFile, previewData]);
+  // ลบ previewData ออกจาก dependencies เพื่อป้องกันการวนลูปไม่สิ้นสุด
+  }, [enhanceTable, periodId, selectedFile]);
 
   /**
    * จัดการเมื่อผู้ใช้กดปุ่มอัปโหลด

@@ -13,7 +13,8 @@ export const getEnhanceTableStructure = async (req: Request, res: Response) => {
         const result = await pool.request()
             .query(`
                 SELECT 
-                    enhance_id, 
+                    enhance_id,
+                    enhanceTableName,
                     enhanceName, 
                     valueName, 
                     sub_id 
