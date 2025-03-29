@@ -11,7 +11,7 @@ import userRoutes from "./userRoutes";
 import newsRoutes from "./newsRoutes";
 import enhanceTableRoutes from "./enhanceTableRoutes";
 import refTableRoutes from "./refTableROutes";
-import uploadTableRoutes from "./uploadTable";
+import filelogRoutes from "./fileLogRoutes";
 
 const router = express.Router();
 
@@ -33,6 +33,6 @@ router.use("/user", userRoutes);
 router.use("/news", newsRoutes);
 router.use("/enhance-table", enhanceTableRoutes);
 router.use("/ref-table", refTableRoutes);
-router.use("/upload-table", uploadTableRoutes);
+router.use("/file-log", filelogRoutes);
 
 export default router;

@@ -114,7 +114,7 @@ export default function BulkDataDeletion2() {
   const fetchUploadedFiles = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/upload-table/`, {
+      const response = await fetch(`${API_BASE_URL}/file-log/uploaded-files`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ export default function BulkDataDeletion2() {
   const fetchReferenceData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/ref-table/pending-approvals`, {
+      const response = await fetch(`${API_BASE_URL}/file-log/reference-data-pending-approval-files`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -186,10 +186,10 @@ export default function BulkDataDeletion2() {
   };
 
   // Handle delete uploaded file by ID
-  const handleDeleteUploadedFileById = async (id: number) => {
+  const handleDeleteUploadedFileById = async (upload_id: number) => {
     try {
-      setDeleteLoading(id);
-      const response = await fetch(`${API_BASE_URL}/upload/uploaded-file/${id}`, {
+      setDeleteLoading(upload_id);
+      const response = await fetch(`${API_BASE_URL}/file-log/uploaded-files/${upload_id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -202,26 +202,26 @@ export default function BulkDataDeletion2() {
       
       if (response.ok && result.success) {
         // Remove deleted file from the list
-        setUploadedFiles(prev => prev.filter(item => item.upload_id !== id));
+        setUploadedFiles(prev => prev.filter(item => item.upload_id !== upload_id));
         setResult({
           success: true,
-          message: `ลบไฟล์รหัส ${id} เรียบร้อยแล้ว`
+          message: `ลบไฟล์รหัส ${upload_id} เรียบร้อยแล้ว`
         });
       } else {
         throw new Error(result.message || 'Failed to delete file');
       }
     } catch (error: any) {
-      setError(error.message || `เกิดข้อผิดพลาดในการลบไฟล์รหัส ${id}`);
+      setError(error.message || `เกิดข้อผิดพลาดในการลบไฟล์รหัส ${upload_id}`);
     } finally {
       setDeleteLoading(null);
     }
   };
 
   // Handle delete reference data by ID
-  const handleDeleteReferenceDataById = async (id: number) => {
+  const handleDeleteReferenceDataById = async (upload_id: number) => {
     try {
-      setDeleteLoading(id);
-      const response = await fetch(`${API_BASE_URL}/upload/reference-data/${id}`, {
+      setDeleteLoading(upload_id);
+      const response = await fetch(`${API_BASE_URL}/file-log/reference-data-pending-approval-files/${upload_id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -234,16 +234,16 @@ export default function BulkDataDeletion2() {
       
       if (response.ok && result.success) {
         // Remove deleted reference data from the list
-        setReferenceData(prev => prev.filter(item => item.upload_id !== id));
+        setReferenceData(prev => prev.filter(item => item.upload_id !== upload_id));
         setResult({
           success: true,
-          message: `ลบข้อมูลอ้างอิงรหัส ${id} เรียบร้อยแล้ว`
+          message: `ลบข้อมูลอ้างอิงรหัส ${upload_id} เรียบร้อยแล้ว`
         });
       } else {
         throw new Error(result.message || 'Failed to delete reference data');
       }
     } catch (error: any) {
-      setError(error.message || `เกิดข้อผิดพลาดในการลบข้อมูลอ้างอิงรหัส ${id}`);
+      setError(error.message || `เกิดข้อผิดพลาดในการลบข้อมูลอ้างอิงรหัส ${upload_id}`);
     } finally {
       setDeleteLoading(null);
     }
@@ -311,7 +311,7 @@ export default function BulkDataDeletion2() {
                   />
                   <span className="ml-2">ข้อมูลข่าว</span>
                 </label>
-                {/* <label className="inline-flex items-center">
+                <label className="inline-flex items-center">
                   <input
                     type="radio"
                     className="form-radio"
@@ -321,8 +321,8 @@ export default function BulkDataDeletion2() {
                     onChange={() => setDataType('uploads')}
                   />
                   <span className="ml-2">ไฟล์ที่อัปโหลด</span>
-                </label> */}
-                {/* <label className="inline-flex items-center">
+                </label>
+                <label className="inline-flex items-center">
                   <input
                     type="radio"
                     className="form-radio"
@@ -332,7 +332,7 @@ export default function BulkDataDeletion2() {
                     onChange={() => setDataType('reference')}
                   />
                   <span className="ml-2">ข้อมูลอ้างอิงรอการอนุมัติ</span>
-                </label> */}
+                </label> 
               </div>
             </div>
             

@@ -1,8 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { getEnhanceTableStructure } from "../controllers/enhanceTable/enhanceTableController";
-import { getEnhanceTableFields } from "../controllers/enhanceTable/enhanceTableFieldsController";
-import { uploadEnhanceCSV, uploadEnhanceExcel } from "../controllers/enhanceTable/enhanceTableUploadController";
+import { getEnhanceTableStructure, getEnhanceTableFields, uploadEnhanceCSV, uploadEnhanceExcel } from "../controllers/enhanceTable/enhanceTableController";
 import { authenticateToken } from "../middleware/authMiddleware";
 
 // Configure multer storage

@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import { uploadCSV, uploadExcel, getPendingApprovals, approveUpload, rejectUpload, deleteDataByPeriod, updateDataByPeriod, getAvailableTables, getPreviewData, uploadReferenceCSV, uploadReferenceExcel, getPendingReferenceApprovals, getPreviewReferenceData, approveReferenceUpload, rejectReferenceUpload } from "../controllers/upload/index";
-import { uploadEnhanceCSV, uploadEnhanceExcel } from "../controllers/enhanceTable/enhanceTableUploadController";
+import { uploadEnhanceCSV, uploadEnhanceExcel } from "../controllers/enhanceTable/enhanceTableController";
 import { getPeriods } from "../controllers/upload/periodController";
 import { getReferenceData, addReferenceData, updateReferenceData, deleteReferenceData } from "../controllers/upload/referenceDataController";
 import { authenticateToken, authorizeRoles } from "../middleware/authMiddleware";

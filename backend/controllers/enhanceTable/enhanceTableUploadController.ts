@@ -205,6 +205,10 @@ const getColumnMapping = (enhanceId: string): { [key: string]: string } => {
 
 /**
  * Save EnhanceTable data for approval process
+ * 
+ * ฟังก์ชันนี้จะบันทึกข้อมูลจากไฟล์ที่อัปโหลดเข้ามาเพื่อรอการอนุมัติ
+ * โดยจะแปลงข้อมูลเป็น JSON และเก็บไว้ในฐานข้อมูล
+ * สำหรับฟิลด์ indexName ที่เป็น NVARCHAR(MAX) จะต้องมีการจัดการพิเศษในขั้นตอนการอนุมัติ
  */
 const saveEnhanceDataForApproval = async (data: any[], enhanceTableId: string, periodId: string, originalFilename: string, systemFilename: string, fileSize: number, mimeType: string, userId: number) => {
     if (!data || data.length === 0) {
