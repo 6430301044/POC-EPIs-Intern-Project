@@ -161,16 +161,16 @@ const WIND_QUALITY_PARAMETERS = [
 
 // Map table names to their ordered parameters
 const TABLE_PARAMETER_MAPPING: Record<string, { column: string, values: string[] }> = {
-  'WDWS': { column: 'windDirection', values: WIND_DIRECTIONS },
-  'AirQuality': { column: 'index_name', values: AIR_QUALITY_INDICES },
-  'Monitorresult': { column: 'timePeriod', values: NOISE_MONITOR_TIME_PERIODS },
-  'NoiseLevelNormal': { column: 'timePeriod', values: NOISE_LEVEL_NORMAL_TIME_PERIODS },
-  'NoiseLevel90': { column: 'timePeriod', values: NOISE_LEVEL_90_TIME_PERIODS },
-  'SeaWater': { column: 'parameter', values: SEA_WATER_PARAMETERS },
-  'WasteWater': { column: 'index_name', values: WASTE_WATER_PARAMETERS },
-  'SO2': { column: 'timePeriod', values: SO2_TIME_PERIODS },
-  'Vocs': { column: 'index_name', values: VOCS_PARAMETERS },
-  'WindQuality': { column: 'parameter', values: WIND_QUALITY_PARAMETERS }
+  'ผลการตรวจวัดทิศทางและความเร็วลมเฉลี่ยรายชั่วโมง': { column: 'windDirection', values: WIND_DIRECTIONS },
+  'ผลการตรวจวัดคุณภาพอากาศภายในสถานประกอบการ': { column: 'index_name', values: AIR_QUALITY_INDICES },
+  'ผลการติดตามตรวจสอบ': { column: 'timePeriod', values: NOISE_MONITOR_TIME_PERIODS },
+  'ผลการตรวจวัดระดับเสียงโดยทั่วไป': { column: 'timePeriod', values: NOISE_LEVEL_NORMAL_TIME_PERIODS },
+  'ผลการตรวจวัดคุณภาพเสียง 90': { column: 'timePeriod', values: NOISE_LEVEL_90_TIME_PERIODS },
+  'ผลการตรวจวัดคุณภาพน้ำทะเล': { column: 'parameter', values: SEA_WATER_PARAMETERS },
+  'ผลการตรวจวัดคุณภาพน้ำทิ้ง': { column: 'index_name', values: WASTE_WATER_PARAMETERS },
+  'ผลการตรวจวัดค่าความเข้มข้นของก๊าซซัลเฟอร์ไดออกไซด์ในบรรยากาศ': { column: 'timePeriod', values: SO2_TIME_PERIODS },
+  'ผลการตรวจวัดสารอินทรีย์ระเหยง่ายในบรรยากาศ': { column: 'index_name', values: VOCS_PARAMETERS },
+  'ผลการตรวจวัดคุณภาพอากาศในบรรยากาศ': { column: 'parameter', values: WIND_QUALITY_PARAMETERS }
 };
 
 // Function to process ordered data for any table

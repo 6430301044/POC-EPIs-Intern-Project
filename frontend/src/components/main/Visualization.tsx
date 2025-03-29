@@ -579,7 +579,7 @@ export default function Visualization() {
                 onChange={(option) => setFilters({ ...filters, mainCategory: option?.value || "", subCategory: "" })}
                 placeholder="เลือกประเภทหลัก"
                 isClearable
-                className="text-sm"
+                className="text-sm dark:text-black"
                 />
             </div>
 
@@ -592,7 +592,7 @@ export default function Visualization() {
                 placeholder="เลือกประเภทย่อย"
                 isDisabled={!filters.mainCategory}
                 isClearable
-                className="text-sm"
+                className="text-sm dark:text-black"
                 />
             </div>
 
@@ -605,7 +605,7 @@ export default function Visualization() {
                 placeholder="เลือกสถานี (ไม่บังคับ)"
                 isDisabled={!filters.subCategory}
                 isClearable
-                className="text-sm"
+                className="text-sm dark:text-black"
                 />
             </div>
 
@@ -618,7 +618,7 @@ export default function Visualization() {
                 placeholder="เลือกปี (ไม่บังคับ)"
                 isDisabled={!filters.subCategory}
                 isClearable
-                className="text-sm"
+                className="text-sm dark:text-black"
                 />
             </div>
 
@@ -631,7 +631,7 @@ export default function Visualization() {
                 placeholder="เลือกรอบการเก็บข้อมูล (ไม่บังคับ)"
                 isDisabled={!filters.subCategory}
                 isClearable
-                className="text-sm"
+                className="text-sm dark:text-black"
                 />
             </div>
 
@@ -648,7 +648,7 @@ export default function Visualization() {
                 ]}
                 onChange={(option) => setChartType(option?.value as ChartType || 'bar')}
                 defaultValue={{ value: 'bar', label: 'กราฟแท่ง' }}
-                className="text-sm"
+                className="text-sm dark:text-black"
                 />
             </div>
             </div>
@@ -663,7 +663,7 @@ export default function Visualization() {
                 placeholder="เลือกตัวแปรสำหรับแกน X"
                 isDisabled={!filters.subCategory}
                 isClearable
-                className="text-sm"
+                className="text-sm dark:text-black"
                 />
             </div>
 
@@ -676,7 +676,7 @@ export default function Visualization() {
                 placeholder="เลือกตัวแปรสำหรับแกน Y"
                 isDisabled={!filters.subCategory}
                 isClearable
-                className="text-sm"
+                className="text-sm dark:text-black"
                 />
             </div>
             </div>
@@ -689,7 +689,7 @@ export default function Visualization() {
                 type="text"
                 value={chartTitle}
                 onChange={(e) => setChartTitle(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                className="w-full p-2 border border-gray-300 rounded-md text-sm dark:text-black"
                 placeholder="ชื่อกราฟ"
                 />
             </div>
@@ -701,7 +701,7 @@ export default function Visualization() {
                 type="text"
                 value={xAxisLabel}
                 onChange={(e) => setXAxisLabel(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                className="w-full p-2 border border-gray-300 rounded-md text-sm dark:text-black"
                 placeholder="ชื่อแกน X"
                 />
             </div>
@@ -713,7 +713,7 @@ export default function Visualization() {
                 type="text"
                 value={yAxisLabel}
                 onChange={(e) => setYAxisLabel(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                className="w-full p-2 border border-gray-300 rounded-md text-sm dark:text-black"
                 placeholder="ชื่อแกน Y"
                 />
             </div>
@@ -725,7 +725,7 @@ export default function Visualization() {
                 type="color"
                 value={chartColor}
                 onChange={(e) => setChartColor(e.target.value)}
-                className="w-full p-1 h-10 border border-gray-300 rounded-md"
+                className="w-full p-1 h-10 border border-gray-300 rounded-md dark:text-black"
                 />
             </div>
             </div>
@@ -747,13 +747,13 @@ export default function Visualization() {
                 id="showLegend"
                 checked={showLegend}
                 onChange={(e) => setShowLegend(e.target.checked)}
-                className="mr-2"
+                className="mr-2 dark:text-black"
             />
             <label htmlFor="showLegend" className="text-sm text-gray-700">แสดงคำอธิบาย</label>
             </div>
 
             {/* Chart Display */}
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 dark:text-black">
             {data.length > 0 ? (
                 renderChart()
             ) : (
